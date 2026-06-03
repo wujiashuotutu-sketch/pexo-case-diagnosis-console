@@ -822,7 +822,7 @@ function applyHighlight(){
 }
 
 /* ═══ Skills Tree ═══ */
-const ADMIN_TOKEN='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMDY4MjM2ZmItZjU4Yy00MzhjLTkxOGMtMTUzYjRhMzkxOGY0IiwiZW1haWwiOiIwNjgyMzZmYi1mNThjLTQzOGMtOTE4Yy0xNTNiNGEzOTE4ZjRAb2F1dGgiLCJ0eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzgwNDgxNDc4LCJpYXQiOjE3ODA0NzQyNzh9.t8odE-Bf3QoDvpu3CSD576tPfLMPdvwOdwSefcw7oI0';
+let stAdminToken='';
 
 async function loadSkillsTree(caseId){
   const panel=$('stPanel');
@@ -831,10 +831,11 @@ async function loadSkillsTree(caseId){
   panel.classList.add('loading');
   panel.classList.remove('collapsed');
   try{
-    const r=await fetch(`${API}/api/cases/${encodeURIComponent(caseId)}/skills-tree?token=${encodeURIComponent(ADMIN_TOKEN)}`);
+    const qs=stAdminToken?`?token=${encodeURIComponent(stAdminToken)}`:'';
+    const r=await fetch(`${API}/api/cases/${encodeURIComponent(caseId)}/skills-tree${qs}`);
     const d=await r.json();
     if(d.error)throw new Error(d.error);
-    renderSkillsTree(d.tree);
+    renderSkillsTree(d);
   }catch(e){
     body.innerHTML=`<div class="st-no-data" style="color:var(--rose)">${H(e.message)}</div>`;
   }finally{
@@ -842,37 +843,69 @@ async function loadSkillsTree(caseId){
   }
 }
 
-function renderSkillsTree(tree){
+function fmtPct(sk){
+  if(sk.aggPct===-1)return `${sk.aggReadLines}行`;
+  return sk.aggPct+'%';
+}
+function pctVal(sk){return sk.aggPct===-1?Math.min(95,Math.max(10,sk.aggReadLines/2)):sk.aggPct}
+function pctColor(v){return v>=60?'var(--green)':v>=20?'var(--gold)':'var(--orange)'}
+
+function renderSkillsTree(data){
   const body=$('stBody');
-  if(!tree||!tree.length){body.innerHTML='<div class="st-no-data">未找到 Skill 读取记录</div>';return}
+  const tree=data.tree||[];
+  const rounds=data.rounds||[];
+  if(!tree.length){body.innerHTML='<div class="st-no-data">未找到 Skill 读取记录</div>';return}
 
   const skillPhaseIcons={
     'brainstorm-skill':'💡','script-skill':'🎬','subject-asset-skill':'🎨',
     'generation-skill':'⚡','assembly-skill':'🔧','modification-skill':'🔄','publishing-skill':'📦'
   };
 
-  let totalSkills=tree.length;
-  let totalReadRefs=tree.reduce((s,sk)=>s+(sk.readRefCount||0),0);
-  let totalAllRefs=tree.reduce((s,sk)=>s+(sk.allRefCount||sk.refs.length),0);
-  let totalReadLines=tree.reduce((s,sk)=>s+(sk.aggReadLines||0),0);
-  let totalAllLines=tree.reduce((s,sk)=>s+(sk.aggTotalLines||0),0);
-  let totalPct=totalAllLines>0?Math.round(totalReadLines/totalAllLines*100):0;
-  $('stBadge').textContent=`${totalPct}% · ${totalReadRefs}/${totalAllRefs} files`;
+  const totalReadRefs=tree.reduce((s,sk)=>s+(sk.readRefCount||0),0);
+  const totalAllRefs=tree.reduce((s,sk)=>s+(sk.allRefCount||sk.refs.length),0);
+  const totalReadLines=tree.reduce((s,sk)=>s+(sk.aggReadLines||0),0);
+  const totalAllLines=tree.reduce((s,sk)=>s+(sk.aggTotalLines||0),0);
+  const totalPct=totalAllLines>0?Math.round(totalReadLines/totalAllLines*100):null;
+  const badgeLabel=totalPct!==null?`${totalPct}%`:`${totalReadLines}行`;
+  $('stBadge').textContent=`${badgeLabel} · ${totalReadRefs}/${totalAllRefs} files`;
+  if(!data.adminAvailable)$('stBadge').title='基于 trace 数据估算（Admin API 不可用）';
 
-  // Summary bar chart — use line-level coverage
+  // Summary bar chart
   let html='<div style="padding:8px 14px 4px;display:flex;gap:4px;align-items:flex-end;height:48px">';
   for(const sk of tree){
-    const pct=sk.aggPct||0;
-    const barH=Math.max(4,Math.round(pct*0.36));
-    const color=pct>=60?'var(--green)':pct>=20?'var(--gold)':'var(--orange)';
+    const v=pctVal(sk);const barH=Math.max(4,Math.round(v*0.36));const c=pctColor(v);
     const label=sk.skill.replace('-skill','');
     html+=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">`;
-    html+=`<div style="font-size:7px;font-family:var(--mono);color:${color};font-weight:600">${pct}%</div>`;
-    html+=`<div style="width:100%;height:${barH}px;background:${color};border-radius:2px;opacity:.6"></div>`;
+    html+=`<div style="font-size:7px;font-family:var(--mono);color:${c};font-weight:600">${fmtPct(sk)}</div>`;
+    html+=`<div style="width:100%;height:${barH}px;background:${c};border-radius:2px;opacity:.6"></div>`;
     html+=`<div style="font-size:7px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center">${H(label)}</div>`;
     html+=`</div>`;
   }
   html+='</div>';
+
+  // ── Rounds view ──
+  if(rounds.length>0){
+    html+=`<div style="padding:6px 14px 2px;font-size:9px;color:var(--t2);font-weight:700;letter-spacing:.5px;border-top:1px solid var(--line);margin-top:6px">对话轮次</div>`;
+    for(const rd of rounds){
+      const msg=rd.userMessage||'';
+      const shortMsg=msg.length>60?msg.slice(0,60)+'…':msg;
+      html+=`<div style="padding:4px 14px 6px;border-bottom:1px solid rgba(255,255,255,.04)">`;
+      html+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">`;
+      html+=`<span style="font-size:8px;background:var(--cyan);color:var(--bg);border-radius:4px;padding:1px 5px;font-weight:800">R${rd.round}</span>`;
+      if(shortMsg)html+=`<span style="font-size:8px;color:var(--t3);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${H(msg)}">${H(shortMsg)}</span>`;
+      html+=`</div>`;
+      html+=`<div style="display:flex;gap:4px;flex-wrap:wrap">`;
+      for(const s of rd.skills){
+        const ic=skillPhaseIcons[s.skill]||'📘';const v=s.aggPct===-1?Math.min(95,Math.max(10,s.aggReadLines/2)):s.aggPct;
+        const c=pctColor(v);const label=s.aggPct===-1?`${s.aggReadLines}行`:`${s.aggPct}%`;
+        html+=`<span style="font-size:8px;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);display:inline-flex;align-items:center;gap:3px">${ic}<span style="color:var(--t1)">${s.skill.replace('-skill','')}</span><span style="color:${c};font-weight:700">${label}</span><span style="color:var(--t3)">${s.readRefCount}/${s.allRefCount}</span></span>`;
+      }
+      html+=`</div></div>`;
+    }
+  }
+
+  // ── Skills detail ──
+  html+=`<div style="padding:6px 14px 2px;font-size:9px;color:var(--t2);font-weight:700;letter-spacing:.5px;border-top:1px solid var(--line);margin-top:4px">技能详情</div>`;
   for(const sk of tree){
     const icon=skillPhaseIcons[sk.skill]||'📘';
     const readRefs=sk.refs.filter(r=>r.wasRead);
@@ -880,14 +913,13 @@ function renderSkillsTree(tree){
     const allRefs=[...readRefs,...unreadRefs];
     const hasRefs=allRefs.length>0;
     const openCls=hasRefs?'open':'';
-    const aggPct=sk.aggPct||0;
-    const aggColor=aggPct>=60?'var(--green)':aggPct>=20?'var(--gold)':'var(--orange)';
+    const v=pctVal(sk);const aggColor=pctColor(v);
 
     html+=`<div class="st-skill ${openCls}">`;
     html+=`<div class="st-skill-hdr" onclick="this.parentElement.classList.toggle('open')">`;
     html+=`<span class="st-skill-ic">${icon}</span>`;
     html+=`<span class="st-skill-name">${H(sk.skill)}</span>`;
-    html+=`<span class="st-skill-meta" style="color:${aggColor}">${aggPct}% · ${sk.readRefCount}/${sk.allRefCount}</span>`;
+    html+=`<span class="st-skill-meta" style="color:${aggColor}">${fmtPct(sk)} · ${sk.readRefCount}/${sk.allRefCount}</span>`;
     html+=`<span class="st-skill-tog">▸</span>`;
     html+=`</div>`;
 
@@ -897,20 +929,23 @@ function renderSkillsTree(tree){
         const total=ref.totalLines||0;
         const read=ref.readLineCount||0;
         const wasRead=ref.wasRead;
-        const pct=total>0?Math.round(read/total*100):0;
-        const pctColor=!wasRead?'var(--t3)':pct>=80?'var(--green)':pct>=40?'var(--gold)':'var(--orange)';
-        const pctLabel=wasRead?(pct+'%'):'未读';
+        const estimated=ref.estimated;
+        let pct=total>0?Math.round(read/total*100):0;
+        let pctLabel;
+        if(!wasRead){pctLabel='未读'}
+        else if(total>0){pctLabel=pct+'%'+(estimated?' ≈':'')}
+        else if(read>0){pctLabel=read+'行';pct=50}
+        else{pctLabel='—'}
+        const pctC=!wasRead?'var(--t3)':pct>=80?'var(--green)':pct>=40?'var(--gold)':'var(--orange)';
         const fileName=ref.path.split('/').pop()||ref.label;
         const barBg=wasRead?`linear-gradient(90deg,var(--green),var(--cyan))`:'var(--t3)';
-        const refOpacity=wasRead?'1':'.5';
 
-        html+=`<div class="st-ref" style="opacity:${refOpacity}">`;
+        html+=`<div class="st-ref" style="opacity:${wasRead?'1':'.5'}">`;
         html+=`<div class="st-ref-hdr" onclick="this.parentElement.classList.toggle('open')">`;
-        const isSkillFile=ref.isSkillFile;
-        html+=`<span class="st-ref-ic">${isSkillFile?'📘':wasRead?'📄':'📄'}</span>`;
+        html+=`<span class="st-ref-ic">${ref.isSkillFile?'📘':'📄'}</span>`;
         html+=`<span class="st-ref-name">${H(fileName)}</span>`;
-        html+=`<div class="st-ref-bar"><div class="st-ref-bar-fill" style="width:${wasRead?pct:0}%;background:${barBg}"></div></div>`;
-        html+=`<span class="st-ref-pct" style="color:${pctColor}">${pctLabel}</span>`;
+        html+=`<div class="st-ref-bar"><div class="st-ref-bar-fill" style="width:${wasRead?Math.max(pct,3):0}%;background:${barBg}"></div></div>`;
+        html+=`<span class="st-ref-pct" style="color:${pctC}">${pctLabel}</span>`;
         html+=`<span class="st-ref-tog">▸</span>`;
         html+=`</div>`;
 
@@ -918,22 +953,17 @@ function renderSkillsTree(tree){
           html+=`<div class="st-ref-body"><div class="st-code">`;
           const lines=ref.fullContent.split('\n');
           const readSet=new Set();
-          for(const range of (ref.readRanges||[])){
-            for(let ln=range.start;ln<=range.end;ln++)readSet.add(ln);
-          }
+          for(const range of (ref.readRanges||[])){for(let ln=range.start;ln<=range.end;ln++)readSet.add(ln)}
           for(let i=0;i<lines.length;i++){
-            const ln=i+1;
-            const isRead=readSet.has(ln);
-            const cls=isRead?'read':'unread';
+            const ln=i+1;const cls=readSet.has(ln)?'read':'unread';
             html+=`<div class="st-code-line ${cls}"><span class="st-code-ln">${ln}</span><span class="st-code-txt">${H(lines[i])}</span></div>`;
           }
           html+=`</div></div>`;
         }else if(!wasRead){
           html+=`<div class="st-ref-body"><div class="st-no-data" style="font-size:9px;color:var(--orange)">此 Reference 在本次 Case 中未被读取</div></div>`;
         }else{
-          html+=`<div class="st-ref-body"><div class="st-no-data" style="font-size:9px">内容未获取</div></div>`;
+          html+=`<div class="st-ref-body"><div class="st-no-data" style="font-size:9px">内容可通过配置 Admin Token 获取完整展示</div></div>`;
         }
-
         html+=`</div>`;
       }
       html+=`</div>`;
