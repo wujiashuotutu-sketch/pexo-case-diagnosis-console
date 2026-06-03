@@ -5,7 +5,9 @@ export default async function handler(req, res) {
   try {
     const body = typeof req.body === "object" && req.body ? req.body : await parseBody(req);
     const job = await startAnalysis(body.caseId);
-    res.status(job.status === "failed" ? 500 : 200).json(job);
+    const { result, ...summary } = job;
+    if (result) summary.traceCount = result.traceCount || 0;
+    res.status(job.status === "failed" ? 500 : 200).json(summary);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

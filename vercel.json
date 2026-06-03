@@ -2,6 +2,22 @@
   "version": 2,
   "cleanUrls": true,
   "functions": {
+    "api/analyze.js": {
+      "maxDuration": 60,
+      "includeFiles": "data/**"
+    },
+    "api/cases/[id]/index.js": {
+      "maxDuration": 60,
+      "includeFiles": "data/**"
+    },
+    "api/cases/[id]/flow.js": {
+      "maxDuration": 60,
+      "includeFiles": "data/**"
+    },
+    "api/cases/[id]/skills-tree.js": {
+      "maxDuration": 60,
+      "includeFiles": "data/**"
+    },
     "api/**/*.js": {
       "maxDuration": 30,
       "includeFiles": "data/**"
