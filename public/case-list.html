@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pexo · Case List View</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#08080f;--s1:#111119;--s2:#17172a;--bd:#252538;--bd2:#333348;
+  --t1:#e8e8f0;--t2:#9898ad;--t3:#6a6a80;
+  --cyan:#2dd4bf;--purple:#a78bfa;--gold:#fbbf24;--green:#34d399;
+  --rose:#fb7185;--blue:#60a5fa;--orange:#fb923c;
+  --r:10px;--font:'DM Sans',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}::-webkit-scrollbar-track{background:transparent}
+
+.shell{display:flex;height:100%;flex-direction:column}
+.topbar{height:48px;display:flex;align-items:center;gap:12px;padding:0 20px;background:rgba(8,8,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);flex-shrink:0;z-index:50}
+.logo{font-weight:700;font-size:15px;background:linear-gradient(135deg,var(--cyan),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sep{width:1px;height:18px;background:var(--bd)}
+.topbar input{background:var(--s1);border:1px solid var(--bd);border-radius:7px;padding:6px 12px;color:var(--t1);font-family:var(--mono);font-size:12px;width:200px;outline:none}
+.topbar input:focus{border-color:var(--cyan)}
+.topbar .btn{background:linear-gradient(135deg,var(--cyan),#20b2aa);color:#000;border:none;border-radius:7px;padding:6px 16px;font-weight:600;font-size:12px;cursor:pointer;font-family:var(--font)}
+.topbar .btn:disabled{opacity:.3}
+.topbar .link{font-size:11px;color:var(--t3);text-decoration:none;padding:4px 10px;border-radius:5px;border:1px solid var(--bd);transition:all .15s}
+.topbar .link:hover{color:var(--cyan);border-color:var(--cyan)}
+.chip{font-size:10px;padding:3px 8px;background:var(--s1);border:1px solid var(--bd);border-radius:5px;color:var(--t3);font-family:var(--mono);display:flex;align-items:center;gap:4px}
+.chip i{width:5px;height:5px;border-radius:50%;display:inline-block}
+
+.main{flex:1;display:flex;overflow:hidden}
+
+/* ═══ Sidebar ═══ */
+.sidebar{width:300px;flex-shrink:0;border-right:1px solid var(--bd);display:flex;flex-direction:column;background:var(--s1)}
+.sb-hdr{padding:14px 16px 10px;border-bottom:1px solid var(--bd);font-size:12px;font-weight:600;color:var(--t2);letter-spacing:.03em;display:flex;align-items:center;gap:6px}
+.sb-hdr .count{font-size:10px;background:rgba(45,212,191,.12);color:var(--cyan);padding:1px 6px;border-radius:4px;font-weight:700}
+.sb-scroll{flex:1;overflow-y:auto;padding:8px}
+.round{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:border-color .2s,box-shadow .2s;overflow:hidden}
+.round:hover{border-color:var(--bd2)}
+.round.active{border-color:rgba(45,212,191,.35);box-shadow:0 0 0 1px rgba(45,212,191,.15)}
+.round-hdr{display:flex;align-items:center;gap:8px;padding:10px 12px 8px}
+.round-num{width:24px;height:24px;border-radius:6px;background:rgba(45,212,191,.1);color:var(--cyan);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.round-title{flex:1;font-size:12px;font-weight:600;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.round-status{font-size:9px;font-weight:600;padding:2px 7px;border-radius:4px}
+.round-status.done{background:rgba(52,211,153,.12);color:var(--green)}
+.round-status.running{background:rgba(251,191,36,.12);color:var(--gold)}
+.round-body{padding:0 12px 10px}
+.round-meta{display:flex;gap:8px;flex-wrap:wrap}
+.round-meta span{font-size:10px;color:var(--t3);display:flex;align-items:center;gap:3px}
+.round-preview{display:flex;gap:6px;margin-top:8px}
+.round-thumb{width:80px;height:50px;border-radius:6px;overflow:hidden;background:var(--bg);border:1px solid var(--bd);flex-shrink:0}
+.round-thumb video,.round-thumb img{width:100%;height:100%;object-fit:cover}
+.round-thumb .ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--s2),var(--bg));font-size:18px;opacity:.3}
+
+/* ═══ Content ═══ */
+.content{flex:1;overflow-y:auto;padding:20px 28px;scroll-behavior:smooth}
+
+/* Round divider */
+.round-divider{display:flex;align-items:center;gap:12px;margin:24px 0 16px;padding:0}
+.round-divider:first-child{margin-top:0}
+.round-divider .rd-line{flex:1;height:1px;background:var(--bd)}
+.round-divider .rd-tag{font-size:11px;font-weight:600;padding:5px 14px;border-radius:6px;white-space:nowrap;color:var(--cyan);border:1px solid rgba(45,212,191,.2);background:rgba(45,212,191,.05)}
+
+/* User message */
+.user-msg{background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.18);border-radius:var(--r);padding:14px 16px;margin-bottom:12px}
+.user-msg .um-label{font-size:10px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.user-msg .um-text{font-size:13px;color:var(--t1);line-height:1.6}
+
+/* ═══ Tool card ═══ */
+.tc{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:8px;overflow:hidden;transition:border-color .2s}
+.tc:hover{border-color:var(--bd2)}
+.tc.tc-fail{border-color:rgba(251,113,133,.25)}
+.tc.tc-fail::before{content:'';display:block;height:2px;background:var(--rose)}
+.tc.tc-ok::before{content:'';display:block;height:2px;background:var(--green);opacity:.4}
+
+.tc-h{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;user-select:none}
+.tc-h .tc-icon{font-size:16px;flex-shrink:0}
+.tc-h .tc-name{font-weight:600;font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tc-h .tc-time{font-size:10px;color:var(--t3);font-family:var(--mono);flex-shrink:0}
+.tc-h .tc-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;text-transform:uppercase;flex-shrink:0}
+.tc-h .tc-toggle{width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:10px;transition:transform .2s;flex-shrink:0}
+.tc.open .tc-toggle{transform:rotate(90deg)}
+
+.tc-body{display:none;border-top:1px solid var(--bd);padding:14px}
+.tc.open .tc-body{display:block}
+
+/* ═══ Body content ═══ */
+.io-section{margin-bottom:10px}
+.io-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.io-label::after{content:'';flex:1;height:1px;background:var(--bd)}
+.media-grid{display:flex;gap:8px;flex-wrap:wrap}
+.media-item{position:relative;border-radius:8px;overflow:hidden;background:var(--bg);border:1px solid var(--bd);cursor:pointer;transition:border-color .2s,transform .15s}
+.media-item:hover{border-color:rgba(45,212,191,.3);transform:scale(1.02)}
+.media-item img,.media-item video{display:block;object-fit:cover}
+.media-item .mi-num{position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:5px;background:var(--cyan);color:#000;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.media-item .mi-label{position:absolute;bottom:0;left:0;right:0;padding:3px 6px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-size:9px;color:var(--t2);font-family:var(--mono)}
+.media-item .mi-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);opacity:0;transition:opacity .2s}
+.media-item:hover .mi-play{opacity:1}
+.media-item .mi-play span{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:14px}
+.mi-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:linear-gradient(135deg,var(--s2),var(--bg));border:1px dashed var(--bd);border-radius:8px}
+.mi-ph .ph-ic{font-size:20px;opacity:.3}
+.mi-ph .ph-tx{font-size:8px;color:var(--t3);font-family:var(--mono)}
+.prompt-box{font-size:11px;line-height:1.55;color:var(--t2);padding:10px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--bd);max-height:120px;overflow-y:auto;margin-top:6px}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{font-size:9px;padding:2px 7px;border-radius:4px;background:var(--s2);color:var(--t3);font-family:var(--mono);border:1px solid var(--bd)}
+.err-detail{background:rgba(251,113,133,.05);border:1px solid rgba(251,113,133,.15);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--rose);margin-top:8px;line-height:1.5}
+/* Reference full text */
+.ref-full{font-family:var(--mono);font-size:10px;line-height:1.55;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px 0;max-height:600px;overflow-y:auto;overflow-x:auto}
+.ref-line{display:flex;padding:0 12px;min-height:18px}
+.ref-line:hover{background:rgba(45,212,191,.04)}
+.ref-ln{width:36px;flex-shrink:0;text-align:right;margin-right:10px;font-size:9px;opacity:.7;user-select:none}
+
+.raw-toggle{font-size:10px;color:var(--t3);cursor:pointer;margin-top:8px;display:flex;align-items:center;gap:4px;border:none;background:none;font-family:var(--font);padding:2px 0}
+.raw-toggle:hover{color:var(--t2)}
+.raw-box{display:none;margin-top:6px;font-family:var(--mono);font-size:9px;line-height:1.4;color:var(--t3);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px;max-height:200px;overflow:auto;white-space:pre-wrap;word-break:break-all}
+.raw-box.show{display:block}
+.url-chip{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-family:var(--mono);font-size:9px;color:var(--t3);background:var(--bg);padding:4px 8px;border-radius:5px;border:1px solid var(--bd);cursor:pointer;transition:border-color .15s}
+.url-chip:hover{border-color:var(--cyan);color:var(--t2)}
+
+/* Lightbox */
+.lightbox{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;cursor:zoom-out}
+.lightbox.show{display:flex}
+.lightbox img,.lightbox video{max-width:90vw;max-height:90vh;border-radius:8px;object-fit:contain}
+.lb-close{position:fixed;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:var(--s2);border:1px solid var(--bd);color:var(--t1);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:201}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--cyan);color:#000;padding:6px 16px;border-radius:6px;font-size:11px;font-weight:600;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.overlay{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--bg)}
+.overlay.hidden{display:none}
+.spinner{width:26px;height:26px;border:2px solid var(--bd);border-top-color:var(--cyan);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.overlay .msg{color:var(--t2);font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="topbar">
+    <span class="logo">PEXO LIST</span><span class="sep"></span>
+    <input id="inp" placeholder="Case ID …" spellcheck="false">
+    <button class="btn" id="goBtn" onclick="go()">Load</button>
+    <span class="sep"></span>
+    <a class="link" id="canvasLink" href="/case-flow" target="_blank">→ 画布模式</a>
+    <div style="margin-left:auto;display:flex;gap:8px" id="stats"></div>
+  </div>
+  <div class="main">
+    <div class="sidebar" id="sidebar">
+      <div class="sb-hdr">OVERVIEW <span class="count" id="roundCount">0</span></div>
+      <div class="sb-scroll" id="sbScroll"></div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<div class="overlay" id="ov"><div class="spinner" id="sp"></div><span class="msg" id="mg">输入 Case ID</span></div>
+<div class="toast" id="toast">已复制</div>
+<div class="lightbox" id="lb" onclick="closeLb()"><button class="lb-close" onclick="closeLb()">✕</button><div id="lbContent"></div></div>
+
+<script>
+const API=location.origin,$=id=>document.getElementById(id);
+let assetIdx={},rounds=[];
+
+(function(){const p=new URLSearchParams(location.search);const id=p.get('case')||sessionStorage.getItem('pexo_case_id')||'';if(id){$('inp').value=id;go()}else{$('mg').textContent='输入 Case ID';$('sp').style.display='none'}})();
+$('inp').addEventListener('keydown',e=>{if(e.key==='Enter')go()});
+
+async function go(){
+  const id=$('inp').value.trim();if(!id)return;
+  sessionStorage.setItem('pexo_case_id',id);history.replaceState(null,'','?case='+encodeURIComponent(id));
+  $('canvasLink').href='/case-flow?case='+encodeURIComponent(id);
+  $('ov').classList.remove('hidden');$('sp').style.display='';$('mg').textContent='加载 …';$('goBtn').disabled=true;
+  try{
+    let r=await fetch(`${API}/api/cases/${encodeURIComponent(id)}/flow`);let d=await r.json();
+    if(d.error==='not_cached'){$('mg').textContent='拉取数据 …';const ar=await fetch(`${API}/api/analyze`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({caseId:id})});const j=await ar.json();for(let i=0;i<120;i++){await new Promise(r=>setTimeout(r,2000));const jr=await fetch(`${API}/api/jobs/${j.id}`);const jd=await jr.json();if(jd.status==='completed')break;if(jd.status==='failed')throw new Error(jd.error||'失败');$('mg').textContent=`拉取 (${i*2}s)…`}r=await fetch(`${API}/api/cases/${encodeURIComponent(id)}/flow`);d=await r.json()}
+    if(!d.nodes?.length)throw new Error('无数据');
+    buildAll(d);$('ov').classList.add('hidden');
+  }catch(e){$('ov').innerHTML=`<div style="text-align:center"><div style="color:var(--rose);font-weight:600;margin-bottom:8px">加载失败</div><div style="color:var(--t2);font-size:13px">${H(e.message)}</div></div>`}
+  finally{$('goBtn').disabled=false}
+}
+
+function H(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function mext(u){const c=(u||'').split('?')[0].toLowerCase();if(/\.(mp4|mov|webm)$/.test(c))return'video';if(/\.(png|jpe?g|webp|gif|svg)$/.test(c))return'image';if(/\.(mp3|wav|m4a|aac|ogg)$/.test(c))return'audio';return'other'}
+function fmtT(ts){if(!ts)return'';try{return new Date(ts).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}catch{return''}}
+function fmtDur(ms){if(!ms||ms<0)return'';if(ms<60000)return Math.round(ms/1000)+'s';return Math.floor(ms/60000)+'m '+Math.round((ms%60000)/1000)+'s'}
+function openLb(url,kind){const lb=$('lb'),c=$('lbContent');if(kind==='video')c.innerHTML=`<video src="${H(url)}" controls autoplay style="max-width:90vw;max-height:90vh;border-radius:8px">`;else c.innerHTML=`<img src="${H(url)}" style="max-width:90vw;max-height:90vh;border-radius:8px">`;lb.classList.add('show')}
+function closeLb(){$('lb').classList.remove('show');$('lbContent').innerHTML=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLb()});
+function cpText(t){navigator.clipboard.writeText(t).then(()=>{const e=$('toast');e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1000)})}
+
+function mediaThumb(url,kind,w,h,label,num){
+  const k=kind||mext(url);let html='';
+  if(!url)html=`<div class="media-item mi-ph" style="width:${w}px;height:${h}px"><span class="ph-ic">${k==='video'?'🎬':'🖼'}</span><span class="ph-tx">${H((label||'').slice(0,18))}</span>`;
+  else if(k==='video')html=`<div class="media-item" style="width:${w}px;height:${h}px" onclick="event.stopPropagation();openLb('${H(url)}','video')"><video src="${H(url)}" preload="auto" muted style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML='<div class=mi-ph style=width:100%;height:100%><span class=ph-ic>🎬</span></div>'"></video><div class="mi-play"><span>▶</span></div>`;
+  else html=`<div class="media-item" style="width:${w}px;height:${h}px" onclick="event.stopPropagation();openLb('${H(url)}','image')"><img src="${H(url)}" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML='<div class=mi-ph style=width:100%;height:100%><span class=ph-ic>🖼</span></div>'">`;
+  if(num!=null)html+=`<span class="mi-num">${num}</span>`;
+  if(label)html+=`<span class="mi-label">${H(label.slice(0,20))}</span>`;
+  return html+'</div>';
+}
+function refThumbs(refStr){
+  if(!refStr)return'';let refs=[];
+  try{refs=JSON.parse(refStr)}catch{const m=refStr.match(/asset:\/\/(a_[a-zA-Z0-9]+)/g);if(m)refs=m.map(r=>({file:r}))}
+  if(!refs.length)return'';
+  let html='<div class="io-label">参考素材 Inputs</div><div class="media-grid">';
+  refs.forEach((ref,i)=>{const aid=(ref.file||ref.url||'').replace('asset://','');const info=assetIdx[aid];html+=mediaThumb(info?.url||'','image',64,64,info?.label||aid.slice(0,10),i+1)});
+  return html+'</div>';
+}
+function rawToggle(content,label){
+  if(!content)return'';const uid='r'+Math.random().toString(36).slice(2,7);
+  return`<button class="raw-toggle" onclick="event.stopPropagation();$('${uid}').classList.toggle('show')">▸ ${H(label||'Raw')}</button><div class="raw-box" id="${uid}">${H(content)}</div>`;
+}
+
+/* ═══ Rounds ═══ */
+function buildRounds(nodes){
+  rounds=[];let cur=null;
+  for(const n of nodes){
+    if(n.type==='user'){if(cur)rounds.push(cur);cur={user:n,tools:[],deliver:null,startTs:n.timestamp||'',endTs:''}}
+    else if(cur){cur.tools.push(n);if(n.type==='deliver'){cur.deliver=n;cur.endTs=n.timestamp||''}}
+  }
+  if(cur)rounds.push(cur);return rounds;
+}
+
+function renderSidebar(rnds){
+  $('roundCount').textContent=rnds.length;const sb=$('sbScroll');sb.innerHTML='';
+  rnds.forEach((r,i)=>{
+    const dur=r.startTs&&r.endTs?fmtDur(new Date(r.endTs)-new Date(r.startTs)):'';
+    const gc=r.tools.filter(t=>t.type==='generation').length;
+    const fc=r.tools.filter(t=>t.failed).length;
+    const isDone=!!r.deliver;
+    let h=`<div class="round${i===0?' active':''}" data-round="${i}" onclick="scrollToRound(${i})">`;
+    h+=`<div class="round-hdr"><div class="round-num">${i+1}</div><div class="round-title">${H(r.user.detail?.slice(0,40))}</div><div class="round-status ${isDone?'done':'running'}">${isDone?'完成':'进行中'}</div></div>`;
+    h+=`<div class="round-body"><div class="round-meta"><span>🔧 ${r.tools.length}</span><span>⚡ ${gc} gen</span>${fc?`<span style="color:var(--rose)">❌ ${fc}</span>`:''}${dur?`<span>⏱ ${dur}</span>`:''}</div>`;
+    h+='<div class="round-preview">';
+    if(r.deliver?.url)h+=`<div class="round-thumb"><video src="${H(r.deliver.url)}" preload="auto" muted></video></div>`;
+    else h+='<div class="round-thumb"><div class="ph">📦</div></div>';
+    const fg=r.tools.find(t=>t.type==='generation'&&t.url);
+    if(fg)h+=`<div class="round-thumb"><video src="${H(fg.url)}" preload="auto" muted></video></div>`;
+    h+='</div></div></div>';
+    sb.innerHTML+=h;
+  });
+}
+function scrollToRound(idx){
+  document.querySelectorAll('.round').forEach((r,i)=>r.classList.toggle('active',i===idx));
+  const el=document.getElementById('round-'+idx);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function scrollToNode(nodeId){
+  const el=document.getElementById('node-'+nodeId);
+  if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.boxShadow='0 0 0 2px var(--cyan)';setTimeout(()=>el.style.boxShadow='',2000)}
+}
+
+function renderRefBody(n){
+  let b='';
+  b+=`<div style="font-family:var(--mono);font-size:10px;color:var(--cyan);padding:6px 10px;background:var(--bg);border-radius:6px;margin-bottom:8px;word-break:break-all">${H(n.detail)}</div>`;
+  if(n.readStartLine!=null)b+=`<div style="font-size:10px;color:var(--t3);margin-bottom:8px">📖 读取范围: 第 <span style="color:var(--green);font-weight:600">${n.readStartLine}</span> – <span style="color:var(--green);font-weight:600">${n.readEndLine}</span> 行</div>`;
+  if(!n.content)return b+'<div style="font-size:10px;color:var(--t3)">（空）</div>';
+  const lines=n.content.split('\n');
+  b+='<div class="ref-full">';
+  for(const line of lines){
+    const lm=line.match(/^\s*(\d+)\t(.*)/);
+    if(lm){
+      const ln=parseInt(lm[1],10),txt=lm[2];
+      const isRead=(n.readStartLine!=null&&ln>=n.readStartLine&&ln<=n.readEndLine);
+      const lnColor=isRead?'var(--green)':'var(--orange)';
+      const txtColor=isRead?'var(--t2)':'rgba(251,146,60,.55)';
+      b+=`<div class="ref-line"><span class="ref-ln" style="color:${lnColor}">${ln}</span><span style="color:${txtColor}">${H(txt)}</span></div>`;
+    }else{
+      b+=`<div class="ref-line"><span class="ref-ln" style="color:var(--t3)"> </span><span style="color:var(--t2)">${H(line)}</span></div>`;
+    }
+  }
+  b+='</div>';
+  return b;
+}
+
+function renderAssemblyTimeline(n){
+  let b='';
+  let j;try{j=JSON.parse(n.rawInput||'{}')}catch{j={}}
+  const tracks=j.tracks||[];const out=j.output||{};const name=j.name||'';
+  if(name)b+=`<div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:6px">${H(name)}</div>`;
+  b+=`<div style="font-size:10px;color:var(--t3);margin-bottom:10px;display:flex;gap:10px;flex-wrap:wrap">`;
+  if(out.width)b+=`<span>${out.width}×${out.height}</span>`;if(out.fps)b+=`<span>${out.fps}fps</span>`;if(out.target_lufs)b+=`<span>LUFS ${out.target_lufs}</span>`;
+  b+=`</div>`;
+  if(!tracks.length){b+=`<div style="font-size:11px;color:var(--t2)">${H(n.detail)}</div>`;if(n.failed&&n.errMsg)b+=`<div class="err-detail">${H(n.errMsg)}</div>`;b+=rawToggle(n.rawInput,'装配参数');return b}
+  let totalMs=0;for(const t of tracks)for(const c of(t.clips||[]))totalMs=Math.max(totalMs,c.end_ms||c.start_ms||0);
+  if(!totalMs)totalMs=1;
+  const trackColors={video:['#2dd4bf','#60a5fa','#a78bfa','#34d399','#fb923c','#fbbf24','#fb7185','#818cf8'],audio:['#f472b6']};
+  let ci2=0;
+  b+=`<div style="margin-bottom:8px">`;
+  const steps=Math.min(8,Math.ceil(totalMs/5000));
+  b+=`<div style="display:flex;align-items:center;height:16px;margin-bottom:4px;position:relative">`;
+  for(let i=0;i<=steps;i++){const t=Math.round(totalMs*i/steps);const pct=t/totalMs*100;b+=`<span style="position:absolute;left:${pct}%;transform:translateX(-50%);font-size:9px;color:var(--t3);font-family:var(--mono)">${(t/1000).toFixed(1)}s</span>`}
+  b+=`</div>`;
+  for(const t of tracks){
+    const kind=t.kind||'?';const clips=t.clips||[];const isA=kind==='audio';
+    b+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="font-size:9px;color:var(--t3);width:32px;text-align:right;flex-shrink:0;font-family:var(--mono)">${kind==='video'?'🎬 V':'🎵 A'}</span>`;
+    b+=`<div style="flex:1;height:${isA?22:28}px;background:var(--bg);border-radius:5px;position:relative;overflow:hidden;border:1px solid var(--bd)">`;
+    for(const c of clips){
+      const s=c.start_ms||0,e2=c.end_ms||totalMs;const left=(s/totalMs*100).toFixed(2),width=((e2-s)/totalMs*100).toFixed(2);
+      const file=(c.source?.file||'').replace('asset://','');const info=assetIdx[file];const label=info?.label||file.slice(0,10);
+      const color=isA?'rgba(244,114,182,.4)':(trackColors.video[ci2++%trackColors.video.length]+'44');
+      const bc=isA?'rgba(244,114,182,.6)':(trackColors.video[(ci2-1)%trackColors.video.length]);
+      let fades='';
+      if(c.fade_in_ms){const fw=(c.fade_in_ms/(e2-s)*100).toFixed(1);fades+=`<div style="position:absolute;left:0;top:0;bottom:0;width:${fw}%;background:linear-gradient(90deg,rgba(255,255,255,.15),transparent)"></div>`}
+      if(c.fade_out_ms){const fw=(c.fade_out_ms/(e2-s)*100).toFixed(1);fades+=`<div style="position:absolute;right:0;top:0;bottom:0;width:${fw}%;background:linear-gradient(270deg,rgba(255,255,255,.15),transparent)"></div>`}
+      b+=`<div style="position:absolute;left:${left}%;width:${width}%;top:1px;bottom:1px;background:${color};border-left:2px solid ${bc};border-radius:3px;overflow:hidden" title="${H(label)} ${(s/1000).toFixed(1)}s–${(e2/1000).toFixed(1)}s"><span style="font-size:8px;color:var(--t1);padding:2px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;font-family:var(--mono)">${H(label.slice(0,15))}</span>`;
+      if(c.volume!=null&&isA)b+=`<span style="font-size:7px;color:var(--t3);padding:0 4px">vol ${c.volume}</span>`;
+      b+=fades+`</div>`;
+    }
+    b+=`</div></div>`;
+  }
+  b+=`<div style="font-size:9px;color:var(--t3);text-align:right;font-family:var(--mono);margin-top:4px">总时长 ${(totalMs/1000).toFixed(1)}s · ${tracks[0]?.clips?.length||0} 视频片段</div></div>`;
+  if(n.failed&&n.errMsg)b+=`<div class="err-detail">${H(n.errMsg)}</div>`;
+  b+=rawToggle(n.rawInput,'装配参数 JSON');
+  return b;
+}
+
+/* ═══ Tool card renderer ═══ */
+function renderCard(n){
+  const isFail=n.failed;
+  const isOk=!isFail&&['generation','assembly','deliver','audio','music'].includes(n.type);
+  const icons={user:'💬',planning:'🧠',skill_branch:'📚',reference:'📄',generation:'⚡',audio:'🎙',music:'🎵',assembly:'🔧',deliver:'📦',analyze:'🔍',attachment:'📎',web:'🌐',file_info:'📋'};
+  const badges={generation:'GEN',audio:'VO',music:'BGM',assembly:'BUILD',deliver:'OUTPUT',skill_branch:'SKILL',reference:'REF',planning:'PLAN',analyze:'ANALYZE',attachment:'SHOW',web:'WEB'};
+  const badgeText=isFail?'FAIL':(badges[n.type]||'TOOL');
+  const badgeCss=`background:${isFail?'rgba(251,113,133,.12)':'rgba(45,212,191,.1)'};color:${isFail?'var(--rose)':'var(--cyan)'}`;
+
+  let body='';
+
+  if(n.type==='generation'){
+    const isVid=n.toolName==='video_generate';
+    body+='<div class="io-section"><div class="io-label">输出 Output</div><div class="media-grid">';
+    body+=mediaThumb(n.url,isVid?'video':'image',isVid?240:180,isVid?140:140,n.label);
+    body+='</div>';
+    if(n.url||n.assetId)body+=`<div class="url-chip" onclick="event.stopPropagation();cpText('${H(n.url||'asset://'+n.assetId)}')">📋 ${H((n.url||n.assetId||'').split('/').pop()?.split('?')[0]?.slice(0,40))}</div>`;
+    body+='</div>';
+    body+=refThumbs(n.refImage);
+    if(n.prompt)body+=`<div class="io-section"><div class="io-label">Prompt</div><div class="prompt-box">${H(n.prompt)}</div></div>`;
+    const tags=[];if(n.provider)tags.push(n.provider);if(n.model)tags.push(n.model);if(n.mode)tags.push(n.mode);if(n.duration)tags.push(n.duration+'s');if(n.aspectRatio)tags.push(n.aspectRatio);
+    if(tags.length)body+=`<div class="tags">${tags.map(t=>`<span class="tag">${H(t)}</span>`).join('')}</div>`;
+    if(isFail&&n.errMsg)body+=`<div class="err-detail">${H(n.errMsg)}</div>`;
+    body+=rawToggle(n.rawInput,'完整参数');
+  }
+  else if(n.type==='deliver'){
+    body+='<div class="io-section"><div class="io-label">🎬 最终成片</div><div class="media-grid">';
+    body+=mediaThumb(n.url,'video',280,170,'成片');
+    body+='</div>';
+    if(n.url)body+=`<div class="url-chip" onclick="event.stopPropagation();cpText('${H(n.url)}')">📋 ${H(n.url.split('/').pop()?.split('?')[0]?.slice(0,40))}</div>`;
+    body+='</div>';
+  }
+  else if(n.type==='skill_branch'){
+    if(n.skillContent)body+=`<div style="font-size:11px;color:var(--t3);line-height:1.4;max-height:50px;overflow:hidden">${H(n.skillContent.slice(0,200))}…</div>`;
+    body+=`<div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:6px;padding:4px 8px;background:var(--bg);border-radius:5px;word-break:break-all">${H(n.detail)}</div>`;
+    body+=rawToggle(n.skillContent,'Skill 全文');
+  }
+  else if(n.type==='reference'){
+    body+=renderRefBody(n);
+  }
+  else if(n.type==='planning'){
+    const lines=(n.detail||'').split('\n').filter(Boolean);
+    body+=lines.map(l=>{const s=l[0]==='▶'?'▶':l[0]==='✓'?'✓':'○';const c=s==='▶'?'var(--gold)':s==='✓'?'var(--green)':'var(--t3)';return`<div style="display:flex;gap:6px;font-size:11px"><span style="color:${c};width:14px;text-align:center">${s}</span><span style="color:var(--t2)">${H(l.replace(/^[▶✓○]\s*/,''))}</span></div>`}).join('');
+  }
+  else if(n.type==='audio'||n.type==='music'){
+    if(n.detail)body+=`<div style="font-size:11px;color:var(--t2)">${H(n.detail)}</div>`;
+    if(n.prompt)body+=`<div class="prompt-box" style="margin-top:6px">${H(n.prompt)}</div>`;
+    if(isFail&&n.errMsg)body+=`<div class="err-detail">${H(n.errMsg)}</div>`;
+    body+=rawToggle(n.rawInput);
+  }
+  else if(n.type==='assembly'){
+    body+=renderAssemblyTimeline(n);
+  }
+  else{
+    if(n.detail)body+=`<div style="font-size:11px;color:var(--t2)">${H(n.detail)}</div>`;
+    if(isFail&&n.errMsg)body+=`<div class="err-detail">${H(n.errMsg)}</div>`;
+    body+=rawToggle(n.rawInput);
+  }
+
+  const autoOpen=['generation','deliver','reference','assembly'].includes(n.type);
+  const displayLabel=n.type==='reference'?n.detail:n.label;
+  const nameStyle=n.type==='reference'?'white-space:normal;word-break:break-all;line-height:1.3':'';
+  return`<div class="tc${isFail?' tc-fail':''}${isOk?' tc-ok':''}${autoOpen?' open':''}" id="node-${n.id}"><div class="tc-h" onclick="this.parentElement.classList.toggle('open')"><span class="tc-icon">${icons[n.type]||'🔧'}</span><span class="tc-name" style="${nameStyle}">${H(displayLabel)}</span><span class="tc-time">${fmtT(n.timestamp)}</span><span class="tc-badge" style="${badgeCss}">${badgeText}</span><span class="tc-toggle">▸</span></div><div class="tc-body">${body}</div></div>`;
+}
+
+/* ═══ Build all ═══ */
+function buildAll(data){
+  const{nodes}=data;
+  assetIdx={};
+  for(const n of nodes){if(n.assetId)assetIdx[n.assetId]={id:n.id,url:n.url||'',label:n.label||n.assetId,type:n.type}}
+
+  const gc=nodes.filter(n=>n.type==='generation').length;
+  const fc=nodes.filter(n=>n.failed).length;
+  const dc=nodes.filter(n=>n.type==='deliver').length;
+  $('stats').innerHTML=`<div class="chip"><i style="background:var(--t2)"></i>${nodes.length}</div><div class="chip"><i style="background:var(--cyan)"></i>${gc} gen</div><div class="chip"><i style="background:var(--gold)"></i>${dc} out</div>${fc?`<div class="chip"><i style="background:var(--rose)"></i>${fc} fail</div>`:''}`;
+
+  const rnds=buildRounds(nodes);
+  renderSidebar(rnds);
+
+  const content=$('content');content.innerHTML='';
+  rnds.forEach((r,ri)=>{
+    const isDone=!!r.deliver;
+    const dur=r.startTs&&r.endTs?fmtDur(new Date(r.endTs)-new Date(r.startTs)):'';
+    content.innerHTML+=`<div class="round-divider" id="round-${ri}"><div class="rd-line"></div><div class="rd-tag">第 ${ri+1} 轮 ${isDone?'✓':'⋯'}${dur?' · '+dur:''}</div><div class="rd-line"></div></div>`;
+    content.innerHTML+=`<div class="user-msg" id="node-${r.user.id}"><div class="um-label">💬 用户消息 <span style="font-weight:400;color:var(--t3)">${fmtT(r.user.timestamp)}</span></div><div class="um-text">${H(r.user.detail)}</div></div>`;
+    for(const n of r.tools)content.innerHTML+=renderCard(n);
+  });
+}
+</script>
+</body>
+</html>

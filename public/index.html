@@ -1,0 +1,1590 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pexo Case Diagnosis Workbench</title>
+  <style>
+    :root{--bg:#070b16;--panel:rgba(17,24,43,.86);--panel2:rgba(25,35,58,.92);--line:rgba(151,170,205,.18);--text:#edf4ff;--muted:#9dafcf;--blue:#72b9ff;--cyan:#5ce4d4;--green:#72dc93;--yellow:#f4c865;--red:#ff7b86;--purple:#ad9cff;--orange:#f0a050}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;color:var(--text);background:radial-gradient(circle at 15% 0,rgba(92,228,212,.14),transparent 28%),radial-gradient(circle at 86% 5%,rgba(114,185,255,.18),transparent 30%),linear-gradient(180deg,#070b16,#0a1020 58%,#050812);min-height:100vh}
+    button,input,textarea,select{font:inherit;color:var(--text)}
+    code{color:var(--cyan);font-size:.92em}
+    a{color:var(--cyan);text-decoration:none}
+    .wrap{width:min(1520px,calc(100% - 40px));margin:0 auto;padding:28px 0 80px}
+
+    .hero{border:1px solid var(--line);border-radius:24px;padding:32px;background:linear-gradient(135deg,rgba(18,27,48,.96),rgba(9,15,29,.9));box-shadow:0 24px 90px rgba(0,0,0,.28)}
+    .eyebrow{display:inline-flex;color:var(--cyan);background:rgba(92,228,212,.1);border:1px solid rgba(92,228,212,.22);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase}
+    h1{margin:14px 0 8px;font-size:clamp(28px,4.5vw,52px);line-height:1;letter-spacing:-1.5px}
+    .hero>p{color:var(--muted);max-width:960px;line-height:1.75;font-size:14px}
+    .input-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;align-items:center}
+    .input-row input{flex:1;min-width:200px;max-width:400px;border:1px solid var(--line);background:rgba(5,9,18,.66);border-radius:14px;padding:12px 16px;outline:none;font-size:15px}
+    .input-row input:focus{border-color:var(--cyan)}
+    .btn{border:1px solid var(--line);color:var(--text);background:rgba(255,255,255,.06);border-radius:14px;padding:11px 18px;cursor:pointer;font-weight:700;font-size:14px;transition:all .15s}
+    .btn:hover{background:rgba(255,255,255,.1)}
+    .btn.primary{border:0;color:#06101d;font-weight:850;background:linear-gradient(135deg,var(--blue),var(--cyan))}
+    .btn.primary:hover{opacity:.9}
+    .btn.accent{border:0;color:#06101d;font-weight:850;background:linear-gradient(135deg,var(--purple),var(--blue))}
+
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:20px 0}
+    .stat{border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:14px;text-align:center}
+    .stat .label{color:var(--muted);font-size:10px;letter-spacing:.7px;text-transform:uppercase;font-weight:760}
+    .stat .value{display:block;margin-top:6px;font-size:28px;font-weight:800;line-height:1}
+
+    .pipeline-section{margin:24px 0}
+    .pipeline-section h2{font-size:18px;font-weight:700;color:var(--cyan);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .pipeline{display:flex;gap:6px;overflow-x:auto;padding:4px 0 12px;align-items:stretch}
+    .pipeline-node{flex:0 0 auto;min-width:160px;max-width:200px;border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:14px;cursor:pointer;transition:all .2s;position:relative}
+    .pipeline-node:hover{border-color:rgba(92,228,212,.4);background:var(--panel2)}
+    .pipeline-node.active{border-color:var(--cyan);box-shadow:0 0 20px rgba(92,228,212,.15)}
+    .pipeline-node.has-issue{border-color:var(--red);box-shadow:0 0 16px rgba(255,123,134,.12)}
+    .pipeline-node .node-name{font-size:13px;font-weight:800;margin-bottom:4px}
+    .pipeline-node .node-desc{font-size:11px;color:var(--muted);line-height:1.4}
+    .pipeline-node .node-badge{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center}
+    .pipeline-node .node-badge.error{background:var(--red);color:#fff}
+    .pipeline-node .node-badge.warn{background:var(--yellow);color:#000}
+    .pipeline-node .node-badge.ok{background:var(--green);color:#000}
+    .pipeline-arrow{display:flex;align-items:center;color:var(--muted);font-size:18px;flex-shrink:0}
+
+    .main-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+    @media(max-width:1100px){.main-grid{grid-template-columns:1fr}}
+    .panel{border:1px solid var(--line);border-radius:20px;background:var(--panel);box-shadow:0 14px 50px rgba(0,0,0,.16);overflow:hidden}
+    .panel-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .panel-head h2{font-size:17px;margin:0}
+    .panel-head .sub{color:var(--muted);font-size:12px}
+    .panel-body{padding:18px 20px;max-height:720px;overflow-y:auto}
+
+    .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+    .tab{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.04);color:var(--muted);padding:7px 12px;cursor:pointer;font-size:12px;font-weight:800;transition:all .15s}
+    .tab:hover{color:var(--text)}
+    .tab.active{color:var(--cyan);border-color:rgba(92,228,212,.42);background:rgba(92,228,212,.1)}
+    .view{display:none}.view.active{display:block}
+
+    .tool-chain{display:flex;flex-direction:column;gap:8px}
+    .tool-item{border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03);padding:12px;transition:all .15s}
+    .tool-item:hover{background:rgba(255,255,255,.06)}
+    .tool-item.failed{border-left:3px solid var(--red)}
+    .tool-item.success{border-left:3px solid var(--green)}
+    .tool-item.warn{border-left:3px solid var(--yellow)}
+    .tool-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+    .tool-name{font-size:13px;font-weight:700}
+    .tool-meta{font-size:11px;color:var(--muted)}
+    .pill{border-radius:999px;padding:4px 9px;font-size:10px;font-weight:850;text-transform:uppercase}
+    .pill.ok{color:var(--green);background:rgba(114,220,147,.11)}
+    .pill.fail{color:var(--red);background:rgba(255,123,134,.12)}
+    .pill.warn{color:var(--yellow);background:rgba(244,200,101,.11)}
+    .pill.info{color:var(--blue);background:rgba(114,185,255,.11)}
+    .chip{display:inline-block;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.04);color:var(--muted);padding:3px 8px;font-size:10px;font-weight:750;margin:2px}
+    details{margin-top:8px}
+    details>summary{cursor:pointer;font-size:12px;color:var(--blue);font-weight:700}
+    details pre{white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;padding:10px;color:#dce8fb;font-size:11px;line-height:1.55;max-height:280px;overflow:auto;margin-top:6px}
+
+    .problem-input{width:100%;min-height:80px;border:1px solid var(--line);background:rgba(5,9,18,.66);border-radius:14px;padding:14px;outline:none;resize:vertical;font-size:14px;line-height:1.65;color:var(--text)}
+    .problem-input:focus{border-color:var(--purple)}
+    .problem-input::placeholder{color:rgba(157,175,207,.5)}
+    .example-problems{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+    .example-btn{border:1px solid rgba(173,156,255,.25);border-radius:10px;background:rgba(173,156,255,.06);color:var(--purple);padding:6px 10px;font-size:11px;cursor:pointer;transition:all .15s}
+    .example-btn:hover{background:rgba(173,156,255,.14);border-color:rgba(173,156,255,.45)}
+
+    .asset-selector{display:flex;flex-direction:column;gap:6px;max-height:680px;overflow-y:auto;padding:2px}
+    .asset-picker-group{margin-bottom:12px}
+    .asset-picker-group .group-title{font-size:12px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+    .asset-pick{border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:all .15s;background:rgba(255,255,255,.02);overflow:hidden;margin-bottom:6px}
+    .asset-pick:hover{background:rgba(255,255,255,.06);border-color:rgba(151,170,205,.35)}
+    .asset-pick.selected{border-color:var(--purple);background:rgba(173,156,255,.08);box-shadow:0 0 0 1px rgba(173,156,255,.2)}
+    .asset-pick .ap-header{display:flex;align-items:center;gap:8px;padding:8px 10px}
+    .asset-pick .ap-check{width:18px;height:18px;border:2px solid var(--line);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;transition:all .15s}
+    .asset-pick.selected .ap-check{border-color:var(--purple);background:var(--purple);color:#fff}
+    .asset-pick .ap-info{flex:1;min-width:0}
+    .asset-pick .ap-name{font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .asset-pick .ap-meta{font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .asset-pick .ap-status{flex-shrink:0}
+    .asset-pick .ap-preview{background:#000;border-top:1px solid var(--line);max-height:220px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .asset-pick .ap-preview video{width:100%;max-height:220px;display:block}
+    .asset-pick .ap-preview img{width:100%;max-height:220px;object-fit:contain;display:block}
+    .asset-pick .ap-preview audio{width:100%;padding:8px 12px;display:block}
+    .asset-pick.final-asset .ap-preview{max-height:320px;border-radius:0 0 11px 11px}
+    .asset-pick.final-asset .ap-preview video{max-height:320px}
+    .asset-pick .ap-expand-btn{padding:4px 10px;font-size:10px;color:var(--blue);cursor:pointer;border-top:1px solid var(--line);text-align:center;font-weight:700;transition:background .15s}
+    .asset-pick .ap-expand-btn:hover{background:rgba(114,185,255,.08)}
+
+    .chat-container{display:flex;flex-direction:column;height:600px;border:1px solid var(--line);border-radius:16px;background:rgba(5,9,18,.5);overflow:hidden}
+    .chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+    .chat-msg{max-width:88%;border-radius:14px;padding:12px 16px;font-size:13px;line-height:1.7;word-break:break-word}
+    .chat-msg.user{align-self:flex-end;background:rgba(173,156,255,.12);border:1px solid rgba(173,156,255,.25);color:var(--text)}
+    .chat-msg.assistant{align-self:flex-start;background:rgba(92,228,212,.06);border:1px solid rgba(92,228,212,.18);color:var(--text)}
+    .chat-msg.system{align-self:center;background:rgba(244,200,101,.06);border:1px solid rgba(244,200,101,.18);color:var(--yellow);font-size:12px;max-width:95%}
+    .chat-msg .msg-assets{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+    .chat-msg .msg-asset-badge{display:inline-flex;align-items:center;gap:4px;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;background:rgba(173,156,255,.1);border:1px solid rgba(173,156,255,.2);color:var(--purple)}
+    .chat-msg pre{white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,.2);border-radius:8px;padding:8px;font-size:11px;margin:6px 0;overflow:auto;max-height:200px}
+    .chat-msg code{background:rgba(92,228,212,.1);border-radius:4px;padding:1px 5px;font-size:12px;color:var(--cyan)}
+    .chat-input-area{border-top:1px solid var(--line);padding:12px;display:flex;gap:8px;align-items:flex-end;background:rgba(17,24,43,.5)}
+    .chat-input-area textarea{flex:1;border:1px solid var(--line);background:rgba(5,9,18,.66);border-radius:12px;padding:10px 14px;outline:none;resize:none;font-size:14px;line-height:1.5;color:var(--text);max-height:120px;min-height:44px}
+    .chat-input-area textarea:focus{border-color:var(--purple)}
+    .chat-input-area .send-btn{border:0;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;border-radius:12px;padding:10px 16px;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+    .chat-input-area .send-btn:hover{opacity:.85}
+    .chat-input-area .send-btn:disabled{opacity:.4;cursor:default}
+    .selected-assets-bar{display:flex;flex-wrap:wrap;gap:4px;padding:8px 12px;border-top:1px solid var(--line);background:rgba(173,156,255,.03);min-height:0}
+    .selected-assets-bar:empty{display:none}
+    .sel-asset-chip{display:inline-flex;align-items:center;gap:4px;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;background:rgba(173,156,255,.1);border:1px solid rgba(173,156,255,.25);color:var(--purple);cursor:pointer;transition:all .15s}
+    .sel-asset-chip:hover{background:rgba(255,123,134,.1);border-color:rgba(255,123,134,.3);color:var(--red)}
+    .sel-asset-chip::after{content:"×";margin-left:2px;font-size:13px}
+
+    .diagnosis-results{display:flex;flex-direction:column;gap:14px}
+    .diag-card{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.03);overflow:hidden}
+    .diag-card .diag-header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+    .diag-card .diag-header .icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+    .diag-card .diag-header h3{font-size:14px;margin:0;flex:1}
+    .diag-card .diag-body{padding:14px 16px;font-size:13px;line-height:1.7;color:var(--text)}
+    .diag-card .diag-body ul{padding-left:18px}
+    .diag-card .diag-body li{margin:6px 0}
+    .diag-card .diag-body li strong{color:var(--text)}
+    .diag-card.root-cause .icon{background:rgba(255,123,134,.15);color:var(--red)}
+    .diag-card.skill-map .icon{background:rgba(92,228,212,.15);color:var(--cyan)}
+    .diag-card.suggestion .icon{background:rgba(114,185,255,.15);color:var(--blue)}
+    .diag-card.evidence .icon{background:rgba(244,200,101,.15);color:var(--yellow)}
+
+    .skill-tag{display:inline-flex;align-items:center;gap:4px;border:1px solid rgba(92,228,212,.25);border-radius:8px;background:rgba(92,228,212,.06);color:var(--cyan);padding:3px 8px;font-size:11px;font-weight:700;margin:2px}
+    .file-tag{display:inline-flex;align-items:center;gap:4px;border:1px solid rgba(114,185,255,.25);border-radius:8px;background:rgba(114,185,255,.06);color:var(--blue);padding:3px 8px;font-size:11px;font-family:'SF Mono','Fira Code',monospace;margin:2px}
+
+    .empty{border:1px dashed rgba(151,170,205,.3);border-radius:16px;padding:28px;text-align:center;color:var(--muted);font-size:13px}
+    .loading{text-align:center;padding:40px;color:var(--muted)}
+    .loading .spinner{display:inline-block;width:24px;height:24px;border:3px solid var(--line);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .msg{border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(255,255,255,.03);margin-bottom:8px}
+    .msg.human{border-left:3px solid var(--cyan)}
+    .msg.ai{border-left:3px solid var(--blue)}
+    .msg.tool{border-left:3px solid var(--yellow)}
+    .msg-head{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:11px;margin-bottom:6px}
+    .msg pre{white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:10px;color:#dce8fb;font-size:12px;max-height:200px;overflow:auto}
+
+    .media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:10px}
+    .media-card{border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.25);overflow:hidden;transition:border-color .15s}
+    .media-card:hover{border-color:rgba(92,228,212,.35)}
+    .media-card video,.media-card img{width:100%;display:block;max-height:240px;object-fit:contain;background:#000;cursor:pointer}
+    .media-card audio{width:100%;display:block;padding:8px}
+    .media-card .media-label{padding:6px 10px;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:6px}
+    .media-card .media-label .kind-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .media-card .media-label .kind-dot.video{background:var(--blue)}
+    .media-card .media-label .kind-dot.image{background:var(--green)}
+    .media-card .media-label .kind-dot.audio{background:var(--yellow)}
+    .media-card .media-label .kind-dot.link{background:var(--muted)}
+    .media-inline{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .media-inline video,.media-inline img{max-width:280px;max-height:180px;border-radius:10px;border:1px solid var(--line);object-fit:contain;background:#000;cursor:pointer}
+    .media-inline audio{max-width:280px;border-radius:10px}
+    .source-media-bar{border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:16px 20px;margin-top:18px}
+    .source-media-bar h3{font-size:14px;margin-bottom:10px;color:var(--cyan)}
+
+    .fail-analysis{margin-top:8px;border:1px solid rgba(255,123,134,.25);border-radius:12px;background:rgba(255,123,134,.04);overflow:hidden}
+    .fail-analysis .fa-header{padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,123,134,.15);flex-wrap:wrap}
+    .fail-analysis .fa-header .fa-type{border-radius:8px;padding:4px 10px;font-size:11px;font-weight:850;background:rgba(255,123,134,.15);color:var(--red)}
+    .fail-analysis .fa-header .fa-retry{border-radius:8px;padding:4px 10px;font-size:11px;font-weight:850;background:rgba(244,200,101,.15);color:var(--yellow)}
+    .fail-analysis .fa-body{padding:10px 14px;font-size:12px;line-height:1.7}
+    .fail-analysis .fa-section{margin-bottom:10px}
+    .fail-analysis .fa-section:last-child{margin-bottom:0}
+    .fail-analysis .fa-section-title{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .fail-analysis .fa-item{padding:6px 10px;border-left:3px solid var(--line);margin:4px 0;border-radius:0 8px 8px 0;background:rgba(0,0,0,.15)}
+    .fail-analysis .fa-item.high{border-left-color:var(--red)}
+    .fail-analysis .fa-item.medium{border-left-color:var(--yellow)}
+    .fail-analysis .fa-item.low{border-left-color:var(--muted)}
+    .fail-analysis .fa-skill{padding:6px 10px;border-left:3px solid var(--purple);margin:4px 0;border-radius:0 8px 8px 0;background:rgba(173,156,255,.05)}
+    .fail-analysis .fa-skill .skill-name{color:var(--cyan);font-weight:700}
+    .fail-analysis .fa-skill .skill-ref{color:var(--blue);font-family:'SF Mono','Fira Code',monospace;font-size:11px}
+
+    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(6px)}
+    .lightbox video,.lightbox img{max-width:92vw;max-height:90vh;border-radius:12px;box-shadow:0 16px 60px rgba(0,0,0,.6)}
+    .lightbox video{cursor:default}
+    .lightbox .lb-close{position:absolute;top:20px;right:24px;color:#fff;font-size:28px;cursor:pointer;opacity:.7;transition:opacity .15s}
+    .lightbox .lb-close:hover{opacity:1}
+
+    @media(max-width:760px){.wrap{width:min(100% - 16px,1520px)}.input-row{flex-direction:column}.input-row input{max-width:none}.pipeline{flex-wrap:wrap}.media-grid{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <span class="eyebrow">Case Diagnosis Workbench</span>
+        <a href="/skill-map" onclick="event.preventDefault();window.open(this.href,'_blank')" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:10px 20px;font-size:13px;font-weight:800;background:linear-gradient(135deg,rgba(92,228,212,.15),rgba(114,185,255,.12));border:1.5px solid rgba(92,228,212,.35);color:#5ce4d4;transition:all .2s;box-shadow:0 4px 20px rgba(92,228,212,.1);cursor:pointer" onmouseover="this.style.background='linear-gradient(135deg,rgba(92,228,212,.25),rgba(114,185,255,.2))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(92,228,212,.15),rgba(114,185,255,.12))'">🗺️ Skill 架构全景（新窗口）</a>
+        <a id="caseFlowLink" href="/case-flow" onclick="event.preventDefault();window.open(this.href,'_blank')" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:10px 20px;font-size:13px;font-weight:800;background:linear-gradient(135deg,rgba(173,156,255,.15),rgba(92,228,212,.1));border:1.5px solid rgba(173,156,255,.35);color:#ad9cff;transition:all .2s;box-shadow:0 4px 20px rgba(173,156,255,.1);cursor:pointer" onmouseover="this.style.background='linear-gradient(135deg,rgba(173,156,255,.25),rgba(92,228,212,.18))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(173,156,255,.15),rgba(92,228,212,.1))'">🔗 Case 调用流程图（新窗口）</a>
+      </div>
+      <h1>Case 问题诊断与 Skill 归因分析</h1>
+      <p>输入 Case ID 拉取完整工具调用链，然后描述人工审核发现的问题。系统会自动根据工具链逻辑和已有 Skill 架构，定位问题出现的阶段、分析根因，并给出修改建议。</p>
+      <div class="input-row">
+        <input id="caseId" placeholder="输入 Case ID / Conversation ID" autocomplete="off">
+        <button class="btn primary" id="fetchBtn">拉取 Case</button>
+        <button class="btn" id="loadLocalBtn">读取本地结果</button>
+        <select id="serverUrl" style="border:1px solid var(--line);background:rgba(5,9,18,.66);border-radius:14px;padding:10px 12px;font-size:13px">
+          <option value="">当前服务 (推荐)</option>
+          <option value="http://localhost:3791">localhost:3791 (直连后端)</option>
+          <option value="http://localhost:3792">localhost:3792</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="stats" id="statsBar" style="display:none">
+      <div class="stat"><span class="label">Traces</span><b class="value" id="sTraces" style="color:var(--cyan)">0</b></div>
+      <div class="stat"><span class="label">Messages</span><b class="value" id="sMessages" style="color:var(--blue)">0</b></div>
+      <div class="stat"><span class="label">Tool Calls</span><b class="value" id="sTools" style="color:var(--yellow)">0</b></div>
+      <div class="stat"><span class="label">Assets</span><b class="value" id="sAssets" style="color:var(--green)">0</b></div>
+      <div class="stat"><span class="label">Failures</span><b class="value" id="sFailures" style="color:var(--red)">0</b></div>
+      <div class="stat"><span class="label">Diagnosis</span><b class="value" id="sDiag" style="color:var(--purple)">—</b></div>
+    </section>
+
+    <section class="source-media-bar" id="sourceMediaBar" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3>用户素材 &amp; 成片预览</h3>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span id="mediaStatus" style="font-size:11px;color:var(--muted)"></span>
+          <button class="btn" id="downloadMediaBtn" style="font-size:12px;padding:7px 12px">下载素材到本地</button>
+        </div>
+      </div>
+      <div id="sourceMediaContent"><div class="empty" style="padding:14px">拉取 Case 后显示素材预览</div></div>
+    </section>
+
+    <section class="pipeline-section" id="pipelineSection" style="display:none">
+      <h2>Skill 流水线 · 工具调用映射</h2>
+      <div class="pipeline" id="pipelineView"></div>
+    </section>
+
+    <section class="main-grid">
+      <div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>工具调用链</h2>
+            <div class="tabs">
+              <button class="tab active" data-tab="chain">调用链</button>
+              <button class="tab" data-tab="conversation">完整问答</button>
+              <button class="tab" data-tab="assets">资产</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="view active" id="tab-chain"><div class="empty">请先拉取 Case 数据</div></div>
+            <div class="view" id="tab-conversation"><div class="empty">暂无对话数据</div></div>
+            <div class="view" id="tab-assets"><div class="empty">暂无资产数据</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel" style="margin-bottom:18px">
+          <div class="panel-head">
+            <h2>素材选择</h2>
+            <span class="sub">选择有问题的素材，然后在对话中描述问题</span>
+          </div>
+          <div class="panel-body" style="padding:12px 16px">
+            <div id="assetPicker"><div class="empty" style="padding:14px">拉取 Case 后显示可选素材</div></div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-bottom:18px">
+          <div class="panel-head">
+            <h2>AI 诊断对话</h2>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="sub" id="diagStatus">加载 Case 后开始对话</span>
+              <button class="btn" id="resetChatBtn" style="font-size:11px;padding:5px 10px">重置对话</button>
+            </div>
+          </div>
+          <div class="chat-container" id="chatContainer">
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-msg system">加载 Case 数据后，选择素材并描述问题开始诊断对话。支持多轮追问。</div>
+            </div>
+            <div class="selected-assets-bar" id="selectedAssetsBar"></div>
+            <div class="chat-input-area">
+              <textarea id="chatInput" placeholder="描述问题，例如：这个视频片段的人物面部变形了..." rows="1" disabled></textarea>
+              <button class="send-btn" id="chatSendBtn" disabled>发送</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>规则诊断</h2>
+            <span class="sub">基于关键词规则的快速诊断</span>
+          </div>
+          <div class="panel-body">
+            <textarea class="problem-input" id="problemInput" placeholder="输入问题关键词进行规则匹配诊断..." style="min-height:60px"></textarea>
+            <div class="example-problems">
+              <button class="example-btn" data-text="视频中人物面部出现变形和闪烁">面部变形</button>
+              <button class="example-btn" data-text="旁白和画面节奏不匹配">旁白错位</button>
+              <button class="example-btn" data-text="背景音乐音量太大">BGM过大</button>
+              <button class="example-btn" data-text="音频断裂丢失">音频丢失</button>
+              <button class="example-btn" data-text="参考素材没有被用于生成">参考丢失</button>
+              <button class="example-btn" data-text="无效重试循环">重试循环</button>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:10px">
+              <button class="btn accent" id="diagnoseBtn" disabled>规则诊断</button>
+              <button class="btn" id="clearBtn">清空</button>
+            </div>
+            <div id="diagResults" style="margin-top:14px"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+<script>
+/* ═══════════════════════════════════════════════
+   Skill architecture knowledge base
+   Mirrors pexo-skills/ARCHITECTURE.md
+   ═══════════════════════════════════════════════ */
+const SKILL_ARCHITECTURE = {
+  pipeline: [
+    { key: 'brainstorm', name: 'brainstorm-skill', label: '创意构思', desc: '理解用户意图，发展创意方向',
+      file: 'pexo-skills/brainstorm-skill/SKILL.md',
+      refs: ['creative-ideation-principles.md','video-models-scheduling.md','image-generation-guide.md','audio-design-guide.md'],
+      tools: [],
+      responsibilities: ['用户意图解析','创意方向提案','预览生成','风格帧制作'] },
+    { key: 'script', name: 'script-skill', label: '分镜设计', desc: '序列级生产计划，模型路由',
+      file: 'pexo-skills/script-skill/SKILL.md',
+      refs: ['video-models-scheduling.md','shot-design-principles.md','editing-rhythm-design.md','audio-design-guide.md','vo-design-principles.md','packaging-keyframe-guide.md'],
+      tools: [],
+      responsibilities: ['模型路由决策','序列规划','音频策略设计','视觉包装设计','节奏计划'] },
+    { key: 'subject-asset', name: 'subject-asset-skill', label: '主体资产', desc: '参考素材管理与覆盖分析',
+      file: 'pexo-skills/subject-asset-skill/SKILL.md',
+      refs: ['video-models-scheduling.md','image-generation-guide.md','media-preprocessing.md'],
+      tools: ['image_generate'],
+      responsibilities: ['素材分类标签','覆盖分析','补充参考生成','逐序列参考图谱'] },
+    { key: 'generation', name: 'generation-skill', label: '生产执行', desc: '执行视频片段生成',
+      file: 'pexo-skills/generation-skill/SKILL.md',
+      refs: ['video-models-scheduling.md','image-generation-guide.md','packaging-keyframe-guide.md','video-editor-tool-guide.md'],
+      tools: ['video_generate','image_generate'],
+      responsibilities: ['四字段验证','Prompt编写','并行/串行生成','降级处理'] },
+    { key: 'assembly', name: 'assembly-skill', label: '后期组装', desc: '时间线装配、音频、混音',
+      file: 'pexo-skills/assembly-skill/SKILL.md',
+      refs: ['video-models-scheduling.md','video-editor-tool-guide.md','editing-rhythm-design.md','vo-design-principles.md','audio-design-guide.md'],
+      tools: ['execute_edit_video','audio_produce','tts_generate','music_generate','show_final_video'],
+      responsibilities: ['预装配检查','转场设计','混音设计','旁白制作','BGM制作','封面烘焙'] },
+    { key: 'modification', name: 'modification-skill', label: '迭代修改', desc: '解读反馈，策略修改',
+      file: 'pexo-skills/modification-skill/SKILL.md',
+      refs: ['video-models-scheduling.md','image-generation-guide.md','video-editor-tool-guide.md'],
+      tools: ['video_generate','execute_edit_video','image_generate'],
+      responsibilities: ['反馈解读','最小修改','段落重生成','重装配','串行级联'] },
+  ],
+  toolToSkill: {
+    'video_generate': ['generation','modification'],
+    'image_generate': ['subject-asset','generation','modification'],
+    'execute_edit_video': ['assembly','modification'],
+    'audio_produce': ['assembly'],
+    'tts_generate': ['assembly'],
+    'music_generate': ['assembly'],
+    'show_final_video': ['assembly'],
+  },
+};
+
+/* ═══════════════════════════════════════════════
+   Diagnosis rules — maps problem keywords to
+   root causes, skill stages, and fix suggestions
+   ═══════════════════════════════════════════════ */
+const DIAGNOSIS_RULES = [
+  { id: 'face-deform',
+    keywords: ['面部变形','人脸变形','脸部','五官','面部闪烁','面部僵硬','人物变形','face','deform','flicker'],
+    rootCause: '视频模型在生成真人面部时缺乏足够的参考锚定，或多序列并行生成导致角色外观不一致。可能的原因：\n(1) 参考图未正确传入 image_list\n(2) 并行生成时各序列没有共享统一的角色参考\n(3) 模型选择不当 — 人脸素材应路由到 L3 Seedance',
+    skills: ['subject-asset','generation','script'],
+    checkPoints: [
+      '检查 video_generate 的 image_list 是否包含人脸参考图',
+      '检查是否使用了并行生成，各序列参考图是否一致',
+      '检查 script-skill 的模型路由是否正确识别了人脸素材 → L3 Seedance',
+    ],
+    suggestions: [
+      { file: 'pexo-skills/subject-asset-skill/SKILL.md', section: '覆盖分析', content: '强化人脸素材的覆盖检查：当检测到角色含真人面部时，强制要求至少一张正面清晰参考图，并在逐序列参考图谱中确保每个涉及该角色的序列都携带该参考' },
+      { file: 'pexo-skills/generation-skill/SKILL.md', section: 'Prompt编写 / 参考映射', content: '在并行生成场景下，验证所有序列的 image_list 都包含共享的角色参考图，防止部分序列丢失参考导致外观漂移' },
+    ]},
+  { id: 'narration-mismatch',
+    keywords: ['旁白','节奏','配音','不匹配','错位','延迟','voiceover','narration','timing','pace','节拍'],
+    rootCause: '旁白的时间轴与视频画面切点不同步。可能的原因：\n(1) 旁白基于分镜脚本的理想时间线制作，而非实际生成视频的真实切点\n(2) TTS 生成的时长与视频段落时长不匹配\n(3) assembly-skill 装配时未对齐旁白与画面',
+    skills: ['assembly','script'],
+    checkPoints: [
+      '检查 audio_produce / tts_generate 的文本长度是否与对应视频段落时长匹配',
+      '检查 execute_edit_video 的 audio_tracks 时间偏移是否合理',
+      '检查 script-skill 的旁白规划是否考虑了实际生成视频的节奏',
+    ],
+    suggestions: [
+      { file: 'pexo-skills/assembly-skill/SKILL.md', section: '旁白制作', content: '旁白制作应基于实际生成视频的时长和切点，而非分镜脚本的预期时间线。先分析视频实际节奏，再据此调整旁白文本长度和分段' },
+      { file: 'pexo-skills/assembly-skill/references/vo-design-principles.md', section: '时间匹配', content: '增加旁白时长与视频段落时长的对齐检查规则' },
+    ]},
+  { id: 'product-distortion',
+    keywords: ['比例','失真','产品','大小','尺寸','变形','product','scale','distort','proportion'],
+    rootCause: '产品在画面中的比例不真实。可能的原因：\n(1) 产品参考图未包含尺寸参照物\n(2) Prompt 未明确描述产品在场景中的相对大小\n(3) 视频模型对产品尺寸的理解偏差',
+    skills: ['generation','script','subject-asset'],
+    checkPoints: [
+      '检查 video_generate prompt 是否描述了产品相对场景的比例关系',
+      '检查 subject-asset-skill 是否提供了产品特写参考',
+      '检查 image_list 中产品参考图的质量和角度',
+    ],
+    suggestions: [
+      { file: 'pexo-skills/generation-skill/SKILL.md', section: 'Prompt 编写', content: '当 prompt 涉及产品展示时，增加明确的尺寸/比例描述（如"手持大小的瓶子"、"桌面上的小型设备"），避免模型猜测产品尺寸' },
+      { file: 'pexo-skills/subject-asset-skill/SKILL.md', section: '素材接收与组织', content: '产品类素材应标注实际尺寸范围，并在补充参考生成时包含有场景参照物的构图' },
+    ]},
+  { id: 'bgm-volume',
+    keywords: ['BGM','音量','太大','盖住','背景音乐','音乐','volume','loud','background music','混音'],
+    rootCause: '背景音乐音量过高，压制了画面共生音效或旁白。可能的原因：\n(1) assembly-skill 混音时 BGM volume 设置过高\n(2) 未遵循 Volume 硬门规则（共生段=1.0, BGM=0.15-0.25）\n(3) 有旁白/SFX 段落未降低 BGM 音量',
+    skills: ['assembly'],
+    checkPoints: [
+      '检查 execute_edit_video 中 BGM audio_track 的 volume 值（应为 0.15-0.25）',
+      '检查共生音频片段的 volume 是否为 1.0',
+      '检查是否存在 BGM 和 SFX 重叠但 BGM 未降低的情况',
+    ],
+    suggestions: [
+      { file: 'pexo-skills/assembly-skill/SKILL.md', section: '混音设计', content: '严格执行 Volume 硬门：共生 SFX 段 volume=1.0，BGM 在有旁白/SFX 时必须降至 0.15-0.25。密集音频段 BGM 应进一步降低或消失' },
+      { file: 'pexo-skills/assembly-skill/references/audio-design-guide.md', section: '音量层级', content: '增加装配前自动检查：当 BGM volume > 0.3 且同时存在 SFX/VO 时发出警告' },
+    ]},
+  { id: 'audio-loss',
+    keywords: ['静音','无声','音频丢失','声音消失','音频断裂','音频中断','配乐丢失','audio loss','silent','mute','sound missing'],
+    rootCause: '部分或全部视频段落缺少音频。可能的原因：\n(1) video_generate 的 sound 参数未设为 "on"\n(2) 模型降级时丢失了音频共生能力\n(3) assembly-skill 装配时错误地将有音频段落设为静音 (volume=0)',
+    skills: ['generation','assembly','script'],
+    checkPoints: [
+      '检查每个 video_generate 调用的 sound 参数',
+      '检查是否发生了模型降级（Seedance → Kling），降级后是否强制静音',
+      '检查 execute_edit_video 中各 clip 的 volume 设置',
+      '检查是否有音频资产生成但未被装配引用',
+    ],
+    suggestions: [
+      { file: 'pexo-skills/generation-skill/SKILL.md', section: '降级处理', content: '降级时必须评估音频影响：如果原路径 sound=on，降级到不支持音频的路径时，必须在装配阶段补充后期音效' },
+      { file: 'pexo-skills/assembly-skill/SKILL.md', section: '预装配检查', content: '增加音频完整性检查：每个视频段落必须有声音来源（共生 SFX 或后期 BGM/VO），全静音段落需要明确标注原因' },
+    ]},
+  { id: 'text-garbled',
+    keywords: ['文字','乱码','字幕','看不清','文字叠加','text','garbled','subtitle','caption','CJK','字体'],
+    rootCause: '视频中的文字或字幕渲染异常。可能的原因：\n(1) 模型生成了画面内文字但效果不可控\n(2) 字幕渲染使用了不支持 CJK 的字体\n(3) 文字叠加层级冲突',
+    skills: ['generation','assembly','script'],
+    checkPoints: [
+      '检查是否有 image_generate 生成包装关键帧（Layer 1 文字）',
+      '检查 execute_edit_video 的 overlay/subtitle 设置',
+      '检查 script-skill 是否将文字需求路由到了正确的模型（Kling L4 处理画面内文字）',
+    ],
+    suggestions: [
+      { file: 'pexo-skills/script-skill/SKILL.md', section: '模型路由', content: '画面内文字/UI 需求必须路由到 L4 Kling，不能用 Seedance 生成可读文字' },
+      { file: 'pexo-skills/assembly-skill/SKILL.md', section: '视觉包装', content: '字幕和文字叠加应使用后期 Layer 2 方式实现，避免依赖 AI 模型生成可读文字' },
+    ]},
+  { id: 'retry-loop',
+    keywords: ['重试','循环','重复','浪费','无效','loop','retry','waste','repeated','多次尝试'],
+    rootCause: 'Agent 在失败后重复尝试相同策略，未改变假设。可能的原因：\n(1) 参数契约违反了 provider 约束但 Agent 只修改 prompt 不修改参数\n(2) 降级策略未被触发\n(3) Agent 未识别错误的真正根因',
+    skills: ['generation','modification'],
+    checkPoints: [
+      '检查连续失败的 tool calls 参数是否有实质变化',
+      '检查错误消息是否指向参数问题而非内容问题',
+      '检查降级链是否被正确触发',
+    ],
+    suggestions: [
+      { file: 'pexo-skills/generation-skill/SKILL.md', section: '降级处理', content: '增加重试策略规则：同一调用连续失败 2 次且错误消息相同时，必须改变策略（降级模型或修改参数），禁止仅修改 prompt 重试' },
+      { file: 'pexo-skills/modification-skill/SKILL.md', section: '反馈解读', content: '强化错误分类能力：区分参数错误（需要改参数）和内容错误（需要改 prompt），避免对参数错误做无效的 prompt 修改' },
+    ]},
+  { id: 'ref-lost',
+    keywords: ['参考','素材丢失','参考图','不像','reference','lost','dropped','missing ref','anchor','丢弃','没有用'],
+    rootCause: '用户上传的参考素材未被传入生成工具。可能的原因：\n(1) subject-asset-skill 未将素材注册到主体元素注册表\n(2) generation-skill 构建 image_list 时遗漏了参考图\n(3) 降级时参考素材未被携带到新模型调用',
+    skills: ['subject-asset','generation'],
+    checkPoints: [
+      '检查 video_generate 的 image_list 是否包含用户上传的素材',
+      '检查 subject-asset-skill 的主体元素注册表是否完整',
+      '如果有降级，检查降级后的调用是否携带了所有参考素材',
+    ],
+    suggestions: [
+      { file: 'pexo-skills/subject-asset-skill/SKILL.md', section: '逐序列参考图谱', content: '增加参考完整性验证：在输出参考图谱时，对比用户原始上传素材列表，确保每个素材至少被分配到一个序列' },
+      { file: 'pexo-skills/generation-skill/SKILL.md', section: '参考映射', content: '在每次 video_generate 调用前增加参考素材完整性断言：用户上传的核心素材必须出现在 image_list 中' },
+    ]},
+  { id: 'style-inconsistent',
+    keywords: ['风格不一致','画风','突变','风格','style','inconsist','visual','画风变化','色调'],
+    rootCause: '不同段落之间视觉风格不统一。可能的原因：\n(1) 并行生成时各序列未共享 Visual Style Convention\n(2) 模型降级导致不同段落使用了不同模型\n(3) 参考图在各序列中不一致',
+    skills: ['script','generation','subject-asset'],
+    checkPoints: [
+      '检查 script-skill 是否定义了 Visual Style Convention（4 个常量）',
+      '检查并行生成的各序列是否共享相同的 style_ref',
+      '检查是否有段落因降级使用了不同模型',
+    ],
+    suggestions: [
+      { file: 'pexo-skills/script-skill/SKILL.md', section: '视觉设计', content: '多序列生产前必须定义 Visual Style Convention，包括色彩基调、光影风格、纹理质感、视觉节奏四个常量' },
+      { file: 'pexo-skills/generation-skill/SKILL.md', section: '并行生成', content: '并行生成时所有序列必须共享相同的 style_ref 和 Visual Style Convention 参数' },
+    ]},
+  { id: 'timeout-degrade',
+    keywords: ['超时','降级','timeout','degrade','fallback','Kling超时','Seedance超时','模型失败'],
+    rootCause: '生成模型调用超时触发降级。可能的原因：\n(1) 请求参数过于复杂（过长时长、过多参考图）\n(2) 模型服务暂时不可用\n(3) 降级后视觉质量显著下降但未通知用户',
+    skills: ['generation','script'],
+    checkPoints: [
+      '检查超时调用的参数（时长、参考图数量）是否在模型限制范围内',
+      '检查降级链执行是否正确（Seedance → Kling → Grok）',
+      '检查降级后是否保持了参考素材完整性',
+    ],
+    suggestions: [
+      { file: 'pexo-skills/generation-skill/SKILL.md', section: '降级处理', content: '降级时遵循优先序：先保用户素材完整性，再保音频共生，最后考虑速度。降级后用创意语言通知用户' },
+    ]},
+  { id: 'assembly-error',
+    keywords: ['装配','合成','拼接','转场','crossfade','剪辑','timeline','编辑','cut','缝合','频闪'],
+    rootCause: '视频装配/编辑环节出现异常。可能的原因：\n(1) execute_edit_video 的 edit_spec 参数格式错误\n(2) 转场参数不合理导致画面闪烁\n(3) 使用了已渲染合成文件而非原始单段文件',
+    skills: ['assembly'],
+    checkPoints: [
+      '检查 execute_edit_video 的 edit_spec 是否符合规范',
+      '检查 clip url 是否指向原始生成文件',
+      '检查转场参数（crossfade 500-750ms 或 cut）',
+    ],
+    suggestions: [
+      { file: 'pexo-skills/assembly-skill/SKILL.md', section: '预装配检查', content: '严格执行预装配 10 项检查清单，特别是源文件检查（永远用原始单段文件）和 Fade 互斥检查' },
+      { file: 'pexo-skills/assembly-skill/references/video-editor-tool-guide.md', section: 'edit spec 格式', content: '增加装配前参数校验' },
+    ]},
+  { id: 'motion-continuity',
+    keywords: ['不连贯','跳跃','动作断裂','衔接','连续','continuity','jump','割裂'],
+    rootCause: '相邻段落之间动作或场景不连贯。可能的原因：\n(1) 应使用串行续接（Continuation）的场景错误使用了并行生成\n(2) 串行生成时首帧参考图选择不当\n(3) 转场设计不当 — 动作连续场景应使用 crossfade 而非 cut',
+    skills: ['script','generation','assembly'],
+    checkPoints: [
+      '检查 script-skill 的序列策略是连续动作（需串行）还是独立场景（可并行）',
+      '检查串行续接时是否正确传递了上一段末帧作为首帧参考',
+      '检查 assembly-skill 对同场景动作的转场是否使用了 crossfade',
+    ],
+    suggestions: [
+      { file: 'pexo-skills/script-skill/SKILL.md', section: '序列规划', content: '明确标注哪些序列是动作连续的（必须串行），哪些是独立场景（可以并行），避免连续动作被错误并行生成' },
+      { file: 'pexo-skills/assembly-skill/SKILL.md', section: '转场设计', content: '同场景连续动作之间使用 crossfade (500-750ms)，不同场景之间使用 cut' },
+    ]},
+];
+
+/* ═══════════════════════════════════════════════
+   App state & utilities
+   ═══════════════════════════════════════════════ */
+let state = { caseData: null, diagnosis: null, selectedAssets: [], chatSessionId: null, chatLoading: false };
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = (v='') => String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+// Restore state from sessionStorage on page load
+(function restoreState() {
+  try {
+    const urlCase = new URLSearchParams(location.search).get('case');
+    const savedId = urlCase || sessionStorage.getItem('pexo_case_id');
+    if (savedId) {
+      setTimeout(() => {
+        const inp = document.querySelector('#caseId');
+        if (inp) { inp.value = savedId; loadCase(); }
+      }, 150);
+    }
+  } catch {}
+})();
+
+async function api(path) {
+  const base = $('#serverUrl').value;
+  const res = await fetch(base + path, { headers: { 'content-type': 'application/json' } });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+async function apiPost(path, body) {
+  const base = $('#serverUrl').value;
+  const res = await fetch(base + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+function showLoading(target, msg = '加载中...') {
+  $(target).innerHTML = `<div class="loading"><div class="spinner"></div><p style="margin-top:12px">${esc(msg)}</p></div>`;
+}
+
+/* ═══════════════════════════════════════════════
+   Fetch / load case
+   ═══════════════════════════════════════════════ */
+async function fetchCase() {
+  const caseId = $('#caseId').value.trim();
+  if (!caseId) return;
+  showLoading('#tab-chain', '正在拉取 Case 数据（新 Case 需从 Langfuse 拉取，可能需要 1-2 分钟）...');
+  try {
+    const job = await apiPost('/api/analyze', { caseId });
+    const jobId = job.id;
+    let attempts = 0;
+    const poll = async () => {
+      attempts++;
+      try {
+        if (jobId) {
+          const j = await api(`/api/jobs/${jobId}`);
+          if (j.status === 'failed') {
+            const errMsg = j.error || '未知错误';
+            const lastLogs = (j.logs || []).filter(l => l.stream === 'stderr').slice(-3).map(l => l.line).join('\n');
+            $('#tab-chain').innerHTML = `<div class="empty" style="color:var(--red)">拉取失败: ${esc(errMsg)}<br><br>${lastLogs ? '<pre style="text-align:left;margin-top:10px;padding:10px;background:rgba(0,0,0,.3);border-radius:8px;font-size:11px;color:var(--muted)">' + esc(lastLogs) + '</pre>' : ''}请确认 Case ID 是否正确（应为 Langfuse session/conversation ID）</div>`;
+            return;
+          }
+          if (j.status === 'completed') {
+            const data = await api(`/api/cases/${encodeURIComponent(caseId)}`);
+            state.caseData = data;
+            try { sessionStorage.setItem('pexo_case_id', caseId); } catch {}
+            renderAll(data);
+            $('#diagnoseBtn').disabled = false;
+            return;
+          }
+          const elapsed = Math.round(attempts * 3);
+          showLoading('#tab-chain', `正在拉取 Case 数据... (${elapsed}s)`);
+        }
+        const data = await api(`/api/cases/${encodeURIComponent(caseId)}`).catch(() => null);
+        if (data && data.traceCount > 0) {
+          state.caseData = data;
+          try { sessionStorage.setItem('pexo_case_id', caseId); } catch {}
+          renderAll(data);
+          $('#diagnoseBtn').disabled = false;
+          return;
+        }
+        if (attempts < 40) setTimeout(poll, 3000);
+        else $('#tab-chain').innerHTML = `<div class="empty" style="color:var(--red)">拉取超时（已等待 ${elapsed}s）。请检查服务端日志或确认 Case ID。</div>`;
+      } catch(err) {
+        if (attempts < 40) setTimeout(poll, 3000);
+        else $('#tab-chain').innerHTML = `<div class="empty" style="color:var(--red)">拉取超时，请检查服务端日志</div>`;
+      }
+    };
+    setTimeout(poll, 3000);
+  } catch(e) {
+    try {
+      const data = await api(`/api/cases/${encodeURIComponent(caseId)}`);
+      state.caseData = data;
+      renderAll(data);
+      $('#diagnoseBtn').disabled = false;
+    } catch(e2) {
+      $('#tab-chain').innerHTML = `<div class="empty" style="color:var(--red)">拉取失败: ${esc(e.message)}<br><br>请确保本地服务正在运行</div>`;
+    }
+  }
+}
+
+async function loadCase() {
+  const caseId = $('#caseId').value.trim();
+  if (!caseId) return;
+  showLoading('#tab-chain', '正在加载本地 Case 数据...');
+  try {
+    const data = await api(`/api/cases/${encodeURIComponent(caseId)}`);
+    state.caseData = data;
+    try { sessionStorage.setItem('pexo_case_id', caseId); } catch {}
+    history.replaceState(null, '', '/?case=' + encodeURIComponent(caseId));
+    renderAll(data);
+    $('#diagnoseBtn').disabled = false;
+  } catch(e) {
+    $('#tab-chain').innerHTML = `<div class="empty" style="color:var(--red)">加载失败: ${esc(e.message)}</div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   Media helpers
+   ═══════════════════════════════════════════════ */
+function mediaTag(url, kind, opts = {}) {
+  const maxW = opts.maxWidth || '100%';
+  const maxH = opts.maxHeight || '240px';
+  if (!url) return '';
+  if (kind === 'video') return `<video src="${esc(url)}" controls preload="metadata" style="max-width:${maxW};max-height:${maxH};border-radius:10px;background:#000;cursor:pointer" onclick="openLightbox(this)"></video>`;
+  if (kind === 'image') return `<img src="${esc(url)}" loading="lazy" style="max-width:${maxW};max-height:${maxH};border-radius:10px;background:#000;cursor:pointer" onclick="openLightbox(this)" onerror="this.style.display='none'">`;
+  if (kind === 'audio') return `<audio src="${esc(url)}" controls preload="metadata" style="max-width:${maxW}"></audio>`;
+  return `<a href="${esc(url)}" target="_blank" class="chip">${esc(url.split('?')[0].split('/').pop())}</a>`;
+}
+
+function mediaCardsHtml(links) {
+  if (!links || !links.length) return '';
+  return `<div class="media-grid">${links.map(l => {
+    const inner = l.kind === 'video'
+      ? `<video src="${esc(l.url)}" controls preload="metadata" onclick="openLightbox(this)"></video>`
+      : l.kind === 'image'
+      ? `<img src="${esc(l.url)}" loading="lazy" onclick="openLightbox(this)" onerror="this.parentElement.style.display='none'">`
+      : l.kind === 'audio'
+      ? `<audio src="${esc(l.url)}" controls preload="metadata"></audio>`
+      : `<div style="padding:18px;text-align:center"><a href="${esc(l.url)}" target="_blank" style="font-size:12px">打开链接 ↗</a></div>`;
+    return `<div class="media-card">${inner}<div class="media-label"><span class="kind-dot ${l.kind}"></span>${esc(l.label)}</div></div>`;
+  }).join('')}</div>`;
+}
+
+function openLightbox(el) {
+  const isVideo = el.tagName === 'VIDEO';
+  const src = el.src || el.currentSrc;
+  const lb = document.createElement('div');
+  lb.className = 'lightbox';
+  lb.innerHTML = `<span class="lb-close">&times;</span>${isVideo
+    ? `<video src="${esc(src)}" controls autoplay style="cursor:default"></video>`
+    : `<img src="${esc(src)}">`}`;
+  lb.addEventListener('click', e => { if (e.target === lb || e.target.classList.contains('lb-close')) lb.remove(); });
+  document.addEventListener('keydown', function handler(e) { if (e.key === 'Escape') { lb.remove(); document.removeEventListener('keydown', handler); }});
+  document.body.appendChild(lb);
+}
+
+function inferKindFromContent(text) {
+  if (/<original-video>/.test(text)) return 'video';
+  if (/<original-image>/.test(text)) return 'image';
+  if (/<original-audio>/.test(text)) return 'audio';
+  return null;
+}
+
+function extractInlineMedia(text) {
+  const results = [];
+  const pattern = /<original-(image|video|audio)>(.*?)<\/original-\1>/g;
+  for (const m of text.matchAll(pattern)) {
+    results.push({ kind: m[1], raw: m[2], label: m[2].split('/').pop() });
+  }
+  return results;
+}
+
+/* ═══════════════════════════════════════════════
+   Render functions
+   ═══════════════════════════════════════════════ */
+function renderAll(data) {
+  const cid = $('#caseId').value.trim();
+  const flowLink = document.getElementById('caseFlowLink');
+  if(flowLink && cid) flowLink.href = '/case-flow?case=' + encodeURIComponent(cid);
+  $('#statsBar').style.display = '';
+  $('#pipelineSection').style.display = '';
+  $('#sourceMediaBar').style.display = '';
+  $('#sTraces').textContent = data.analysis?.summary?.traces || data.traceCount || 0;
+  $('#sMessages').textContent = data.analysis?.summary?.messages || data.conversation?.length || 0;
+  $('#sTools').textContent = data.analysis?.summary?.toolCalls || data.toolCalls?.length || 0;
+  $('#sAssets').textContent = data.analysis?.summary?.assets || data.assets?.length || 0;
+  const failedCalls = (data.toolCalls || []).filter(c => c.failed);
+  const analyzedFails = failedCalls.filter(c => c.failureAnalysis);
+  $('#sFailures').textContent = failedCalls.length;
+  if (analyzedFails.length) {
+    $('#sDiag').textContent = analyzedFails.length;
+    $('#diagStatus').textContent = `已自动分析 ${analyzedFails.length} 个失败调用`;
+  }
+  $('#mediaStatus').textContent = data.hasLocalMedia ? '✓ 本地素材已下载' : `${data.urlMapSize || 0} 个 URL`;
+  renderPipeline(data);
+  renderToolChain(data.toolCalls || []);
+  renderConversation(data.conversation || []);
+  renderAssets(data.assets || []);
+  renderSourceMedia(data);
+  renderAssetPicker();
+  $('#chatInput').disabled = false;
+  $('#chatSendBtn').disabled = false;
+  $('#diagStatus').textContent = '选择素材并描述问题';
+  if (analyzedFails.length) {
+    renderAutoFailureSummary(analyzedFails);
+    const failSummary = analyzedFails.map(c => {
+      const fa = c.failureAnalysis || {};
+      return `${fa.problemClassIcon || '❓'} ${c.assetName || c.name}: ${fa.problemClassLabel || '未知'} — ${fa.errorLabel || ''}`;
+    }).join('\n');
+    addChatMessage('system', `已加载 Case，检测到 ${analyzedFails.length} 个失败调用:\n${failSummary}\n\n选择素材并描述具体问题开始分析。`);
+  }
+}
+
+function renderAutoFailureSummary(failedCalls) {
+  const byClass = {};
+  for (const c of failedCalls) {
+    const fa = c.failureAnalysis;
+    if (!fa) continue;
+    const cls = fa.problemClass || 'unknown';
+    if (!byClass[cls]) byClass[cls] = [];
+    byClass[cls].push(c);
+  }
+  const classOrder = ['tool_call','infra','generation','content','parameter','unknown'];
+
+  let summaryBadges = '';
+  for (const cls of classOrder) {
+    const items = byClass[cls];
+    if (!items?.length) continue;
+    const fa0 = items[0].failureAnalysis;
+    summaryBadges += `<span style="display:inline-flex;align-items:center;gap:4px;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:800;background:${fa0.problemClassColor}22;color:${fa0.problemClassColor};border:1px solid ${fa0.problemClassColor}44;margin:3px">${fa0.problemClassIcon} ${fa0.problemClassLabel} ×${items.length}</span>`;
+  }
+
+  let html = `<div class="diag-card root-cause">
+    <div class="diag-header"><div class="icon" style="background:rgba(255,123,134,.15);color:var(--red)">⚡</div>
+    <h3>自动失败分析 — ${failedCalls.length} 个失败调用</h3></div>
+    <div class="diag-body">
+    <div style="margin-bottom:14px;display:flex;flex-wrap:wrap;gap:4px;align-items:center">
+      <span style="font-size:12px;font-weight:700;color:var(--muted);margin-right:6px">问题分类：</span>${summaryBadges}
+    </div>`;
+
+  for (const cls of classOrder) {
+    const items = byClass[cls];
+    if (!items?.length) continue;
+    const fa0 = items[0].failureAnalysis;
+    html += `<div style="margin-bottom:16px">
+      <div style="font-weight:800;color:${fa0.problemClassColor};margin-bottom:8px;display:flex;align-items:center;gap:6px">
+        <span style="font-size:16px">${fa0.problemClassIcon}</span> ${esc(fa0.problemClassLabel)} (${items.length} 个)
+      </div>`;
+
+    for (const c of items) {
+      const fa = c.failureAnalysis;
+      if (!fa) continue;
+      html += `<div style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:rgba(0,0,0,.15);border-left:3px solid ${fa.problemClassColor}">`;
+      html += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap">`;
+      html += `<strong style="color:var(--text)">${esc(c.assetName || c.name)}</strong>`;
+      html += `<span class="pill fail" style="font-size:10px">${esc(fa.errorLabel)}</span>`;
+      if (fa.retryCount) html += `<span class="pill warn" style="font-size:10px">重试${fa.retryCount}次</span>`;
+      const stageLabels = { 'subject-asset':'主体资产','generation':'生产执行','assembly':'后期组装','modification':'迭代修改' };
+      if (stageLabels[c.pipelineStage]) html += `<span class="chip">${stageLabels[c.pipelineStage]}</span>`;
+      html += `</div>`;
+      for (const rc of (fa.rootCause || [])) {
+        const sevColor = rc.severity === 'critical' ? 'var(--red)' : rc.severity === 'high' ? 'var(--red)' : rc.severity === 'medium' ? 'var(--yellow)' : 'var(--muted)';
+        html += `<div style="font-size:12px;line-height:1.65;padding:4px 0;white-space:pre-line;color:${sevColor}">${esc(rc.detail)}</div>`;
+      }
+      if (fa.skillIssues?.length) {
+        html += `<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--line)">`;
+        html += `<div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Skill 修改建议</div>`;
+        for (const si of fa.skillIssues) {
+          html += `<div style="font-size:12px;line-height:1.55;padding:4px 0;margin-bottom:4px">
+            <span class="skill-tag">${esc(si.skill)}</span> ${esc(si.issue)}
+            <br><span style="color:var(--blue);font-size:11px;font-family:'SF Mono','Fira Code',monospace">${esc(si.ref)}</span>
+          </div>`;
+        }
+        html += `</div>`;
+      }
+      html += `</div>`;
+    }
+    html += `</div>`;
+  }
+  html += `</div></div>`;
+
+  const existingContent = $('#diagResults').innerHTML;
+  const isDefault = existingContent.includes('输入 Case ID 和问题描述');
+  $('#diagResults').innerHTML = `<div class="diagnosis-results">${html}</div>` + (isDefault ? '' : existingContent);
+}
+
+function renderPipeline(data) {
+  const toolCalls = data.toolCalls || [];
+  const assets = data.assets || [];
+  const toolNames = new Set(toolCalls.map(c => c.name).concat(assets.map(a => a.tool)).filter(Boolean));
+  const failedTools = new Set(toolCalls.filter(c => c.failed).map(c => c.name));
+  const html = SKILL_ARCHITECTURE.pipeline.map((node, i) => {
+    const matchedTools = node.tools.filter(t => toolNames.has(t));
+    const hasFailure = node.tools.some(t => failedTools.has(t));
+    const isActive = matchedTools.length > 0;
+    const cls = [isActive ? 'active' : '', hasFailure ? 'has-issue' : ''].filter(Boolean).join(' ');
+    const badgeHtml = hasFailure
+      ? `<div class="node-badge error">${node.tools.filter(t => failedTools.has(t)).length}</div>`
+      : isActive ? `<div class="node-badge ok">✓</div>` : '';
+    const arrow = i < SKILL_ARCHITECTURE.pipeline.length - 1 ? '<div class="pipeline-arrow">→</div>' : '';
+    return `<div class="pipeline-node ${cls}" data-skill="${node.key}">
+      ${badgeHtml}
+      <div class="node-name">${esc(node.label)}</div>
+      <div class="node-desc">${esc(node.desc)}</div>
+      <div style="margin-top:6px">${matchedTools.map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div>
+    </div>${arrow}`;
+  }).join('');
+  $('#pipelineView').innerHTML = html;
+}
+
+function renderFailureAnalysis(fa) {
+  if (!fa) return '';
+  const pcColor = fa.problemClassColor || '#95a5a6';
+  const pcIcon = fa.problemClassIcon || '❓';
+  const pcLabel = fa.problemClassLabel || '待定';
+
+  let html = '<div class="fail-analysis"><div class="fa-header">';
+  html += `<span style="border-radius:8px;padding:4px 10px;font-size:11px;font-weight:850;background:${pcColor}22;color:${pcColor};border:1px solid ${pcColor}44">${pcIcon} ${esc(pcLabel)}</span>`;
+  html += `<span class="fa-type">${esc(fa.errorLabel)}</span>`;
+  if (fa.retryCount > 0) html += `<span class="fa-retry">重试 ${fa.retryCount} 次</span>`;
+  html += `<span style="font-size:11px;color:var(--muted)">前序 ${fa.precedingCount} 调用 · ${fa.precedingFailCount} 失败</span>`;
+  html += '</div><div class="fa-body">';
+
+  if (fa.rootCause?.length) {
+    html += '<div class="fa-section"><div class="fa-section-title">根因分析</div>';
+    for (const rc of fa.rootCause) {
+      const sev = rc.severity === 'critical' ? 'high' : rc.severity;
+      html += `<div class="fa-item ${sev}" style="white-space:pre-line">${esc(rc.detail)}</div>`;
+    }
+    html += '</div>';
+  }
+
+  if (fa.downstreamImpact?.length) {
+    html += '<div class="fa-section"><div class="fa-section-title">下游影响</div>';
+    for (const impact of fa.downstreamImpact) {
+      html += `<div class="fa-item medium">${esc(impact)}</div>`;
+    }
+    html += '</div>';
+  }
+
+  if (fa.skillIssues?.length) {
+    html += '<div class="fa-section"><div class="fa-section-title">Skill 层面问题与修改建议</div>';
+    for (const si of fa.skillIssues) {
+      html += `<div class="fa-skill"><span class="skill-name">${esc(si.skill)}</span>：${esc(si.issue)}<br><span class="skill-ref">${esc(si.ref)}</span></div>`;
+    }
+    html += '</div>';
+  }
+
+  html += '</div></div>';
+  return html;
+}
+
+const STAGE_META = {
+  'subject-asset': { label: '主体资产', color: 'cyan', icon: '🎨', desc: 'subject-asset-skill — 参考素材管理与补充生成' },
+  'generation':    { label: '生产执行', color: 'blue', icon: '🎬', desc: 'generation-skill — 视频/图片片段生成' },
+  'assembly':      { label: '后期组装', color: 'green', icon: '🔧', desc: 'assembly-skill — 时间线装配、音频、混音、交付' },
+  'modification':  { label: '迭代修改', color: 'orange', icon: '🔄', desc: 'modification-skill — 基于反馈的重生成与重装配' },
+  'other':         { label: '其他调用', color: 'muted', icon: '⚙️', desc: '辅助工具调用' },
+};
+
+function summarizeCall(call) {
+  const name = call.name || '';
+  const asset = call.assetName || '';
+  const input = String(call.input || '');
+  const provider = call.provider || '';
+  const model = call.model || '';
+
+  const promptSnippet = (() => {
+    const parsed = typeof input === 'string' ? (()=>{ try { return JSON.parse(input); } catch { return null; } })() : null;
+    if (parsed) {
+      const p = parsed.prompt || parsed.text || parsed.input || '';
+      if (p) return String(p).replace(/\s+/g,' ').slice(0,80);
+      const pp = parsed.provider_param;
+      if (pp && typeof pp === 'object') {
+        for (const v of Object.values(pp)) {
+          if (v && typeof v === 'object' && v.prompt) return String(v.prompt).replace(/\s+/g,' ').slice(0,80);
+        }
+      }
+    }
+    const m = input.match(/"prompt"\s*:\s*"([^"]{3,})"/);
+    if (m) return m[1].replace(/\\n/g,' ').slice(0,80);
+    return '';
+  })();
+
+  const durationMatch = input.match(/"duration"\s*:\s*"?(\d+)"?/);
+  const dur = durationMatch ? durationMatch[1]+'s' : '';
+  const arMatch = input.match(/"aspect_ratio"\s*:\s*"([^"]+)"/);
+  const ar = arMatch ? arMatch[1] : '';
+  const soundMatch = input.match(/"sound"\s*:\s*"(on|off)"/);
+  const sound = soundMatch ? (soundMatch[1]==='on'?'有声':'静音') : '';
+  const modeMatch = input.match(/"mode"\s*:\s*"([^"]+)"/);
+  const mode = modeMatch ? modeMatch[1] : '';
+
+  if (name === 'video_generate') {
+    const specs = [mode, ar, dur, sound, provider||model].filter(Boolean).join(' · ');
+    const desc = promptSnippet ? `「${promptSnippet}…」` : (asset || '视频片段');
+    return `生成视频 ${desc}${specs ? ' — '+specs : ''}`;
+  }
+  if (name === 'image_generate') {
+    const nameMatch = input.match(/"name"\s*:\s*"([^"]+)"/);
+    const imgName = nameMatch ? nameMatch[1] : asset;
+    const desc = promptSnippet ? `「${promptSnippet}…」` : (imgName || '图片');
+    return `生成图片 ${desc}`;
+  }
+  if (name === 'execute_edit_video') {
+    const clipCount = (input.match(/"clips"\s*:\s*\[/g)||[]).length ? ((input.match(/"file"/g)||[]).length) : 0;
+    const hasAudio = /"audio_tracks"/.test(input);
+    const hasTrans = /crossfade|dissolve|transition/.test(input);
+    const parts = [];
+    if (clipCount) parts.push(`${clipCount} 个片段`);
+    if (hasAudio) parts.push('含音轨');
+    if (hasTrans) parts.push('含转场');
+    return `时间线装配` + (parts.length ? ` — ${parts.join('、')}` : '');
+  }
+  if (name === 'audio_produce' || name === 'tts_generate') {
+    const text = promptSnippet || '';
+    return `语音合成` + (text ? ` — 「${text.slice(0,60)}…」` : '');
+  }
+  if (name === 'music_generate') {
+    return `BGM 生成` + (promptSnippet ? ` — 「${promptSnippet.slice(0,60)}…」` : '');
+  }
+  if (name === 'show_final_video') {
+    return '交付成片 — 最终视频呈现给用户';
+  }
+  if (/analyze_audio|ffprobe/i.test(name)) {
+    return '音频/媒体文件分析';
+  }
+  if (/get_file_info/i.test(name)) {
+    return '获取文件信息 / 刷新签名 URL';
+  }
+  if (promptSnippet) return `${name} — 「${promptSnippet.slice(0,60)}…」`;
+  return '';
+}
+
+function renderToolChain(calls) {
+  if (!calls.length) { $('#tab-chain').innerHTML = '<div class="empty">暂无工具调用</div>'; return; }
+  const assets = state.caseData?.assets || [];
+
+  const stageOrder = ['subject-asset','generation','assembly','modification','other'];
+  const grouped = {};
+  for (const stage of stageOrder) grouped[stage] = [];
+  let globalIdx = 0;
+
+  for (const call of calls) {
+    const stage = call.pipelineStage || 'other';
+    if (!grouped[stage]) grouped[stage] = [];
+    grouped[stage].push({ ...call, _idx: ++globalIdx });
+  }
+
+  let html = '';
+  for (const stage of stageOrder) {
+    const items = grouped[stage];
+    if (!items.length) continue;
+    const meta = STAGE_META[stage] || STAGE_META['other'];
+    const failCount = items.filter(c => c.failed).length;
+    const failBadge = failCount ? `<span class="pill fail" style="margin-left:8px">${failCount} FAIL</span>` : '';
+
+    html += `<div style="margin-bottom:6px;margin-top:${html ? '18px' : '0'}">
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03)">
+        <span style="font-size:18px">${meta.icon}</span>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--${meta.color})">${meta.label}${failBadge}</div>
+          <div style="font-size:11px;color:var(--muted)">${meta.desc} · ${items.length} 调用</div>
+        </div>
+      </div>
+    </div>`;
+
+    for (const call of items) {
+      const cls = call.failed ? 'failed' : /error/i.test(call.status) ? 'warn' : 'success';
+      const pillCls = call.failed ? 'fail' : 'ok';
+      const matchedAsset = call.type === 'ASSET'
+        ? assets.find(a => (a.observation_id && a.observation_id === call.id) || (a.name === call.assetName && a.tool === call.name))
+        : null;
+      const mediaHtml = matchedAsset?.mediaLinks?.length
+        ? `<div class="media-inline">${matchedAsset.mediaLinks.slice(0, 3).map(l => mediaTag(l.url, l.kind, {maxWidth:'200px',maxHeight:'140px'})).join('')}</div>` : '';
+      const timeStr = call.startTime ? new Date(call.startTime).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '';
+
+      const fa = call.failureAnalysis;
+      const faHtml = fa ? renderFailureAnalysis(fa) : '';
+      const summary = summarizeCall(call);
+
+      html += `<div class="tool-item ${cls}" style="margin-left:28px">
+        <div class="tool-top">
+          <span class="tool-name">#${call._idx} ${esc(call.assetName || call.name || 'tool')}</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            ${timeStr ? `<span style="font-size:11px;color:var(--muted)">${timeStr}</span>` : ''}
+            <span class="pill ${pillCls}">${call.failed ? 'FAIL' : 'OK'}</span>
+          </div>
+        </div>
+        ${summary ? `<div style="margin-top:4px;font-size:12px;line-height:1.5;color:var(--muted);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(summary)}</div>` : ''}
+        <div class="tool-meta">
+          ${[call.provider, call.model, call.trace].filter(Boolean).map(v => `<span class="chip">${esc(v)}</span>`).join('')}
+          ${call.latency ? `<span class="chip">${call.latency}ms</span>` : ''}
+        </div>
+        ${call.failed && call.output ? `<div style="margin-top:6px;padding:8px;background:rgba(255,123,134,.06);border-radius:8px;font-size:12px;color:var(--red)">${esc(String(call.output).slice(0,300))}</div>` : ''}
+        ${faHtml}
+        ${mediaHtml}
+        <details><summary>Input / Prompt</summary><pre>${esc(String(call.input || '').slice(0,2000))}</pre></details>
+        ${call.output ? `<details><summary>Output</summary><pre>${esc(String(call.output).slice(0,2000))}</pre></details>` : ''}
+      </div>`;
+    }
+  }
+  $('#tab-chain').innerHTML = `<div class="tool-chain">${html}</div>`;
+}
+
+function renderConversation(messages) {
+  if (!messages.length) { $('#tab-conversation').innerHTML = '<div class="empty">暂无对话</div>'; return; }
+  const sourceMedia = state.caseData?.sourceMedia || [];
+  const smByRaw = {};
+  sourceMedia.forEach(s => { smByRaw[s.raw] = s; });
+
+  $('#tab-conversation').innerHTML = messages.map((msg, i) => {
+    const inlineMedia = extractInlineMedia(msg.content);
+    const mediaHtml = inlineMedia.length ? `<div class="media-inline">${inlineMedia.map(m => {
+      const sm = smByRaw[m.raw];
+      const url = sm?.url || m.raw;
+      return isUsableUrlClient(url) ? mediaTag(url, m.kind, {maxWidth:'260px',maxHeight:'160px'}) : `<span class="chip">${esc(m.label)}</span>`;
+    }).join('')}</div>` : '';
+    const contentText = msg.content.replace(/<original-(image|video|audio)>.*?<\/original-\1>/g, '[素材]');
+    return `<div class="msg ${msg.role}">
+      <div class="msg-head"><strong>#${i+1} ${esc(msg.role)} ${msg.name ? '· ' + esc(msg.name) : ''}</strong><span>${esc(msg.trace)}</span></div>
+      ${mediaHtml}
+      <pre>${esc(String(contentText).slice(0,3000))}</pre>
+    </div>`;
+  }).join('');
+}
+
+function isUsableUrlClient(url) { return typeof url === 'string' && /^https?:\/\//.test(url); }
+
+function renderAssets(assets) {
+  if (!assets.length) { $('#tab-assets').innerHTML = '<div class="empty">暂无资产</div>'; return; }
+  const finals = assets.filter(a => a.type === 'final' || a.tool === 'show_final_video');
+  const videos = assets.filter(a => a.type === 'video' && a.tool !== 'show_final_video');
+  const images = assets.filter(a => a.type === 'image');
+  const audio = assets.filter(a => a.type === 'audio');
+  const assemblies = assets.filter(a => a.type === 'assembly');
+  const other = assets.filter(a => !['final','video','image','audio','assembly'].includes(a.type));
+
+  function assetSection(title, items, color) {
+    if (!items.length) return '';
+    return `<div style="margin-bottom:16px"><div style="font-size:13px;font-weight:800;color:var(--${color});margin-bottom:8px">${title} (${items.length})</div>${items.map(assetCard).join('')}</div>`;
+  }
+
+  $('#tab-assets').innerHTML =
+    assetSection('成片交付', finals, 'green') +
+    assetSection('视频片段', videos, 'blue') +
+    assetSection('图片资产', images, 'cyan') +
+    assetSection('音频资产', audio, 'yellow') +
+    assetSection('装配记录', assemblies, 'purple') +
+    assetSection('其他', other, 'muted');
+}
+
+function assetCard(a) {
+  const links = a.mediaLinks || [];
+  return `<div class="tool-item ${a.ok === false ? 'failed' : 'success'}" style="margin-bottom:8px">
+    <div class="tool-top">
+      <span class="tool-name">${esc(a.name || a.tool)}</span>
+      <span class="pill ${a.ok === false ? 'fail' : 'info'}">${esc(a.type)}</span>
+    </div>
+    <div class="tool-meta">${[a.tool, a.provider, a.model, a.mode].filter(Boolean).map(v => `<span class="chip">${esc(v)}</span>`).join('')}
+      ${a.duration ? `<span class="chip">${a.duration}s</span>` : ''}${a.sound ? `<span class="chip">sound:${a.sound}</span>` : ''}${a.reference_count ? `<span class="chip">${a.reference_count} refs</span>` : ''}
+    </div>
+    ${a.message ? `<div style="margin-top:6px;font-size:12px;color:var(--red)">${esc(a.message)}</div>` : ''}
+    ${links.length ? mediaCardsHtml(links) : ''}
+    ${a.prompt ? `<details><summary>Prompt</summary><pre>${esc(String(a.prompt).slice(0,1500))}</pre></details>` : ''}
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════
+   Diagnosis engine
+   ═══════════════════════════════════════════════ */
+function runDiagnosis() {
+  const problem = $('#problemInput').value.trim();
+  if (!problem || !state.caseData) return;
+
+  const toolCalls = state.caseData.toolCalls || [];
+  const assets = state.caseData.assets || [];
+  const failedCalls = toolCalls.filter(c => c.failed);
+  const failedAssets = assets.filter(a => a.ok === false || a.message);
+
+  let matchedRules = DIAGNOSIS_RULES.filter(rule =>
+    rule.keywords.some(kw => problem.toLowerCase().includes(kw.toLowerCase()))
+  );
+
+  if (!matchedRules.length) {
+    matchedRules = [generateGenericDiagnosis(problem, toolCalls, assets, failedCalls)];
+  }
+
+  const involvedSkills = new Set();
+  matchedRules.forEach(r => (r.skills || []).forEach(s => involvedSkills.add(s)));
+
+  const evidence = collectEvidence(matchedRules, toolCalls, assets, failedCalls, failedAssets);
+
+  state.diagnosis = { matchedRules, involvedSkills: [...involvedSkills], evidence };
+
+  renderDiagnosis(matchedRules, involvedSkills, evidence);
+  $('#sDiag').textContent = matchedRules.length;
+  $('#diagStatus').textContent = `已匹配 ${matchedRules.length} 条诊断规则，涉及 ${involvedSkills.size} 个 Skill`;
+  highlightPipelineIssues(involvedSkills);
+}
+
+function generateGenericDiagnosis(problem, toolCalls, assets, failedCalls) {
+  const failedToolNames = [...new Set(failedCalls.map(c => c.name))];
+  const skills = new Set();
+  failedToolNames.forEach(t => (SKILL_ARCHITECTURE.toolToSkill[t] || []).forEach(s => skills.add(s)));
+  if (!skills.size) skills.add('generation');
+
+  return {
+    id: 'generic',
+    rootCause: `根据问题描述「${problem.slice(0,80)}」和工具链分析：检测到 ${failedCalls.length} 个失败调用` +
+      (failedToolNames.length ? `，涉及工具 ${failedToolNames.join(', ')}` : '') +
+      `。建议重点检查这些调用的输入参数和错误消息，判断是参数契约违反、模型能力限制、还是上游数据传递问题。`,
+    skills: [...skills],
+    checkPoints: [
+      '检查失败调用的错误消息，区分参数错误和模型限制',
+      '对比用户原始请求和实际工具输入，检查意图是否被忠实编码',
+      '检查是否有重试但未改变策略的情况',
+      '检查最终交付是否存在 show_final_video',
+    ],
+    suggestions: [
+      { file: 'pexo-skills/generation-skill/SKILL.md', section: '通用', content: '根据具体失败模式，在相应规则中增加边界处理' },
+    ],
+  };
+}
+
+function collectEvidence(rules, toolCalls, assets, failedCalls, failedAssets) {
+  const evidence = [];
+  const involvedTools = new Set();
+  rules.forEach(r => (r.skills || []).forEach(sk => {
+    const node = SKILL_ARCHITECTURE.pipeline.find(n => n.key === sk);
+    if (node) node.tools.forEach(t => involvedTools.add(t));
+  }));
+
+  failedCalls.forEach(call => {
+    if (involvedTools.has(call.name) || involvedTools.size === 0) {
+      evidence.push({
+        type: 'tool_failure', tool: call.name,
+        detail: `[${call.assetName || call.name}] FAILED — ${String(call.output || '').slice(0,200)}`,
+        provider: call.provider || '', model: call.model || '',
+      });
+    }
+  });
+
+  failedAssets.forEach(a => {
+    evidence.push({
+      type: 'asset_issue', tool: a.tool,
+      detail: `[${a.name}] ${a.message || 'ok=false'} — provider: ${a.provider}, model: ${a.model}`,
+    });
+  });
+
+  const retryGroups = {};
+  toolCalls.forEach(c => { const k = c.name + '|' + (c.assetName || ''); retryGroups[k] = (retryGroups[k] || 0) + 1; });
+  Object.entries(retryGroups).filter(([,c]) => c > 2).forEach(([key, count]) => {
+    evidence.push({ type: 'retry_pattern', tool: key.split('|')[0], detail: `「${key}」被调用 ${count} 次，可能存在无效重试` });
+  });
+
+  assets.filter(a => a.tool === 'video_generate').forEach(v => {
+    if (/reference|character|style|人物|角色|风格/i.test(v.prompt || '') && (!v.reference_count || v.reference_count === 0)) {
+      evidence.push({ type: 'ref_mismatch', tool: 'video_generate', detail: `[${v.name}] prompt 提及参考/角色/风格，但 reference_count=0` });
+    }
+  });
+
+  if (!assets.some(a => a.type === 'final' || a.tool === 'show_final_video')) {
+    evidence.push({ type: 'no_delivery', tool: 'show_final_video', detail: '未检测到最终交付 (show_final_video)，Case 可能未完成' });
+  }
+
+  return evidence;
+}
+
+/* ═══════════════════════════════════════════════
+   Render diagnosis
+   ═══════════════════════════════════════════════ */
+function renderDiagnosis(rules, involvedSkills, evidence) {
+  let html = '';
+
+  rules.forEach((rule, i) => {
+    const skillNodes = (rule.skills || []).map(sk => SKILL_ARCHITECTURE.pipeline.find(n => n.key === sk)).filter(Boolean);
+
+    html += `<div class="diag-card root-cause">
+      <div class="diag-header"><div class="icon">🔴</div><h3>问题 ${i+1}：根因分析</h3></div>
+      <div class="diag-body">
+        <p style="white-space:pre-line">${esc(rule.rootCause)}</p>
+        <div style="margin-top:10px">${skillNodes.map(s => `<span class="skill-tag">${esc(s.label)} · ${esc(s.name)}</span>`).join('')}</div>
+      </div>
+    </div>`;
+
+    if (rule.checkPoints?.length) {
+      html += `<div class="diag-card evidence">
+        <div class="diag-header"><div class="icon">🔍</div><h3>检查要点</h3></div>
+        <div class="diag-body"><ul>${rule.checkPoints.map(cp => `<li>${esc(cp)}</li>`).join('')}</ul></div>
+      </div>`;
+    }
+
+    if (rule.suggestions?.length) {
+      html += `<div class="diag-card suggestion">
+        <div class="diag-header"><div class="icon">💡</div><h3>修改建议</h3></div>
+        <div class="diag-body"><ul>${rule.suggestions.map(s => `<li>
+          <span class="file-tag">${esc(s.file)}</span> <span class="chip">${esc(s.section)}</span><br>
+          <span style="color:var(--text)">${esc(s.content)}</span>
+        </li>`).join('')}</ul></div>
+      </div>`;
+    }
+  });
+
+  if (evidence.length) {
+    html += `<div class="diag-card evidence">
+      <div class="diag-header"><div class="icon">📊</div><h3>工具链证据 (${evidence.length})</h3></div>
+      <div class="diag-body"><ul>${evidence.map(e => `<li>
+        <span class="pill ${e.type === 'tool_failure' ? 'fail' : e.type === 'retry_pattern' ? 'warn' : 'info'}">${esc(e.type)}</span>
+        <span class="chip">${esc(e.tool)}</span>
+        <div style="margin-top:4px;font-size:12px;color:var(--muted)">${esc(e.detail)}</div>
+      </li>`).join('')}</ul></div>
+    </div>`;
+  }
+
+  html += `<div class="diag-card skill-map">
+    <div class="diag-header"><div class="icon">🗺️</div><h3>涉及的 Skill 与 Reference 文件</h3></div>
+    <div class="diag-body">${[...involvedSkills].map(sk => {
+      const node = SKILL_ARCHITECTURE.pipeline.find(n => n.key === sk);
+      if (!node) return '';
+      return `<div style="margin-bottom:14px;border:1px solid var(--line);border-radius:12px;padding:12px;background:rgba(255,255,255,.02)">
+        <div style="font-weight:700;margin-bottom:6px"><span class="skill-tag">${esc(node.label)}</span> <span class="file-tag">${esc(node.file)}</span></div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">职责：${node.responsibilities.join(' · ')}</div>
+        <div>关联 References：${node.refs.map(r => `<span class="file-tag">${esc(r)}</span>`).join(' ')}</div>
+      </div>`;
+    }).join('')}</div>
+  </div>`;
+
+  $('#diagResults').innerHTML = `<div class="diagnosis-results">${html}</div>`;
+}
+
+function highlightPipelineIssues(involvedSkills) {
+  $$('.pipeline-node').forEach(node => {
+    node.classList.remove('has-issue');
+    if (involvedSkills.has(node.dataset.skill)) node.classList.add('has-issue');
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   Source media & download
+   ═══════════════════════════════════════════════ */
+function renderSourceMedia(data) {
+  const sourceMedia = data.sourceMedia || [];
+  const finals = (data.assets || []).filter(a => a.type === 'final' || a.tool === 'show_final_video');
+  const finalLinks = finals.flatMap(a => (a.mediaLinks || []).filter(l => l.kind === 'video'));
+
+  if (!sourceMedia.length && !finalLinks.length) {
+    $('#sourceMediaContent').innerHTML = '<div class="empty" style="padding:14px">未检测到用户素材或成片链接。点击「下载素材到本地」尝试解析更多媒体。</div>';
+    return;
+  }
+
+  let html = '';
+  if (finalLinks.length) {
+    html += `<div style="margin-bottom:14px"><div style="font-size:13px;font-weight:800;color:var(--green);margin-bottom:8px">成片视频</div>${mediaCardsHtml(finalLinks)}</div>`;
+  }
+  if (sourceMedia.length) {
+    const withUrl = sourceMedia.filter(s => s.hasPreview);
+    const noUrl = sourceMedia.filter(s => !s.hasPreview);
+    html += `<div style="margin-bottom:8px"><div style="font-size:13px;font-weight:800;color:var(--cyan);margin-bottom:8px">用户上传素材 (${sourceMedia.length})</div>`;
+    if (withUrl.length) {
+      html += mediaCardsHtml(withUrl.map(s => ({ label: s.label, url: s.url, kind: s.kind, source: 'user' })));
+    }
+    if (noUrl.length) {
+      html += `<div style="margin-top:8px;font-size:12px;color:var(--muted)">以下素材无可预览 URL（可能需要下载到本地）：<br>${noUrl.map(s => `<span class="chip">${esc(s.label)}</span>`).join(' ')}</div>`;
+    }
+    html += '</div>';
+  }
+  $('#sourceMediaContent').innerHTML = html;
+}
+
+async function downloadMedia() {
+  const caseId = state.caseData?.caseId || $('#caseId').value.trim();
+  if (!caseId) return;
+  const btn = $('#downloadMediaBtn');
+  btn.disabled = true; btn.textContent = '下载中...';
+  try {
+    const job = await apiPost('/api/download-media', { caseId });
+    let attempts = 0;
+    const poll = async () => {
+      attempts++;
+      try {
+        const j = await api(`/api/jobs/${job.id}`);
+        if (j.status === 'completed') {
+          btn.textContent = '✓ 下载完成'; btn.disabled = false;
+          const fresh = await api(`/api/cases/${encodeURIComponent(caseId)}`);
+          state.caseData = fresh;
+          try { sessionStorage.setItem('pexo_case_id', caseId); } catch {}
+          renderAll(fresh);
+        } else if (j.status === 'failed') {
+          btn.textContent = '下载失败'; btn.disabled = false;
+          $('#mediaStatus').textContent = j.error || '下载失败';
+        } else if (attempts < 60) {
+          setTimeout(poll, 3000);
+        } else {
+          btn.textContent = '超时'; btn.disabled = false;
+        }
+      } catch { if (attempts < 60) setTimeout(poll, 3000); }
+    };
+    setTimeout(poll, 2000);
+  } catch(e) {
+    btn.textContent = '下载素材到本地'; btn.disabled = false;
+    alert('下载失败: ' + e.message);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   Asset picker & Chat
+   ═══════════════════════════════════════════════ */
+function renderAssetPicker() {
+  const data = state.caseData;
+  if (!data) { $('#assetPicker').innerHTML = '<div class="empty" style="padding:14px">拉取 Case 后显示可选素材</div>'; return; }
+
+  const assets = data.assets || [];
+  const finals = assets.filter(a => a.type === 'final' || a.tool === 'show_final_video');
+  const videos = assets.filter(a => a.type === 'video' && a.tool !== 'show_final_video');
+  const images = assets.filter(a => a.type === 'image');
+  const audio = assets.filter(a => a.type === 'audio');
+  const assemblies = assets.filter(a => a.type === 'assembly');
+
+  function getPreviewUrl(a) {
+    const links = a.mediaLinks || [];
+    const video = links.find(l => l.kind === 'video');
+    if (video) return { url: video.url, kind: 'video' };
+    const img = links.find(l => l.kind === 'image');
+    if (img) return { url: img.url, kind: 'image' };
+    const aud = links.find(l => l.kind === 'audio');
+    if (aud) return { url: aud.url, kind: 'audio' };
+    return null;
+  }
+
+  function previewHtml(a, isFinal) {
+    const preview = getPreviewUrl(a);
+    if (!preview) {
+      if (isFinal) return `<div class="ap-preview" style="background:rgba(114,220,147,.05);padding:16px;text-align:center;max-height:none;border-top:1px solid var(--line)"><div style="font-size:28px;margin-bottom:8px">🏁</div><div style="font-size:12px;color:var(--green);font-weight:700">成片已生成 (${a.duration || '60'}s)</div><div style="font-size:11px;color:var(--muted);margin-top:4px">点击上方「下载素材到本地」获取完整视频</div></div>`;
+      const typeIcon = a.type === 'image' ? '🖼️' : a.type === 'audio' ? '🎵' : '📦';
+      const typeLabel = a.type === 'image' ? '图片' : a.type === 'audio' ? '音频' : '素材';
+      return `<div style="padding:8px 12px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);text-align:center">${typeIcon} ${typeLabel}预览不可用 — asset:// 内部引用</div>`;
+    }
+    if (preview.kind === 'video') return `<div class="ap-preview"><video src="${esc(preview.url)}" controls preload="metadata" onclick="event.stopPropagation();openLightbox(this)" onerror="this.parentElement.innerHTML='<div style=padding:12px;text-align:center;font-size:11px;color:var(--muted)>视频加载失败（URL 可能已过期）</div>'"></video></div>`;
+    if (preview.kind === 'image') return `<div class="ap-preview"><img src="${esc(preview.url)}" loading="lazy" onclick="event.stopPropagation();openLightbox(this)" onerror="this.parentElement.innerHTML='<div style=padding:12px;text-align:center;font-size:11px;color:var(--muted)>图片加载失败</div>'"></div>`;
+    if (preview.kind === 'audio') return `<div class="ap-preview"><audio src="${esc(preview.url)}" controls preload="metadata" onclick="event.stopPropagation()"></audio></div>`;
+    return '';
+  }
+
+  function pickItem(a, idx, opts = {}) {
+    const isSelected = state.selectedAssets.some(s => s._pickIdx === idx);
+    const isFinal = opts.isFinal || false;
+    const alwaysPreview = isFinal || opts.alwaysPreview;
+    const isExpanded = state._expandedPicks?.has(idx);
+    const failBadge = a.ok === false ? '<span class="pill fail" style="font-size:9px">FAIL</span>' : '';
+    const icon = a.type === 'video' ? '🎬' : a.type === 'image' ? '🖼️' : a.type === 'audio' ? '🎵' : a.type === 'final' ? '🏁' : '📦';
+    const hasMedia = getPreviewUrl(a) !== null;
+    const showPreview = alwaysPreview || isExpanded;
+
+    let html = `<div class="asset-pick ${isSelected ? 'selected' : ''} ${isFinal ? 'final-asset' : ''}" data-pick-idx="${idx}">
+      <div class="ap-header" onclick="toggleAssetPick(${idx})">
+        <div class="ap-check">${isSelected ? '✓' : ''}</div>
+        <span style="font-size:16px;flex-shrink:0">${icon}</span>
+        <div class="ap-info">
+          <div class="ap-name">${esc(a.name || a.tool || '未命名')}</div>
+          <div class="ap-meta">${[a.tool, a.provider, a.model, a.duration ? a.duration + 's' : ''].filter(Boolean).join(' · ')}</div>
+        </div>
+        <div class="ap-status">${failBadge}</div>
+      </div>`;
+
+    if (showPreview) {
+      html += previewHtml(a, isFinal);
+    } else if (hasMedia) {
+      html += `<div class="ap-expand-btn" onclick="event.stopPropagation();expandAssetPreview(${idx})">▶ 预览</div>`;
+    }
+    html += `</div>`;
+    return html;
+  }
+
+  function group(title, items, color, icon, startIdx, opts = {}) {
+    if (!items.length) return { html: '', endIdx: startIdx };
+    let html = `<div class="asset-picker-group"><div class="group-title"><span style="color:var(--${color})">${icon} ${title}</span><span style="font-size:11px;color:var(--muted)">(${items.length})</span></div>`;
+    items.forEach((a, i) => { html += pickItem(a, startIdx + i, opts); });
+    html += '</div>';
+    return { html, endIdx: startIdx + items.length };
+  }
+
+  if (!state._expandedPicks) state._expandedPicks = new Set();
+
+  const allItems = [...finals, ...videos, ...images, ...audio, ...assemblies];
+  state._pickableAssets = allItems;
+
+  let html = '', idx = 0;
+  const g1 = group('成片', finals, 'green', '🏁', idx, { isFinal: true, alwaysPreview: true }); html += g1.html; idx = g1.endIdx;
+  const g2 = group('视频片段', videos, 'blue', '🎬', idx, { alwaysPreview: false }); html += g2.html; idx = g2.endIdx;
+  const g3 = group('图片', images, 'cyan', '🖼️', idx, { alwaysPreview: false }); html += g3.html; idx = g3.endIdx;
+  const g4 = group('音频', audio, 'yellow', '🎵', idx, { alwaysPreview: true }); html += g4.html; idx = g4.endIdx;
+  const g5 = group('装配', assemblies, 'purple', '📦', idx); html += g5.html;
+
+  if (!html) html = '<div class="empty" style="padding:14px">此 Case 无可选素材</div>';
+  else html = `<div style="margin-bottom:8px;font-size:12px;color:var(--muted)">点击选择有问题的素材（可多选），然后在下方对话中描述问题。成片/图片/音频直接预览，视频片段点击「预览」展开。</div>` + html;
+
+  $('#assetPicker').innerHTML = `<div class="asset-selector">${html}</div>`;
+}
+
+function expandAssetPreview(idx) {
+  if (!state._expandedPicks) state._expandedPicks = new Set();
+  state._expandedPicks.add(idx);
+  renderAssetPicker();
+}
+
+function toggleAssetPick(idx) {
+  const asset = state._pickableAssets?.[idx];
+  if (!asset) return;
+  const tagged = { ...asset, _pickIdx: idx };
+  const existingIdx = state.selectedAssets.findIndex(s => s._pickIdx === idx);
+  if (existingIdx >= 0) state.selectedAssets.splice(existingIdx, 1);
+  else state.selectedAssets.push(tagged);
+  renderAssetPicker();
+  renderSelectedAssetsBar();
+}
+
+function renderSelectedAssetsBar() {
+  const bar = $('#selectedAssetsBar');
+  if (!state.selectedAssets.length) { bar.innerHTML = ''; return; }
+  bar.innerHTML = state.selectedAssets.map((a, i) =>
+    `<span class="sel-asset-chip" onclick="removeSelectedAsset(${i})" title="点击移除">${esc(a.name || a.tool || '素材')}</span>`
+  ).join('');
+}
+
+function removeSelectedAsset(i) {
+  state.selectedAssets.splice(i, 1);
+  renderAssetPicker();
+  renderSelectedAssetsBar();
+}
+
+function formatMarkdown(text) {
+  return text
+    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre>$2</pre>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+function addChatMessage(role, content, assets) {
+  const container = $('#chatMessages');
+  const div = document.createElement('div');
+  div.className = `chat-msg ${role}`;
+  let inner = '';
+  if (assets?.length) {
+    inner += `<div class="msg-assets">${assets.map(a => `<span class="msg-asset-badge">${esc(a.name || a.tool)}</span>`).join('')}</div>`;
+  }
+  if (role === 'assistant') {
+    inner += formatMarkdown(content);
+  } else {
+    inner += esc(content);
+  }
+  div.innerHTML = inner;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendChatMessage() {
+  const input = $('#chatInput');
+  const message = input.value.trim();
+  if (!message || state.chatLoading) return;
+
+  const selectedForMsg = [...state.selectedAssets];
+  addChatMessage('user', message, selectedForMsg);
+  input.value = '';
+  input.style.height = 'auto';
+
+  state.chatLoading = true;
+  $('#chatSendBtn').disabled = true;
+  const thinkingDiv = document.createElement('div');
+  thinkingDiv.className = 'chat-msg assistant';
+  thinkingDiv.innerHTML = '<span style="color:var(--muted)">分析中<span class="thinking-dots">...</span></span>';
+  thinkingDiv.id = 'chatThinking';
+  $('#chatMessages').appendChild(thinkingDiv);
+  $('#chatMessages').scrollTop = $('#chatMessages').scrollHeight;
+
+  try {
+    const resp = await apiPost('/api/chat', {
+      sessionId: state.chatSessionId,
+      message,
+      selectedAssets: selectedForMsg.map(a => ({
+        name: a.name, type: a.type, tool: a.tool, provider: a.provider, model: a.model,
+        prompt: a.prompt ? String(a.prompt).slice(0, 800) : undefined,
+        ok: a.ok, message: a.message, duration: a.duration,
+        mediaLinks: (a.mediaLinks || []).slice(0, 3),
+      })),
+      caseId: state.caseData?.caseId,
+    });
+    state.chatSessionId = resp.sessionId;
+    thinkingDiv.remove();
+    addChatMessage('assistant', resp.reply);
+  } catch (e) {
+    thinkingDiv.remove();
+    addChatMessage('system', `错误: ${e.message}`);
+  } finally {
+    state.chatLoading = false;
+    $('#chatSendBtn').disabled = false;
+  }
+}
+
+function resetChat() {
+  if (state.chatSessionId) {
+    apiPost('/api/chat/reset', { sessionId: state.chatSessionId }).catch(() => {});
+  }
+  state.chatSessionId = null;
+  state.selectedAssets = [];
+  renderSelectedAssetsBar();
+  renderAssetPicker();
+  $('#chatMessages').innerHTML = '<div class="chat-msg system">对话已重置。选择素材并描述问题开始新的诊断。</div>';
+}
+
+/* ═══════════════════════════════════════════════
+   Event bindings
+   ═══════════════════════════════════════════════ */
+$$('.tab').forEach(tab => tab.addEventListener('click', () => {
+  const parent = tab.closest('.panel');
+  parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  parent.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  tab.classList.add('active');
+  parent.querySelector(`#tab-${tab.dataset.tab}`).classList.add('active');
+}));
+
+$$('.example-btn').forEach(btn => btn.addEventListener('click', () => {
+  $('#problemInput').value = btn.dataset.text;
+}));
+
+$('#fetchBtn').addEventListener('click', fetchCase);
+$('#loadLocalBtn').addEventListener('click', () => loadCase());
+$('#downloadMediaBtn').addEventListener('click', downloadMedia);
+$('#diagnoseBtn').addEventListener('click', runDiagnosis);
+$('#clearBtn').addEventListener('click', () => {
+  $('#problemInput').value = '';
+  $('#diagResults').innerHTML = '';
+  $$('.pipeline-node').forEach(n => n.classList.remove('has-issue'));
+});
+$('#caseId').addEventListener('keydown', e => { if (e.key === 'Enter') fetchCase(); });
+
+$('#chatSendBtn').addEventListener('click', sendChatMessage);
+$('#chatInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
+});
+$('#chatInput').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+$('#resetChatBtn').addEventListener('click', resetChat);
+</script>
+</body>
+</html>

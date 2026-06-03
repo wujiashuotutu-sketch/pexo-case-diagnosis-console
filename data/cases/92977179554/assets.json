@@ -1,0 +1,88 @@
+[
+  {
+    "tool": "audio_produce",
+    "trace_file": "trace-1-12333282.json",
+    "observation_id": "527712efed3a9ac9",
+    "provider": "elevenlabs",
+    "prompt": "[laughs] Hahaha! Hahaha hahaha hahaha!",
+    "model": "eleven_v3",
+    "name": "lying_lady_laugh2",
+    "type": "audio",
+    "voice_id": "EXAVITQu4vr4xnSDxMaL",
+    "text": "[laughs] Hahaha! Hahaha hahaha hahaha!"
+  },
+  {
+    "tool": "show_final_video",
+    "trace_file": "trace-1-12333282.json",
+    "observation_id": "06ad5c4bd3599921",
+    "name": "final_video",
+    "type": "final",
+    "prompt": "",
+    "file_path": "/projects/92977179554/workspace/assets/oopsie_drag_with_audio.mp4"
+  },
+  {
+    "tool": "audio_produce",
+    "trace_file": "trace-1-12333282.json",
+    "observation_id": "9177a940ca1472fe",
+    "provider": "elevenlabs",
+    "prompt": "[laughs hysterically]",
+    "model": "eleven_v3",
+    "name": "lying_lady_laugh1",
+    "type": "audio",
+    "voice_id": "EXAVITQu4vr4xnSDxMaL",
+    "text": "[laughs hysterically]"
+  },
+  {
+    "tool": "audio_produce",
+    "trace_file": "trace-1-12333282.json",
+    "observation_id": "2baa2be0857e5991",
+    "ok": true,
+    "provider": "elevenlabs",
+    "prompt": "[laughs] Oopsie. Better take out the trash... because my husband forgot to do so.",
+    "model": "eleven_v3",
+    "name": "standing_lady_oopsie",
+    "type": "audio",
+    "voice_id": "cgSgspJ2msm6clMCkdW9",
+    "text": "[laughs] Oopsie. Better take out the trash... because my husband forgot to do so."
+  },
+  {
+    "tool": "audio_produce",
+    "trace_file": "trace-1-12333282.json",
+    "observation_id": "8567f3bfea21a074",
+    "ok": true,
+    "provider": "elevenlabs",
+    "prompt": "[laughs] Hahaha hahaha hahaha!",
+    "model": "eleven_v3",
+    "name": "lying_lady_laugh1",
+    "type": "audio",
+    "voice_id": "EXAVITQu4vr4xnSDxMaL",
+    "text": "[laughs] Hahaha hahaha hahaha!"
+  },
+  {
+    "tool": "audio_produce",
+    "trace_file": "trace-1-12333282.json",
+    "observation_id": "8b8a085df666c810",
+    "ok": false,
+    "message": "{\"detail\":{\"type\":\"validation_error\",\"code\":\"invalid_parameters\",\"message\":\"Input at position 0 has empty text. All inputs must include non-empty text after removing speaker tags and emojis.\",\"status\":\"input_text_empty\",\"request_id\":\"abf92c7d3761c7888b41723f3564b46c\",\"param\":\"text\"}}",
+    "provider": "elevenlabs",
+    "prompt": "[laughs hysterically] [laughs]",
+    "model": "eleven_v3",
+    "name": "lying_lady_laugh2",
+    "type": "audio",
+    "voice_id": "EXAVITQu4vr4xnSDxMaL",
+    "text": "[laughs hysterically] [laughs]"
+  },
+  {
+    "tool": "audio_produce",
+    "trace_file": "trace-1-12333282.json",
+    "observation_id": "f1035f982171a09c",
+    "ok": true,
+    "provider": "elevenlabs",
+    "prompt": "[shouts] Oh my god!",
+    "model": "eleven_v3",
+    "name": "lying_lady_ohmygod",
+    "type": "audio",
+    "voice_id": "EXAVITQu4vr4xnSDxMaL",
+    "text": "[shouts] Oh my god!"
+  }
+]

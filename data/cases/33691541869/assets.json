@@ -1,0 +1,45 @@
+[
+  {
+    "tool": "video_generate",
+    "trace_file": "trace-1-ac09ae76.json",
+    "observation_id": "07ce06b4b6997c7b",
+    "provider": "fal",
+    "prompt": "Cinematic Free Fire mobile battle royale 1v4 clutch moment. A lone soldier with low health crouched behind cover in a dark urban war zone. Explosions and fire all around. He quickly peeks and lands a headshot on enemy 1 - slow motion effect. Enemy 2 rushes - he spins and shoots with perfect aim, another headshot. He throws a grenade at the third - massive explosion, enemy eliminated. Final enemy charges with a shotgun - intense close range battle, the hero fires the last bullet in dramatic slow motion. Victory flash. Camera pulls back showing the lone hero standing among four downed enemies. Intense red and orange fire glow, dark night environment. Heavy SFX: gunshots, explosions, bullet whizz, victory music build-up.",
+    "model": "xai/grok-imagine-video/text-to-video",
+    "mode": "text2video",
+    "name": "ff_1v4_clutch_preview",
+    "type": "video",
+    "sound": "",
+    "duration": "",
+    "references": [],
+    "audio_inputs": [],
+    "reference_count": 0,
+    "audio_input_count": 0
+  },
+  {
+    "tool": "show_final_video",
+    "trace_file": "trace-1-ac09ae76.json",
+    "observation_id": "d03e5258c35fc9ac",
+    "name": "final_video",
+    "type": "final",
+    "prompt": "",
+    "file_path": "/projects/33691541869/workspace/assets/ff_1v4_clutch_preview_20260525T030539_5fcc2090.mp4"
+  },
+  {
+    "tool": "video_generate",
+    "trace_file": "trace-1-ac09ae76.json",
+    "observation_id": "3dd78e5da4b66703",
+    "provider": "fal",
+    "prompt": "",
+    "model": "xai/grok-imagine-video/text-to-video",
+    "mode": "text2video",
+    "name": "ff_1v4_clutch_preview",
+    "type": "video",
+    "sound": "",
+    "duration": "",
+    "references": [],
+    "audio_inputs": [],
+    "reference_count": 0,
+    "audio_input_count": 0
+  }
+]

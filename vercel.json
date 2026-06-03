@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "functions": {
+    "api/**/*.js": {
+      "maxDuration": 30,
+      "includeFiles": "data/**"
+    }
+  },
+  "rewrites": [
+    { "source": "/skill-map", "destination": "/skill-map.html" },
+    { "source": "/case-flow", "destination": "/case-flow.html" },
+    { "source": "/case-list", "destination": "/case-list.html" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    }
+  ]
+}

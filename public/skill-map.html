@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pexo Skill Pipeline Map</title>
+<style>
+:root{--bg:#070b16;--panel:rgba(17,24,43,.92);--panel2:rgba(25,35,58,.95);--line:rgba(151,170,205,.18);--text:#edf4ff;--muted:#9dafcf;--blue:#72b9ff;--cyan:#5ce4d4;--green:#72dc93;--yellow:#f4c865;--red:#ff7b86;--purple:#ad9cff;--orange:#f0a050;--pink:#ff8ec4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;color:var(--text);background:var(--bg);overflow:hidden;height:100vh;width:100vw}
+
+.toolbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;gap:10px;padding:10px 20px;background:rgba(7,11,22,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}
+.toolbar h1{font-size:15px;font-weight:800;margin:0;background:linear-gradient(135deg,var(--cyan),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.toolbar .sub{font-size:11px;color:var(--muted);margin-left:4px}
+.toolbar .spacer{flex:1}
+.tb-btn{border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);border-radius:10px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s}
+.tb-btn:hover{background:rgba(255,255,255,.1)}
+.tb-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(92,228,212,.08)}
+.zoom-info{font-size:11px;color:var(--muted);font-weight:700;min-width:44px;text-align:center}
+
+.canvas-wrap{position:fixed;top:48px;left:0;right:0;bottom:0;overflow:hidden;cursor:grab}
+.canvas-wrap.dragging{cursor:grabbing}
+.canvas{transform-origin:0 0;will-change:transform;position:absolute;top:0;left:0}
+
+.node{position:absolute;border:1.5px solid var(--line);border-radius:18px;background:var(--panel);box-shadow:0 8px 40px rgba(0,0,0,.35);cursor:default;transition:box-shadow .2s,border-color .2s;overflow:hidden}
+.node:hover{border-color:rgba(92,228,212,.3);box-shadow:0 12px 50px rgba(0,0,0,.4)}
+.node-header{padding:14px 16px 10px;display:flex;align-items:center;gap:10px}
+.node-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.node-title{font-size:14px;font-weight:800;line-height:1.2}
+.node-ver{font-size:10px;font-weight:700;color:var(--muted);margin-top:2px}
+.node-desc{padding:0 16px 12px;font-size:11px;line-height:1.5;color:var(--muted)}
+
+.node-section{border-top:1px solid var(--line);overflow:hidden}
+.node-section-head{padding:9px 16px;display:flex;align-items:center;gap:7px;cursor:pointer;font-size:11px;font-weight:800;color:var(--blue);transition:background .15s;user-select:none}
+.node-section-head:hover{background:rgba(114,185,255,.05)}
+.node-section-head .arrow{transition:transform .2s;font-size:9px;color:var(--muted)}
+.node-section-head .arrow.open{transform:rotate(90deg)}
+.node-section-head .badge{margin-left:auto;border-radius:7px;padding:2px 7px;font-size:9px;font-weight:800;background:rgba(114,185,255,.1);color:var(--blue)}
+.node-section-body{padding:0 16px 10px;font-size:11px;line-height:1.6;color:var(--text);display:none}
+.node-section-body.open{display:block}
+
+.tag{display:inline-block;border-radius:6px;padding:2px 7px;font-size:10px;font-weight:750;margin:2px}
+.tag.tool{background:rgba(244,200,101,.1);border:1px solid rgba(244,200,101,.2);color:var(--yellow)}
+.tag.ref{background:rgba(114,185,255,.1);border:1px solid rgba(114,185,255,.2);color:var(--blue)}
+.tag.model{background:rgba(173,156,255,.1);border:1px solid rgba(173,156,255,.2);color:var(--purple)}
+.tag.handoff{background:rgba(92,228,212,.1);border:1px solid rgba(92,228,212,.2);color:var(--cyan)}
+.tag.rule{background:rgba(255,142,196,.08);border:1px solid rgba(255,142,196,.18);color:var(--pink)}
+
+.rule-item{padding:3px 0;border-bottom:1px solid rgba(151,170,205,.06)}
+.rule-item:last-child{border-bottom:none}
+.model-row{display:flex;gap:6px;align-items:flex-start;padding:3px 0;flex-wrap:wrap}
+.model-row .model-when{color:var(--muted);font-size:10px}
+.ref-row{padding:2px 0}
+.ref-row code{font-size:10px;color:var(--cyan);background:rgba(92,228,212,.08);border-radius:4px;padding:1px 5px}
+.ref-row .ref-note{color:var(--muted);font-size:10px;margin-left:2px}
+.ref-row .exclusive{color:var(--pink);font-size:9px;font-weight:800}
+
+svg.connectors{position:absolute;top:0;left:0;pointer-events:none;overflow:visible}
+
+.legend{position:fixed;bottom:14px;left:14px;z-index:100;display:flex;gap:6px;flex-wrap:wrap}
+.legend .tag{font-size:9px;opacity:.85}
+
+.phase-label{position:absolute;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;opacity:.5}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>Pexo Skill Pipeline Map</h1>
+  <span class="sub">内容策略调用链路可视化</span>
+  <div class="spacer"></div>
+  <button class="tb-btn" onclick="expandAll()">展开全部</button>
+  <button class="tb-btn" onclick="collapseAll()">收起全部</button>
+  <span style="width:1px;height:20px;background:var(--line)"></span>
+  <button class="tb-btn" onclick="zoomTo(.4)">40%</button>
+  <button class="tb-btn" onclick="zoomTo(.65)">65%</button>
+  <button class="tb-btn active" onclick="zoomTo(1)">100%</button>
+  <button class="tb-btn" onclick="zoomTo(1.4)">140%</button>
+  <span class="zoom-info" id="zoomInfo">100%</span>
+  <button class="tb-btn" onclick="fitView()">适应窗口</button>
+  <button class="tb-btn" onclick="resetView()">重置</button>
+  <a href="/" class="tb-btn" style="text-decoration:none">← 返回诊断工具</a>
+</div>
+
+<div class="canvas-wrap" id="canvasWrap">
+  <svg class="connectors" id="connectors" width="3000" height="1800"></svg>
+  <div class="canvas" id="canvas"></div>
+</div>
+
+<div class="legend">
+  <span class="tag tool">🔧 工具</span>
+  <span class="tag ref">📄 Reference</span>
+  <span class="tag model">🤖 模型</span>
+  <span class="tag handoff">→ 交接</span>
+  <span class="tag rule">📋 规则</span>
+</div>
+
+<script>
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+const SKILLS = [
+  {
+    key:'brainstorm', name:'brainstorm-skill', label:'创意构思',
+    icon:'💡', color:'#f4c865', version:'v57',
+    desc:'理解用户意图，发展创意方向，产出创意脚本。展示胜于询问——用视觉/音频参考推进方向。',
+    tools:['image_generate','video_generate'],
+    references:[
+      {file:'creative-ideation-principles.md', note:'9 条创意原则：紧凑 brief、流量测试、AI 可行性', exclusive:true},
+      {file:'video-models-scheduling.md', note:'模型能力边界，预览路由'},
+      {file:'image-generation-guide.md', note:'风格帧/故事板生成的模型路由和 prompt 规则'},
+      {file:'audio-design-guide.md', note:'预览中的声音设计方向'},
+    ],
+    models:[
+      {model:'Grok (L1)', when:'无用户素材、速度优先'},
+      {model:'Seedance Fast (L2)', when:'无用户素材、质量重要'},
+      {model:'Seedance (L3)', when:'有用户素材（含真人面部）'},
+      {model:'Kling (L4)', when:'素材含版权 IP'},
+    ],
+    rules:[
+      'See → Think → Execute → Land 四拍循环',
+      '一次一个问题，避免决策疲劳',
+      '预览不等于生产源',
+      '脚本需含：叙事弧线、关键节拍、情感形态、音频方向',
+    ],
+    handoffTo:['script-skill'],
+    handoffFrom:['用户输入 / 参考素材'],
+    input:'用户的模糊想法、参考素材、感觉',
+    output:'创意脚本（叙事弧线、关键节拍、情感形态、音频方向）',
+    skipWhen:'用户提供完整 brief 时可跳过',
+    prompt:'分析用户输入 → 评估信息充分度 → 发展创意方向 → 产出创意脚本\n\n8 层 prompt 构建：\n1. 参考映射\n2. 动作逻辑\n3. 运镜\n4. 时间线索\n5. 氛围\n6. 色彩\n7. 包装\n8. 音频方向',
+  },
+  {
+    key:'script', name:'script-skill', label:'分镜设计',
+    icon:'🎬', color:'#72b9ff', version:'v44',
+    desc:'将创意脚本分解为可执行的序列级生产计划。模型选择前置——先锁模型再规划序列。',
+    tools:[],
+    references:[
+      {file:'video-models-scheduling.md', note:'核心——路由决策树、音频策略、序列策略、prompt 限制'},
+      {file:'shot-design-principles.md', note:'镜头序列逻辑、运镜叙事功能'},
+      {file:'editing-rhythm-design.md', note:'节奏曲线设计、情感/信息密度映射'},
+      {file:'audio-design-guide.md', note:'声音风格定位、音画关系'},
+      {file:'dialogue-monologue-design-kb.md', note:'对白构建原则'},
+      {file:'vo-design-principles.md', note:'旁白内容设计 + 声音目录'},
+      {file:'packaging-keyframe-guide.md', note:'Layer 1/2 分类和构图规则'},
+      {file:'visual-packaging-guide.md', note:'叠加类型和设计模式'},
+      {file:'image-generation-guide.md', note:'包装关键帧图片生成'},
+      {file:'media-preprocessing.md', note:'素材预处理约束'},
+    ],
+    models:[
+      {model:'L4 Kling', when:'版权 IP / 画面内文字-UI / 微细节'},
+      {model:'L3 Seedance', when:'有参考素材 + 人脸 → 默认生产'},
+      {model:'L2 Seedance Fast', when:'纯文本默认'},
+      {model:'L1 Grok', when:'预览 / NSFW'},
+    ],
+    rules:[
+      '7 步流程：模型路由 → 序列规划 → 视觉设计 → 音频设计 → 视觉包装 → 节奏计划 → 生产交接',
+      '单次调用优先（Seedance ≤15s, Kling ≤10s）',
+      '多序列需定义 Visual Style Convention（4 常量）',
+      'SFX 共生 + 对白声源逐序列声明',
+    ],
+    handoffTo:['subject-asset-skill','generation-skill'],
+    handoffFrom:['brainstorm-skill'],
+    input:'创意脚本 + 用户素材',
+    output:'序列级生产计划（分镜、模型路由、音频设计、包装设计、节奏计划）',
+    skipWhen:'完整逐镜头脚本时可跳过',
+    prompt:'模型路由决策树：\n  版权 IP ─────→ L4 Kling\n  人脸（任何类型）──→ L3 Seedance\n  画面内文字/UI ──→ L4 Kling\n  有参考素材 + 其他 → L3 Seedance\n  纯文本 默认 ───→ L2 Seedance Fast\n  纯文本 预览 ───→ L1 Grok\n\n输出结构：\n- Visual Style Convention (4 常量)\n- Visual Intent Table (逐序列)\n- Voice Strategy Declaration\n- BGM Timing Mode Declaration',
+  },
+  {
+    key:'subject-asset', name:'subject-asset-skill', label:'主体资产',
+    icon:'🎨', color:'#5ce4d4', version:'v35',
+    desc:'确保每个视觉主体有足够参考素材覆盖，角色标签化分配，并行一致性靠参考图。',
+    tools:['image_generate'],
+    references:[
+      {file:'video-models-scheduling.md', note:'模型容量限制（Seedance 9图 / Kling 7图）'},
+      {file:'image-generation-guide.md', note:'补充参考图的生成规则'},
+      {file:'media-preprocessing.md', note:'视频裁剪、多素材时长预算'},
+    ],
+    models:[
+      {model:'Seedream', when:'补充生成缺失的参考图'},
+      {model:'GPT-Image / Gemini', when:'特定风格参考图'},
+    ],
+    rules:[
+      '素材接收 → 主体分解 → 覆盖分析 → 补充生成 → 逐序列参考图谱',
+      '角色标签：product_ref / character_ref / style_ref / environment_ref',
+      '覆盖状态：covered / partial / uncovered',
+      '用户上传素材绝不重新生成',
+    ],
+    handoffTo:['generation-skill'],
+    handoffFrom:['script-skill'],
+    input:'序列计划 + 用户素材',
+    output:'主体元素注册表 + 逐序列参考图计划 + 补充参考素材',
+    skipWhen:'素材简单且全覆盖时可精简',
+    prompt:'主体分解流程：\n1. 从创意脚本提取所有需要视觉表现的主体\n2. 逐主体检查覆盖状态\n3. 为未覆盖主体生成参考图\n4. 为每个序列构建完整 image_list 分配',
+  },
+  {
+    key:'generation', name:'generation-skill', label:'生产执行',
+    icon:'⚡', color:'#ad9cff', version:'v95',
+    desc:'从锁定的生产计划执行视频片段生成。忠实执行上游模型决策，四字段验证。',
+    tools:['video_generate','image_generate','get_file_info'],
+    references:[
+      {file:'video-models-scheduling.md', note:'核心——全文 Section I-VII'},
+      {file:'image-generation-guide.md', note:'包装关键帧生成'},
+      {file:'packaging-keyframe-guide.md', note:'画面内文字关键帧'},
+      {file:'video-editor-tool-guide.md', note:'视频编辑工具使用指南'},
+    ],
+    models:[
+      {model:'Seedance (L3)', when:'默认生产——文本/多模态/长叙事'},
+      {model:'Kling (L4)', when:'版权 IP、画面内文字/UI'},
+      {model:'Grok (L1)', when:'降级最后手段（仅纯文本）'},
+    ],
+    rules:[
+      '四字段验证：provider + model + mode + provider_param key',
+      'Prompt 8 层优先级',
+      '多序列并行同时发起',
+      '降级链：Seedance → 重试 → Kling → 重试 → Grok',
+      '降级时参考图完整携带',
+      '有素材时绝不选 text2video',
+    ],
+    handoffTo:['assembly-skill'],
+    handoffFrom:['script-skill','subject-asset-skill'],
+    input:'锁定的生产计划 + 参考图谱',
+    output:'视频片段（含 sound-on/off 状态）',
+    skipWhen:'不可跳过',
+    prompt:'Prompt 8 层优先级：\n1. 参考映射（image_list 位置与 prompt 映射声明）\n2. 动作逻辑（主体在时间轴上的行为）\n3. 运镜（镜头运动设计）\n4. 时间线索（时间锚点与节奏控制）\n5. 氛围（光影、色温、情绪基调）\n6. 色彩（调色板、对比度）\n7. 包装（关键帧文字、Logo 位置）\n8. 音频方向（SFX 描述、对白内容）',
+  },
+  {
+    key:'assembly', name:'assembly-skill', label:'后期组装',
+    icon:'🔧', color:'#72dc93', version:'v53',
+    desc:'时间线组装、转场、音频制作（旁白/BGM）、混音、封面烘焙——拥有生产后的一切。',
+    tools:['execute_edit_video','audio_produce','tts_generate','music_generate','text_to_music','show_final_video','get_file_info'],
+    references:[
+      {file:'video-models-scheduling.md', note:'Section VI 装配规则、Volume 硬门'},
+      {file:'video-editor-tool-guide.md', note:'edit spec 格式、转场参数'},
+      {file:'editing-rhythm-design.md', note:'转场风格、剪辑节奏'},
+      {file:'vo-design-principles.md', note:'声音目录、旁白制作参数'},
+      {file:'audio-design-guide.md', note:'混音设计、声音层级'},
+    ],
+    models:[
+      {model:'ElevenLabs v3 TTS', when:'旁白语音合成 (audio_produce)'},
+      {model:'text_to_music', when:'BGM 生成'},
+    ],
+    rules:[
+      '预装配 10 项检查必过',
+      'Volume 硬门：共生=1.0，静音=0，禁止中间值',
+      'BGM 0.15-0.25，旁白 0.8-1.0',
+      '用原始单段文件，不用已渲染合成',
+      'crossfade 500-750ms（同场景），cut（换场）',
+      '封面烘焙到视频首 1-3 帧',
+    ],
+    handoffTo:['show_final_video → 用户'],
+    handoffFrom:['generation-skill'],
+    input:'视频片段 + 语音策略 + BGM 策略',
+    output:'成品视频（含转场、BGM、旁白、封面）',
+    skipWhen:'单段无额外音频时可精简',
+    prompt:'预装配 10 项检查清单：\n1. Volume 设置（共生=1.0/静音=0）\n2. 音频资产完整性\n3. BGM 音量范围\n4. file 输入合法性\n5. 双重 BGM 检查\n6. 双重配音检查\n7. TTS 时长匹配\n8. 源文件验证\n9. Fade 互斥检查\n10. 时间字段模式',
+  },
+  {
+    key:'modification', name:'modification-skill', label:'迭代修改',
+    icon:'🔄', color:'#f0a050', version:'v81',
+    desc:'自包含修改引擎——解读反馈、决策、执行、交付。能本地处理的不推上游。',
+    tools:['video_generate','execute_edit_video','image_generate','audio_produce','music_generate','get_file_info'],
+    references:[
+      {file:'video-models-scheduling.md', note:'重新路由、降级、重装配'},
+      {file:'image-generation-guide.md', note:'关键帧重生成'},
+      {file:'video-editor-tool-guide.md', note:'裁剪、变速、合成'},
+    ],
+    models:[
+      {model:'继承原模型', when:'段落重生成延续原 provider/model'},
+      {model:'降级链', when:'原模型失败时调整'},
+    ],
+    rules:[
+      '本地 vs 上游判断',
+      '最小修改——只影响受影响段落',
+      '串行级联感知',
+      '上游路由：方向→brainstorm / 结构→script / 素材→subject-asset',
+    ],
+    handoffTo:['assembly-skill','brainstorm-skill (上游)'],
+    handoffFrom:['用户反馈'],
+    input:'用户反馈 + 当前视频',
+    output:'更新后的成品视频',
+    skipWhen:'用户满意则无需',
+  },
+  {
+    key:'publishing', name:'publishing-skill', label:'发布包装',
+    icon:'📦', color:'#ff8ec4', version:'v31',
+    desc:'封面选择、缩略图导出、首帧预处理、社交文案。非默认挂载，按需启用。',
+    tools:['image_generate','execute_edit_video'],
+    references:[
+      {file:'cover-platform-notes.md', note:'各平台封面规格', exclusive:true},
+      {file:'social-publishing-guide.md', note:'社交文案规范', exclusive:true},
+      {file:'image-generation-guide.md', note:'封面图片生成'},
+    ],
+    models:[],
+    rules:[
+      '项目缩略图 vs 社交封面分离',
+      '封面优先级：用户上传 > 用户时间码 > 自动选帧',
+      '暗开头保护',
+    ],
+    handoffTo:['用户 / 平台'],
+    handoffFrom:['assembly-skill'],
+    input:'成品视频 + 目标平台信息',
+    output:'封面 + 发布视频 + 社交文案',
+    skipWhen:'非默认挂载，按需启用',
+  },
+  {
+    key:'image-production', name:'image-production-skill', label:'图片制作',
+    icon:'🖼️', color:'#72b9ff', version:'v2',
+    desc:'独立图片生产——从文本或参考素材创建、编辑、适配静态图片。非视频流水线的独立 Skill。',
+    tools:['image_generate'],
+    references:[
+      {file:'image-generation-guide.md', note:'图片模型路由、prompt 规则'},
+    ],
+    models:[
+      {model:'Seedream', when:'默认图片生成'},
+      {model:'GPT-Image', when:'复杂场景/多主体'},
+      {model:'Gemini', when:'特定风格'},
+    ],
+    rules:[
+      '独立于视频流水线，用户明确要求图片时触发',
+      '适用于海报、封面、角色参考、故事板等静态视觉',
+    ],
+    handoffTo:[],
+    handoffFrom:['用户请求'],
+    input:'文本描述 / 参考素材',
+    output:'静态图片',
+    skipWhen:'用户请求视频时不触发',
+  },
+  {
+    key:'product-knowledge', name:'pexo-product-knowledge-skill', label:'产品知识',
+    icon:'📖', color:'#9dafcf', version:'v4',
+    desc:'回答 Pexo 产品问题——创作能力、积分、定价、订阅。辅助 Skill，不在主流水线内。',
+    tools:[],
+    references:[
+      {file:'creation-faq.md', note:'创作能力 FAQ', exclusive:true},
+      {file:'billing-faq.md', note:'积分/定价/订阅 FAQ', exclusive:true},
+    ],
+    models:[],
+    rules:['不编造数字，不确定时优雅重定向'],
+    handoffTo:[],
+    handoffFrom:['用户提问'],
+    input:'用户关于 Pexo 产品的问题',
+    output:'产品信息回答',
+    skipWhen:'无产品问题时不触发',
+  },
+];
+
+const PIPELINE_ORDER = ['brainstorm','script','subject-asset','generation','assembly'];
+
+const NODE_W = {
+  brainstorm:280, script:340, 'subject-asset':280, generation:300, assembly:300,
+  modification:280, publishing:260, 'image-production':260, 'product-knowledge':260,
+};
+
+const LAYOUT = {
+  brainstorm:       {x:60,   y:100},
+  script:           {x:420,  y:100},
+  'subject-asset':  {x:840,  y:100},
+  generation:       {x:1200, y:100},
+  assembly:         {x:1580, y:100},
+  modification:     {x:1200, y:700},
+  publishing:       {x:1580, y:700},
+  'image-production':{x:420, y:700},
+  'product-knowledge':{x:60, y:700},
+};
+
+const canvas = document.getElementById('canvas');
+const wrap = document.getElementById('canvasWrap');
+const svg = document.getElementById('connectors');
+
+let scale = 1, panX = 0, panY = 0;
+let isDragging = false, dragStartX, dragStartY, panStartX, panStartY;
+
+function applyTransform(){
+  const t = `translate(${panX}px,${panY}px) scale(${scale})`;
+  canvas.style.transform = t;
+  svg.style.transform = t;
+  document.getElementById('zoomInfo').textContent = Math.round(scale*100)+'%';
+  document.querySelectorAll('.tb-btn[onclick^="zoomTo"]').forEach(b=>{
+    const z = parseFloat(b.getAttribute('onclick')?.match(/zoomTo\(([^)]+)\)/)?.[1]);
+    b.classList.toggle('active', z && Math.abs(z-scale)<.02);
+  });
+}
+
+function zoomTo(z){ scale=z; applyTransform(); }
+
+function resetView(){ scale=1; panX=40; panY=20; applyTransform(); }
+
+function fitView(){
+  const ww = wrap.clientWidth, wh = wrap.clientHeight;
+  let maxX=0, maxY=0;
+  for(const sk of SKILLS){
+    const pos = LAYOUT[sk.key]; if(!pos) continue;
+    const el = document.getElementById(`node-${sk.key}`);
+    const w = el ? el.offsetWidth : 300;
+    const h = el ? el.offsetHeight : 400;
+    maxX = Math.max(maxX, pos.x + w + 60);
+    maxY = Math.max(maxY, pos.y + h + 60);
+  }
+  scale = Math.min(ww/maxX, wh/maxY, 1.2);
+  panX = (ww - maxX*scale)/2;
+  panY = (wh - maxY*scale)/2;
+  applyTransform();
+}
+
+wrap.addEventListener('wheel', e=>{
+  e.preventDefault();
+  const rect = wrap.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const oldScale = scale;
+  scale = Math.max(.15, Math.min(3, scale * (e.deltaY < 0 ? 1.08 : 1/1.08)));
+  panX = mx - (mx - panX) * (scale / oldScale);
+  panY = my - (my - panY) * (scale / oldScale);
+  applyTransform();
+}, {passive:false});
+
+wrap.addEventListener('mousedown', e=>{
+  if(e.target.closest('.node-section-head')) return;
+  isDragging=true; dragStartX=e.clientX; dragStartY=e.clientY; panStartX=panX; panStartY=panY;
+  wrap.classList.add('dragging');
+});
+window.addEventListener('mousemove', e=>{
+  if(!isDragging) return;
+  panX = panStartX + (e.clientX - dragStartX);
+  panY = panStartY + (e.clientY - dragStartY);
+  applyTransform();
+});
+window.addEventListener('mouseup', ()=>{ isDragging=false; wrap.classList.remove('dragging'); });
+
+function toggleSection(el){
+  const body = el.nextElementSibling;
+  const arrow = el.querySelector('.arrow');
+  const open = body.classList.toggle('open');
+  arrow.classList.toggle('open', open);
+  setTimeout(drawConnectors, 10);
+}
+
+function expandAll(){
+  document.querySelectorAll('.node-section-body').forEach(b=>b.classList.add('open'));
+  document.querySelectorAll('.arrow').forEach(a=>a.classList.add('open'));
+  setTimeout(drawConnectors, 10);
+}
+
+function collapseAll(){
+  document.querySelectorAll('.node-section-body').forEach(b=>b.classList.remove('open'));
+  document.querySelectorAll('.arrow').forEach(a=>a.classList.remove('open'));
+  setTimeout(drawConnectors, 10);
+}
+
+function renderNodes(){
+  let html = '';
+
+  html += `<div class="phase-label" style="left:60px;top:68px">主流水线 — Main Pipeline</div>`;
+  html += `<div class="phase-label" style="left:60px;top:668px">辅助 / 迭代 — Auxiliary</div>`;
+
+  for(const sk of SKILLS){
+    const pos = LAYOUT[sk.key];
+    if(!pos) continue;
+    const w = NODE_W[sk.key] || 280;
+
+    html += `<div class="node" id="node-${sk.key}" style="left:${pos.x}px;top:${pos.y}px;width:${w}px;border-color:${sk.color}40">`;
+    html += `<div class="node-header">
+      <div class="node-icon" style="background:${sk.color}18;color:${sk.color}">${sk.icon}</div>
+      <div><div class="node-title" style="color:${sk.color}">${sk.label}</div>
+      <div class="node-ver">${sk.name} · ${sk.version}</div></div>
+    </div>`;
+    html += `<div class="node-desc">${esc(sk.desc)}</div>`;
+
+    // IO / Handoff
+    html += `<div class="node-section">
+      <div class="node-section-head" onclick="toggleSection(this)"><span class="arrow">▶</span> 输入 / 输出 / 交接 <span class="badge">${sk.handoffTo.length} 交接</span></div>
+      <div class="node-section-body">
+        <div style="margin-bottom:5px"><strong style="color:var(--cyan);font-size:10px">输入：</strong><span style="color:var(--muted)">${esc(sk.input)}</span></div>
+        <div style="margin-bottom:5px"><strong style="color:var(--green);font-size:10px">输出：</strong><span style="color:var(--muted)">${esc(sk.output)}</span></div>
+        <div style="margin-bottom:5px"><strong style="color:var(--muted);font-size:10px">跳过条件：</strong><span style="color:var(--muted)">${esc(sk.skipWhen)}</span></div>
+        <div style="margin-bottom:3px"><strong style="color:var(--orange);font-size:10px">上游：</strong>${sk.handoffFrom.map(h=>`<span class="tag handoff">${esc(h)}</span>`).join('')}</div>
+        <div><strong style="color:var(--orange);font-size:10px">下游：</strong>${sk.handoffTo.map(h=>`<span class="tag handoff">${esc(h)}</span>`).join('')}</div>
+      </div>
+    </div>`;
+
+    // Tools
+    if(sk.tools.length){
+      html += `<div class="node-section">
+        <div class="node-section-head" onclick="toggleSection(this)"><span class="arrow">▶</span> 工具调用 <span class="badge">${sk.tools.length}</span></div>
+        <div class="node-section-body">${sk.tools.map(t=>`<span class="tag tool">🔧 ${esc(t)}</span>`).join(' ')}</div>
+      </div>`;
+    }
+
+    // References
+    if(sk.references.length){
+      html += `<div class="node-section">
+        <div class="node-section-head" onclick="toggleSection(this)"><span class="arrow">▶</span> References <span class="badge">${sk.references.length}</span></div>
+        <div class="node-section-body">${sk.references.map(r=>
+          `<div class="ref-row"><code>${esc(r.file)}</code>${r.exclusive?'<span class="exclusive"> 专属</span>':''}<br><span class="ref-note">${esc(r.note)}</span></div>`
+        ).join('')}</div>
+      </div>`;
+    }
+
+    // Models
+    if(sk.models.length){
+      html += `<div class="node-section">
+        <div class="node-section-head" onclick="toggleSection(this)"><span class="arrow">▶</span> 模型路由 <span class="badge">${sk.models.length}</span></div>
+        <div class="node-section-body">${sk.models.map(m=>
+          `<div class="model-row"><span class="tag model">🤖 ${esc(m.model)}</span><span class="model-when">${esc(m.when)}</span></div>`
+        ).join('')}</div>
+      </div>`;
+    }
+
+    // Rules
+    if(sk.rules.length){
+      html += `<div class="node-section">
+        <div class="node-section-head" onclick="toggleSection(this)"><span class="arrow">▶</span> 关键规则 <span class="badge">${sk.rules.length}</span></div>
+        <div class="node-section-body">${sk.rules.map(r=>
+          `<div class="rule-item"><span class="tag rule">📋</span> ${esc(r)}</div>`
+        ).join('')}</div>
+      </div>`;
+    }
+
+    // Prompt
+    if(sk.prompt){
+      html += `<div class="node-section">
+        <div class="node-section-head" onclick="toggleSection(this)"><span class="arrow">▶</span> 核心 Prompt / 决策逻辑</div>
+        <div class="node-section-body"><pre style="white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:10px;line-height:1.55;color:#dce8fb;max-height:200px;overflow:auto;margin:0">${esc(sk.prompt)}</pre></div>
+      </div>`;
+    }
+
+    html += `</div>`;
+  }
+  canvas.innerHTML = html;
+}
+
+function getNodeRect(key){
+  const el = document.getElementById(`node-${key}`);
+  const pos = LAYOUT[key];
+  if(!el || !pos) return null;
+  return { x:pos.x, y:pos.y, w:el.offsetWidth, h:el.offsetHeight };
+}
+
+function drawConnectors(){
+  let paths = '';
+
+  function arrow(x1,y1,x2,y2,cls='main',dashed=false){
+    const mx = (x1+x2)/2;
+    const dash = dashed ? ' stroke-dasharray="6 4"' : '';
+    paths += `<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}" fill="none" stroke="${cls==='main'?'rgba(92,228,212,.4)':cls==='warn'?'rgba(240,160,80,.35)':'rgba(92,228,212,.25)'}" stroke-width="${cls==='main'?2.5:2}"${dash}/>`;
+    const angle = Math.atan2(y2 - (y2+y1)/2, x2 - mx);
+    const ax = x2 - 8*Math.cos(angle), ay = y2 - 8*Math.sin(angle);
+    const lx = ax - 6*Math.cos(angle - .5), ly = ay - 6*Math.sin(angle - .5);
+    const rx = ax - 6*Math.cos(angle + .5), ry = ay - 6*Math.sin(angle + .5);
+    paths += `<polygon points="${x2},${y2} ${lx},${ly} ${rx},${ry}" fill="${cls==='main'?'rgba(92,228,212,.6)':cls==='warn'?'rgba(240,160,80,.5)':'rgba(92,228,212,.4)'}"/>`;
+  }
+
+  function vertArrow(x1,y1,x2,y2,cls='aux'){
+    const my = (y1+y2)/2;
+    const dashed = cls === 'warn';
+    paths += `<path d="M${x1},${y1} C${x1},${my} ${x2},${my} ${x2},${y2}" fill="none" stroke="${cls==='warn'?'rgba(240,160,80,.3)':'rgba(92,228,212,.25)'}" stroke-width="2" ${dashed?'stroke-dasharray="6 4"':''}/>`;
+    paths += `<polygon points="${x2},${y2} ${x2-4},${y2-8} ${x2+4},${y2-8}" fill="${cls==='warn'?'rgba(240,160,80,.45)':'rgba(92,228,212,.4)'}"/>`;
+  }
+
+  // Main pipeline: left-to-right
+  for(let i=0; i<PIPELINE_ORDER.length-1; i++){
+    const f = getNodeRect(PIPELINE_ORDER[i]), t = getNodeRect(PIPELINE_ORDER[i+1]);
+    if(!f||!t) continue;
+    arrow(f.x+f.w, f.y+30, t.x, t.y+30, 'main');
+  }
+
+  // modification -> generation (upstream feedback loop)
+  const mod = getNodeRect('modification'), gen = getNodeRect('generation');
+  if(mod && gen){
+    vertArrow(mod.x + mod.w/2, mod.y, gen.x + gen.w/2, gen.y + gen.h, 'warn');
+  }
+
+  // modification -> assembly (re-assembly)
+  const asm = getNodeRect('assembly');
+  if(mod && asm){
+    arrow(mod.x + mod.w, mod.y + 30, asm.x + asm.w/2, asm.y + asm.h, 'aux');
+  }
+
+  // modification -> brainstorm (upstream route, dashed)
+  const bs = getNodeRect('brainstorm');
+  if(mod && bs){
+    const x1 = mod.x, y1 = mod.y + 30;
+    const x2 = bs.x + bs.w/2, y2 = bs.y + bs.h;
+    paths += `<path d="M${x1},${y1} C${x1-60},${y1} ${x2},${y2+50} ${x2},${y2}" fill="none" stroke="rgba(240,160,80,.25)" stroke-width="1.5" stroke-dasharray="6 4"/>`;
+    paths += `<polygon points="${x2},${y2} ${x2-4},${y2+8} ${x2+4},${y2+8}" fill="rgba(240,160,80,.4)"/>`;
+  }
+
+  // assembly -> publishing
+  const pub = getNodeRect('publishing');
+  if(asm && pub){
+    vertArrow(asm.x + asm.w/2 + 40, asm.y + asm.h, pub.x + pub.w/2, pub.y, 'aux');
+  }
+
+  svg.innerHTML = paths;
+}
+
+renderNodes();
+setTimeout(()=>{ drawConnectors(); resetView(); }, 80);
+window.addEventListener('resize', ()=>{ drawConnectors(); });
+</script>
+</body>
+</html>
