@@ -583,9 +583,25 @@ function showLoading(target, msg = '加载中...') {
 async function fetchCase() {
   const caseId = $('#caseId').value.trim();
   if (!caseId) return;
-  showLoading('#tab-chain', '正在拉取 Case 数据（新 Case 需从 Langfuse 拉取，可能需要 30 秒左右）...');
+  showLoading('#tab-chain', '正在加载 Case 数据...');
+  const base = $('#serverUrl').value;
+
+  // First try direct load (works for bundled/cached cases)
   try {
-    const base = $('#serverUrl').value;
+    const data = await api(`/api/cases/${encodeURIComponent(caseId)}`);
+    if (data && data.traceCount > 0) {
+      state.caseData = data;
+      try { sessionStorage.setItem('pexo_case_id', caseId); } catch {}
+      history.replaceState(null, '', '/?case=' + encodeURIComponent(caseId));
+      renderAll(data);
+      $('#diagnoseBtn').disabled = false;
+      return;
+    }
+  } catch {}
+
+  // Not cached — fetch from Langfuse via analyze endpoint
+  showLoading('#tab-chain', '本地无缓存，正在从 Langfuse 拉取（可能需要 30 秒）...');
+  try {
     const res = await fetch(base + '/api/analyze', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ caseId }) });
     const job = await res.json();
 
@@ -601,6 +617,7 @@ async function fetchCase() {
       const data = await api(`/api/cases/${encodeURIComponent(caseId)}`);
       state.caseData = data;
       try { sessionStorage.setItem('pexo_case_id', caseId); } catch {}
+      history.replaceState(null, '', '/?case=' + encodeURIComponent(caseId));
       renderAll(data);
       $('#diagnoseBtn').disabled = false;
       return;
@@ -625,14 +642,7 @@ async function fetchCase() {
     };
     setTimeout(poll, 3000);
   } catch(e) {
-    try {
-      const data = await api(`/api/cases/${encodeURIComponent(caseId)}`);
-      state.caseData = data;
-      renderAll(data);
-      $('#diagnoseBtn').disabled = false;
-    } catch(e2) {
-      $('#tab-chain').innerHTML = `<div class="empty" style="color:var(--red)">拉取失败: ${esc(e.message)}<br><br>请检查网络连接或确认服务配置正确</div>`;
-    }
+    $('#tab-chain').innerHTML = `<div class="empty" style="color:var(--red)">拉取失败: ${esc(e.message)}<br><br>请检查网络连接或确认服务配置正确</div>`;
   }
 }
 
