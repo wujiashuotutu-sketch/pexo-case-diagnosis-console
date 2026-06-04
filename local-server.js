@@ -10,13 +10,26 @@ import { createReadStream, readFileSync, existsSync } from "node:fs";
 import { join, dirname, extname } from "node:path";
 import { fileURLToPath } from "node:url";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Load .env.local if present
+for (const envFile of [".env.local", ".env"]) {
+  const envPath = join(__dirname, envFile);
+  if (existsSync(envPath)) {
+    for (const line of readFileSync(envPath, "utf8").split("\n")) {
+      const m = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*"?([^"]*)"?\s*$/);
+      if (m) process.env[m[1]] = m[2];
+    }
+    break;
+  }
+}
+
 import {
   sendJson, listCases, buildCasePayload, buildCaseFlow,
   buildSkillsTree, safeCaseId, findCaseDir, countTraces,
   startAnalysis, handleChat, chatSessions, parseBody, jobs,
 } from "./lib/server-core.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(__dirname, "public");
 const PORT = Number(process.env.PORT || 3792);
 
@@ -96,8 +109,7 @@ const server = createServer(async (req, res) => {
       const caseId = decodeURIComponent(skillsTreeMatch[1]);
       const normalized = safeCaseId(caseId);
       if (countTraces(findCaseDir(normalized)) === 0) return sendJson(res, 404, { error: "Case not found" });
-      const reqToken = url.searchParams.get("token") || (req.headers.authorization || "").replace(/^Bearer\s+/i, "").trim() || "";
-      const tree = await buildSkillsTree(normalized, reqToken);
+      const tree = buildSkillsTree(normalized);
       return sendJson(res, 200, tree);
     }
 
