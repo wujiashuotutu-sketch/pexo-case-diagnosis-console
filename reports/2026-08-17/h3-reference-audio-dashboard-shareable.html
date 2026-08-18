@@ -1,0 +1,1480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src 'unsafe-inline' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>H3 Reference Audio Dashboard</title>
+<style>:root{color-scheme:light dark;background:light-dark(rgb(255 255 255), rgb(24 24 24))}html,body{margin:0}body{box-sizing:border-box;padding:1rem;background:inherit}iframe{display:block;width:100%;height:calc(100vh - 2rem);margin:0 auto;border:0}</style>
+</head>
+<body>
+<iframe sandbox="allow-scripts" referrerpolicy="no-referrer" title="H3 Reference Audio Dashboard" srcdoc="&lt;!doctype html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;meta name=&quot;referrer&quot; content=&quot;no-referrer&quot;&gt;
+&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src &#x27;none&#x27;; script-src &#x27;unsafe-inline&#x27; &#x27;unsafe-eval&#x27; &#x27;wasm-unsafe-eval&#x27; blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src &#x27;unsafe-inline&#x27; blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src &#x27;none&#x27;; object-src &#x27;none&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;&quot;&gt;
+&lt;title&gt;H3 Reference Audio Dashboard&lt;/title&gt;
+&lt;style&gt;:root {
+  color-scheme: light dark;
+  background-color: var(
+    --background,
+    var(--color-background-primary, light-dark(rgb(255 255 255), rgb(24 24 24)))
+  ) !important;
+
+  /* Agent-facing contract; keep in sync with SKILL.md. */
+  --background: var(
+    --color-background-primary,
+    light-dark(rgb(255 255 255), rgb(24 24 24))
+  );
+  --foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --card: color-mix(in oklab, var(--foreground) 5%, var(--background));
+  --card-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --popover: var(
+    --color-background-secondary,
+    light-dark(rgb(255 255 255), rgb(45 45 45))
+  );
+  --popover-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --primary: var(
+    --color-text-info,
+    light-dark(rgb(51 156 255), rgb(131 195 255))
+  );
+  --primary-foreground: var(
+    --color-text-inverse,
+    light-dark(rgb(255 255 255), rgb(13 13 13))
+  );
+  --secondary: var(
+    --color-background-secondary,
+    light-dark(rgb(255 255 255 / 96%), rgb(54 54 54 / 96%))
+  );
+  --secondary-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --muted: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --muted-foreground: var(
+    --color-text-secondary,
+    light-dark(rgb(26 28 31 / 49.4%), rgb(255 255 255 / 49.8%))
+  );
+  --accent: var(
+    --color-background-info,
+    light-dark(rgb(229 242 255), rgb(13 39 63))
+  );
+  --accent-foreground: var(
+    --color-text-info,
+    light-dark(rgb(51 156 255), rgb(131 195 255))
+  );
+  --destructive: var(
+    --color-text-warning,
+    light-dark(rgb(226 85 7), rgb(255 133 73))
+  );
+  --border: var(
+    --color-border-secondary,
+    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+  );
+  --input: var(
+    --color-border-primary,
+    light-dark(
+      rgb(26 28 31 / 11.8%),
+      color-mix(in oklab, rgb(0 0 0) 10%, transparent)
+    )
+  );
+  --ring: var(
+    --color-ring-primary,
+    light-dark(rgb(51 156 255), rgb(131 195 255 / 76%))
+  );
+  --font-size-base: var(--font-text-md-size, 14px);
+  --blue: light-dark(rgb(51 156 255), rgb(51 156 255));
+  --orange: light-dark(rgb(226 85 7), rgb(251 106 34));
+  --green: light-dark(rgb(0 162 64), rgb(64 201 119));
+  --red: light-dark(rgb(224 46 42), rgb(255 103 100));
+  --purple: light-dark(rgb(146 79 247), rgb(173 123 249));
+  --yellow: light-dark(rgb(255 195 0), rgb(255 210 64));
+  --viz-series-1: var(--primary);
+  --viz-series-2: light-dark(rgb(243 136 59), rgb(245 154 86));
+  --viz-series-3: light-dark(rgb(93 201 119), rgb(116 213 139));
+  --viz-series-4: light-dark(rgb(235 119 177), rgb(240 143 192));
+  --viz-series-5: light-dark(rgb(155 121 236), rgb(170 145 239));
+  --viz-series-6: light-dark(rgb(58 185 177), rgb(90 203 194));
+
+  /* Internal implementation variables; not part of the agent contract. */
+  --font-sans: -apple-system, system-ui, &quot;Segoe UI&quot;, sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, &quot;SF Mono&quot;, Menlo, Consolas, &quot;Liberation Mono&quot;,
+    monospace;
+  --font-size-normal: max(11px, var(--font-size-base));
+  --font-size-tooltip: calc(var(--font-size-base) - 1px);
+  --font-size-small: max(11px, calc(var(--font-size-base) - 2px));
+  --font-size-h1: calc(var(--font-size-normal) * 1.7142857143);
+  --font-size-h2: calc(var(--font-size-normal) * 1.4285714286);
+  --font-size-h3: calc(var(--font-size-normal) * 1.2857142857);
+  --font-weight-normal: 430;
+  --font-weight-medium: 500;
+  --line-height-normal: calc(var(--font-size-normal) * 1.5);
+  --line-height-tooltip: calc(var(--font-size-tooltip) * 1.4285714286);
+  --line-height-small: calc(var(--font-size-small) + 4px);
+  --radius: var(--border-radius-lg, 12.5px);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-2xl: calc(var(--radius) * 1.6);
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px -1px rgb(0 0 0 / 8%);
+  --checkmark-image: url(&quot;data:image/svg+xml,%3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; viewBox=&#x27;0 0 17 17&#x27;%3E%3Cpath d=&#x27;M12.8961 3.64101C13.1297 3.41418 13.4984 3.37523 13.7779 3.56581C14.0571 3.75635 14.1554 4.11331 14.0299 4.41347L13.9615 4.53847L7.71151 13.7045C7.59411 13.8767 7.4063 13.9877 7.19881 14.0072C6.99136 14.0267 6.78564 13.9533 6.63826 13.806L2.88826 10.056L2.79842 9.9457C2.6192 9.67407 2.64927 9.30496 2.88826 9.06581C3.12738 8.82669 3.49647 8.79676 3.76815 8.97597L3.8785 9.06581L7.03084 12.2182L12.8053 3.74941L12.8961 3.64101Z&#x27;/%3E%3C/svg%3E&quot;);
+
+  /* Legacy aliases; not part of the current agent contract. */
+  --viz-bg: transparent;
+  --viz-panel: var(--card);
+  --viz-border: var(--border);
+  --viz-text: var(--foreground);
+  --viz-muted: var(--muted-foreground);
+  --viz-accent: var(--primary);
+  --viz-accent-text: var(--primary-foreground);
+  --viz-accent-bg: var(--accent);
+  --viz-font-size: var(--font-size-base);
+  --viz-warning: var(--destructive);
+}
+
+:root[data-theme=&quot;light&quot;] {
+  color-scheme: light;
+}
+
+:root[data-theme=&quot;dark&quot;] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html &gt; body {
+  /* Preserve MCP aliases for older inline renderers without creating :root cycles. */
+  --color-background-primary: var(
+    --background,
+    light-dark(rgb(255 255 255), rgb(24 24 24))
+  );
+  --color-text-primary: var(
+    --foreground,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --color-border-secondary: var(
+    --border,
+    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+  );
+
+  margin: 0;
+  padding: 5px;
+  color: var(--foreground);
+  background: transparent !important;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-normal);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+}
+
+a {
+  color: color-mix(in srgb, var(--viz-accent) 80%, var(--viz-text) 20%);
+  cursor: pointer;
+  font-weight: var(--font-weight-medium, 500);
+  text-decoration: none;
+  text-underline-offset: 2px;
+}
+
+a:is(:hover, :focus-visible) {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-thickness: 0.5px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-block: 0;
+}
+
+h1 {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+h3,
+h4,
+h5,
+h6 {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.3;
+}
+
+b,
+strong,
+th {
+  font-weight: var(--font-weight-medium);
+}
+
+code:not(pre code) {
+  display: inline;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  corner-shape: superellipse(1.5);
+  background: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  word-break: break-word;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--foreground);
+  font: inherit;
+  text-align: start;
+}
+
+.table :is(th, td) {
+  padding-block: 10px;
+  padding-inline: 0 24px;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--border);
+  text-align: start;
+  vertical-align: top;
+}
+
+.table-responsive &gt; .table :is(th, td) {
+  overflow-wrap: break-word;
+}
+
+.table :is(th, td):last-child {
+  padding-inline-end: 0;
+}
+
+.table :is(caption, thead th) {
+  font-weight: 600;
+}
+
+.table thead th {
+  padding-block: 8px;
+  border-bottom-color: color-mix(in srgb, var(--foreground) 16%, transparent);
+}
+
+.table tbody tr:last-child :is(th, td) {
+  border-bottom: 0;
+}
+
+.table.table-sm :is(th, td) {
+  padding-block: 6px;
+}
+
+.table.table-sm :is(th, td):not(:last-child) {
+  padding-inline-end: 16px;
+}
+
+.table :is(.text-end, [align=&quot;right&quot;]) {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.table :is(.text-center, [align=&quot;center&quot;]) {
+  text-align: center;
+}
+
+.table .text-nowrap {
+  white-space: nowrap;
+}
+
+#widget {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  background: transparent !important;
+}
+
+.card {
+  min-width: 0;
+  padding: 12px;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  border-radius: var(--radius-2xl);
+  corner-shape: superellipse(1.5);
+  color: var(--card-foreground);
+  background: var(--card);
+}
+
+#widget &gt; :not(.card) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.tooltip {
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  width: max-content;
+  max-width: min(
+    20rem,
+    var(--tooltip-available-width, calc(100vw - 10px)),
+    calc(100vw - 10px)
+  );
+  max-height: min(
+    var(--tooltip-available-height, calc(100vh - 10px)),
+    calc(100vh - 10px)
+  );
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  corner-shape: superellipse(1.5);
+  color: var(--popover-foreground);
+  background: var(--popover);
+  box-shadow: none;
+  font-size: var(--font-size-tooltip);
+  line-height: var(--line-height-tooltip);
+  overflow-wrap: break-word;
+  white-space: normal;
+  pointer-events: none;
+  user-select: none;
+}
+
+.viz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(max(180px, 24%), 1fr));
+  gap: 10px;
+}
+
+.viz-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viz-stat-value {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+.viz-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.viz-badge {
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  color: var(--accent-foreground);
+  background: var(--accent);
+  font-weight: var(--font-weight-medium);
+}
+
+small,
+.text-small,
+.viz-badge {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.viz-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.viz-controls &gt; .form-label {
+  display: grid;
+  min-width: min(100%, 260px);
+  flex: 1 1 280px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 12px;
+  margin-bottom: 0;
+}
+
+.viz-controls &gt; .form-label &gt; :is(.form-control, .form-range, .form-select) {
+  grid-column: 1 / -1;
+}
+
+.btn,
+.form-check-input,
+.form-control,
+.form-range,
+.form-select {
+  font: inherit;
+}
+
+.btn {
+  appearance: button;
+  display: inline-flex;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0 8px;
+  -webkit-app-region: no-drag;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-lg);
+  corner-shape: superellipse(1.5);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+  cursor: var(--cursor-interaction, pointer);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.btn:is(.btn-block, .viz-tile) {
+  inline-size: 100%;
+}
+
+.btn.viz-tile {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+a.btn {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn:not(:disabled):hover {
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.btn-primary {
+  border-color: transparent;
+  color: var(--primary-foreground);
+  background: var(--foreground);
+  background-clip: padding-box;
+}
+
+.btn-primary .text-muted {
+  color: color-mix(in srgb, var(--primary-foreground) 50%, transparent);
+}
+
+.btn-primary:not(:disabled):hover {
+  background: color-mix(in srgb, var(--foreground) 80%, transparent);
+  background-clip: padding-box;
+}
+
+.btn-ghost {
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.btn-ghost:not(:disabled):hover {
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+[data-lucide] {
+  stroke-width: 1.6;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--foreground);
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  min-height: 28px;
+  padding: 0 8px;
+  outline: none;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-lg);
+  corner-shape: superellipse(1.5);
+  color: var(--foreground);
+  background: var(--secondary);
+}
+
+.form-control::placeholder {
+  color: var(--muted-foreground);
+}
+
+.form-control[type=&quot;file&quot;] {
+  padding: 0;
+  overflow: hidden;
+  cursor: var(--cursor-interaction, pointer);
+}
+
+.form-control[type=&quot;file&quot;]::file-selector-button {
+  min-height: 26px;
+  margin-right: 8px;
+  padding: 0 8px;
+  border: 0;
+  border-right: 1px solid var(--input);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+  cursor: inherit;
+  font: inherit;
+}
+
+.form-control[type=&quot;file&quot;]:not(:disabled):hover::file-selector-button {
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.form-control-color[type=&quot;color&quot;] {
+  width: 40px;
+  height: 28px;
+  padding: 3px;
+  cursor: var(--cursor-interaction, pointer);
+}
+
+.form-control-color[type=&quot;color&quot;]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.form-control-color[type=&quot;color&quot;]::-webkit-color-swatch {
+  border: 0;
+  border-radius: calc(var(--radius-lg) - 4px);
+  corner-shape: superellipse(1.5);
+}
+
+textarea.form-control {
+  height: auto;
+  min-height: 72px;
+  padding: 8px 10px;
+  resize: vertical;
+}
+
+.form-control:focus-visible {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.form-select {
+  appearance: none;
+  display: block;
+  width: 100%;
+  min-height: 28px;
+  margin: 0;
+  padding: 0 32px 0 8px;
+  outline: none;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-lg);
+  corner-shape: superellipse(1.5);
+  color: var(--foreground);
+  background-color: var(--secondary);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted-foreground) 50%),
+    linear-gradient(135deg, var(--muted-foreground) 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) 50%,
+    calc(100% - 10px) 50%;
+  background-repeat: no-repeat;
+  background-size: 4px 4px;
+  cursor: var(--cursor-interaction, default);
+}
+
+.form-select:not(:disabled):hover {
+  background-color: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.form-select:focus-visible {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-check {
+  display: flex;
+  min-height: 20px;
+  align-items: center;
+  gap: 6px;
+}
+
+.form-check-input {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  margin: 0;
+  border: 1px solid var(--input);
+  color: var(--primary-foreground);
+  background-color: transparent;
+  cursor: var(--cursor-interaction, default);
+  transition:
+    background-color 150ms,
+    border-color 150ms,
+    box-shadow 150ms;
+}
+
+.form-check:not(.form-switch) .form-check-input[type=&quot;checkbox&quot;] {
+  border-color: var(--input);
+  border-radius: var(--radius-sm);
+  corner-shape: superellipse(1.5);
+  background-color: var(--secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input:not(:disabled):not(:checked):hover {
+  background-color: var(--card);
+}
+
+.form-check:not(.form-switch) .form-check-input[type=&quot;checkbox&quot;]:checked {
+  border-color: var(--primary);
+  background-color: var(--primary);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input[type=&quot;checkbox&quot;]:checked::before {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-foreground);
+  content: &quot;&quot;;
+  mask: var(--checkmark-image) center / 12px 12px no-repeat;
+}
+
+.form-check-input[type=&quot;radio&quot;] {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+}
+
+.form-check-input[type=&quot;radio&quot;]:checked {
+  border: 2px solid var(--primary);
+  background:
+    radial-gradient(circle, var(--primary-foreground) 0 2.5px, transparent 3px),
+    var(--primary);
+}
+
+.form-check:not(.form-switch) .form-check-input:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+}
+
+.form-switch .form-check-input:disabled,
+.form-switch .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-check-label {
+  color: var(--foreground);
+  cursor: var(--cursor-interaction, default);
+}
+
+.form-switch .form-check-input {
+  position: relative;
+  width: 32px;
+  height: 20px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  box-shadow: none;
+  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.form-switch .form-check-input::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 1px solid light-dark(var(--primary-foreground), var(--foreground));
+  border-radius: var(--radius-full);
+  background: light-dark(var(--primary-foreground), var(--foreground));
+  box-shadow: var(--shadow-sm);
+  content: &quot;&quot;;
+  transform: translate(2px, -50%);
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.form-switch .form-check-input:checked {
+  background: var(--primary);
+}
+
+.form-switch .form-check-input:checked::before {
+  transform: translate(14px, -50%);
+}
+
+.form-switch .form-check-input:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.form-range {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 28px;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  border: 0;
+  accent-color: var(--primary);
+  background: linear-gradient(
+      color-mix(in srgb, var(--foreground) 7%, transparent),
+      color-mix(in srgb, var(--foreground) 7%, transparent)
+    )
+    center / 100% 2px no-repeat;
+}
+
+.form-range::-webkit-slider-runnable-track {
+  height: 28px;
+  background: transparent;
+}
+
+.form-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: light-dark(var(--primary-foreground), var(--foreground));
+}
+
+.form-range:focus-visible::-webkit-slider-thumb {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-range::-moz-range-track {
+  height: 28px;
+  background: transparent;
+}
+
+.form-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: light-dark(var(--primary-foreground), var(--foreground));
+}
+
+.form-range:focus-visible::-moz-range-thumb {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-range:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.btn:not(.btn-primary, .viz-tile):is(
+    [aria-pressed=&quot;true&quot;],
+    [aria-selected=&quot;true&quot;],
+    .is-selected
+  ) {
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+
+.btn.viz-tile:is([aria-pressed=&quot;true&quot;], [aria-selected=&quot;true&quot;], .is-selected) {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+#widget &gt; svg {
+  width: 100%;
+}
+
+/* Model-authored chart rules can otherwise stretch icons after these styles load. */
+svg.lucide {
+  display: block;
+  width: 16px !important;
+  height: 16px !important;
+  flex: none;
+  margin: 0 !important;
+  stroke-width: 1.6;
+}
+
+.text-warning,
+.text-destructive {
+  color: var(--destructive);
+}
+
+html&gt;body{padding:0}&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div id=&quot;h3FormalDashboard&quot;&gt;
+  &lt;div class=&quot;h3-dashboard-shell&quot;&gt;
+    &lt;header class=&quot;h3-dashboard-header&quot;&gt;
+      &lt;div&gt;
+        &lt;p class=&quot;h3-eyebrow&quot;&gt;MINIMAX H3 / REFERENCE_AUDIO / FORMAL RUN&lt;/p&gt;
+        &lt;h1&gt;Audio role control audit&lt;/h1&gt;
+        &lt;p class=&quot;h3-subtitle&quot;&gt;24 个有效试次 · 12 条核心用例 · 15 秒输出 · 2026-08-14&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;h3-run-meta&quot; aria-label=&quot;运行元数据&quot;&gt;
+        &lt;span&gt;MiniMax-H3&lt;/span&gt;
+        &lt;span&gt;768P&lt;/span&gt;
+        &lt;span&gt;16:9&lt;/span&gt;
+        &lt;span&gt;无未文档化开关&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/header&gt;
+
+    &lt;section class=&quot;h3-summary-grid&quot; aria-label=&quot;运行摘要&quot;&gt;
+      &lt;article class=&quot;card h3-summary-card&quot;&gt;
+        &lt;span class=&quot;h3-summary-label&quot;&gt;有效任务&lt;/span&gt;
+        &lt;strong&gt;24/24&lt;/strong&gt;
+        &lt;small&gt;全部 SUCCEEDED · 360 秒总输出&lt;/small&gt;
+      &lt;/article&gt;
+      &lt;article class=&quot;card h3-summary-card h3-summary-alert&quot;&gt;
+        &lt;span class=&quot;h3-summary-label&quot;&gt;严格静音&lt;/span&gt;
+        &lt;strong&gt;0/6&lt;/strong&gt;
+        &lt;small&gt;RA-04 ×3 · RA-07 ×3 均保留可听音轨&lt;/small&gt;
+      &lt;/article&gt;
+      &lt;article class=&quot;card h3-summary-card h3-summary-alert&quot;&gt;
+        &lt;span class=&quot;h3-summary-label&quot;&gt;参考音频泄漏&lt;/span&gt;
+        &lt;strong&gt;9/9&lt;/strong&gt;
+        &lt;small&gt;人声、click、marker 均出现强相关&lt;/small&gt;
+      &lt;/article&gt;
+      &lt;article class=&quot;card h3-summary-card h3-summary-warn&quot;&gt;
+        &lt;span class=&quot;h3-summary-label&quot;&gt;可判定边界&lt;/span&gt;
+        &lt;strong&gt;3 项&lt;/strong&gt;
+        &lt;small&gt;ASR、盲听音色、严格 250ms 口型仍缺证据&lt;/small&gt;
+      &lt;/article&gt;
+    &lt;/section&gt;
+
+    &lt;section class=&quot;h3-decision-strip&quot; aria-label=&quot;主要发现&quot;&gt;
+      &lt;div class=&quot;h3-decision-item&quot;&gt;&lt;span class=&quot;h3-dot h3-dot-alert&quot;&gt;&lt;/span&gt;&lt;span&gt;&lt;b&gt;Prompt 静音不可靠&lt;/b&gt;&lt;em&gt;三次人声静音均约 -15 LUFS&lt;/em&gt;&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;h3-decision-item&quot;&gt;&lt;span class=&quot;h3-dot h3-dot-alert&quot;&gt;&lt;/span&gt;&lt;span&gt;&lt;b&gt;音频角色会混合&lt;/b&gt;&lt;em&gt;RA-10 更接近源视频嵌入音轨&lt;/em&gt;&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;h3-decision-item&quot;&gt;&lt;span class=&quot;h3-dot h3-dot-neutral&quot;&gt;&lt;/span&gt;&lt;span&gt;&lt;b&gt;严格交付需后处理&lt;/b&gt;&lt;em&gt;删除/替换音轨后再做 PCM 验收&lt;/em&gt;&lt;/span&gt;&lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;section class=&quot;h3-chart-section&quot; aria-labelledby=&quot;h3ChartTitle&quot;&gt;
+      &lt;div class=&quot;h3-section-heading&quot;&gt;
+        &lt;div&gt;
+          &lt;h2 id=&quot;h3ChartTitle&quot;&gt;参考波形影响 × 输出响度&lt;/h2&gt;
+          &lt;p&gt;每个点代表一条用例的平均值；越右表示与参考音频越相似，越上表示输出越响。相关性是诊断信号，不是质量分数。&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;span class=&quot;h3-chart-note&quot;&gt;点击点位查看试次与证据&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;h3-chart-wrap&quot;&gt;
+        &lt;svg id=&quot;h3CorrelationChart&quot; role=&quot;img&quot; aria-label=&quot;各用例参考音频相关性与输出响度散点图&quot;&gt;&lt;/svg&gt;
+        &lt;div id=&quot;h3ChartTooltip&quot; class=&quot;tooltip&quot; role=&quot;tooltip&quot; aria-hidden=&quot;true&quot;&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;h3-chart-legend&quot; aria-label=&quot;图例&quot;&gt;
+        &lt;span&gt;&lt;i class=&quot;h3-legend-swatch h3-series-blue&quot;&gt;&lt;/i&gt;基线/默认&lt;/span&gt;
+        &lt;span&gt;&lt;i class=&quot;h3-legend-swatch h3-series-orange&quot;&gt;&lt;/i&gt;参考音频进入输出&lt;/span&gt;
+        &lt;span&gt;&lt;i class=&quot;h3-legend-swatch h3-series-red&quot;&gt;&lt;/i&gt;静音/隔离失败&lt;/span&gt;
+        &lt;span&gt;&lt;i class=&quot;h3-legend-swatch h3-series-purple&quot;&gt;&lt;/i&gt;角色冲突&lt;/span&gt;
+        &lt;span&gt;&lt;i class=&quot;h3-legend-swatch h3-series-yellow&quot;&gt;&lt;/i&gt;证据待补&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;section class=&quot;h3-results-section&quot; aria-labelledby=&quot;h3ResultsTitle&quot;&gt;
+      &lt;div class=&quot;h3-section-heading&quot;&gt;
+        &lt;div&gt;
+          &lt;h2 id=&quot;h3ResultsTitle&quot;&gt;12 条核心用例&lt;/h2&gt;
+          &lt;p&gt;点击用例编号，右侧详情会显示重复试次、响度、波形相关性和可复核文件。&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;h3-results-layout&quot;&gt;
+        &lt;div class=&quot;h3-table-wrap&quot;&gt;
+          &lt;table class=&quot;h3-results-table&quot;&gt;
+            &lt;caption class=&quot;sr-only&quot;&gt;MiniMax H3 reference_audio 正式用例结果&lt;/caption&gt;
+            &lt;thead&gt;
+              &lt;tr&gt;&lt;th scope=&quot;col&quot;&gt;用例&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;输入角色&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;试次&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;平均相关性&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;平均 LUFS&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;判断&lt;/th&gt;&lt;/tr&gt;
+            &lt;/thead&gt;
+            &lt;tbody id=&quot;h3ResultsBody&quot;&gt;&lt;/tbody&gt;
+          &lt;/table&gt;
+        &lt;/div&gt;
+        &lt;aside id=&quot;h3CaseDetail&quot; class=&quot;card h3-detail-card&quot; aria-live=&quot;polite&quot;&gt;&lt;/aside&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;footer class=&quot;h3-dashboard-footer&quot;&gt;
+      &lt;span&gt;证据：ffprobe · ebur128 · silencedetect · PCM 相关性 · 关键帧联系表&lt;/span&gt;
+    &lt;/footer&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+#h3FormalDashboard {
+  --background: light-dark(#f5f7fa, #11161c);
+  --foreground: light-dark(#17222d, #e9eef3);
+  --card: light-dark(#ffffff, #1a222b);
+  --card-foreground: light-dark(#17222d, #e9eef3);
+  --muted-foreground: light-dark(#657381, #a5b1bc);
+  --border: light-dark(#dbe2e8, #34414d);
+  --input: light-dark(#eef2f5, #202b35);
+  --primary: light-dark(#2e668a, #72c5ea);
+  --primary-foreground: light-dark(#ffffff, #0c1820);
+  --accent: light-dark(#eaf1f5, #24343e);
+  --accent-foreground: light-dark(#1d4e6c, #c4eafb);
+  --popover: light-dark(#ffffff, #1a222b);
+  --popover-foreground: light-dark(#17222d, #e9eef3);
+  --destructive: light-dark(#b63a42, #f28a8d);
+  --warning: light-dark(#9a6d18, #e7be5d);
+  --viz-series-1: light-dark(#347ca6, #6ec4ed);
+  --viz-series-2: light-dark(#cf7835, #f0a25d);
+  --viz-series-3: light-dark(#bd4d54, #ee8c92);
+  --viz-series-4: light-dark(#765aa6, #b69bea);
+  --viz-series-5: light-dark(#b48a25, #e8c462);
+  --font-size-base: 14px;
+  color: var(--foreground);
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;
+  font-size: var(--font-size-base);
+  line-height: 1.45;
+  background: transparent;
+}
+
+#h3FormalDashboard *, #h3FormalDashboard *::before, #h3FormalDashboard *::after { box-sizing: border-box; }
+#h3FormalDashboard .h3-dashboard-shell { width: 100%; max-width: 1080px; margin: 0 auto; padding: 26px 24px 32px; }
+#h3FormalDashboard .h3-dashboard-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 22px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+#h3FormalDashboard .h3-eyebrow { margin: 0 0 8px; color: var(--primary); font-size: 11px; font-weight: 500; letter-spacing: .12em; }
+#h3FormalDashboard h1, #h3FormalDashboard h2, #h3FormalDashboard p { margin-top: 0; }
+#h3FormalDashboard h1 { margin-bottom: 7px; font-size: 25px; line-height: 1.15; font-weight: 500; letter-spacing: 0; }
+#h3FormalDashboard h2 { margin-bottom: 5px; font-size: 18px; line-height: 1.25; font-weight: 500; }
+#h3FormalDashboard .h3-subtitle, #h3FormalDashboard .h3-section-heading p { margin-bottom: 0; color: var(--muted-foreground); }
+#h3FormalDashboard .h3-subtitle { font-size: 13px; }
+#h3FormalDashboard .h3-run-meta { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px 12px; max-width: 310px; color: var(--muted-foreground); font-size: 12px; text-align: right; }
+#h3FormalDashboard .h3-run-meta span + span::before { content: &quot;·&quot;; margin-right: 12px; color: var(--border); }
+#h3FormalDashboard .h3-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 18px 0 20px; }
+#h3FormalDashboard .card { border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--card-foreground); }
+#h3FormalDashboard .h3-summary-card { min-height: 118px; padding: 15px 16px; display: flex; flex-direction: column; justify-content: space-between; }
+#h3FormalDashboard .h3-summary-label { color: var(--muted-foreground); font-size: 12px; }
+#h3FormalDashboard .h3-summary-card strong { display: block; font-size: 26px; line-height: 1; font-weight: 500; }
+#h3FormalDashboard .h3-summary-card small { color: var(--muted-foreground); font-size: 12px; }
+#h3FormalDashboard .h3-summary-alert strong { color: var(--destructive); }
+#h3FormalDashboard .h3-summary-warn strong { color: var(--warning); }
+#h3FormalDashboard .h3-decision-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding: 0 0 24px; border-bottom: 1px solid var(--border); }
+#h3FormalDashboard .h3-decision-item { display: flex; gap: 9px; align-items: flex-start; min-width: 0; }
+#h3FormalDashboard .h3-decision-item b, #h3FormalDashboard .h3-decision-item em { display: block; font-size: 12px; font-style: normal; }
+#h3FormalDashboard .h3-decision-item em { margin-top: 3px; color: var(--muted-foreground); }
+#h3FormalDashboard .h3-dot { flex: 0 0 8px; width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; background: var(--viz-series-1); }
+#h3FormalDashboard .h3-dot-alert { background: var(--destructive); }
+#h3FormalDashboard .h3-dot-neutral { background: var(--viz-series-1); }
+#h3FormalDashboard .h3-chart-section, #h3FormalDashboard .h3-results-section { padding-top: 25px; }
+#h3FormalDashboard .h3-section-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 12px; }
+#h3FormalDashboard .h3-section-heading p { max-width: 720px; font-size: 12px; }
+#h3FormalDashboard .h3-chart-note { color: var(--muted-foreground); font-size: 12px; white-space: nowrap; }
+#h3FormalDashboard .h3-chart-wrap { position: relative; width: 100%; min-height: 340px; }
+#h3FormalDashboard #h3CorrelationChart { display: block; width: 100%; height: 360px; overflow: visible; }
+#h3FormalDashboard #h3CorrelationChart text { fill: var(--foreground); font-size: 12px; }
+#h3FormalDashboard #h3CorrelationChart .grid line { stroke: var(--border); stroke-opacity: .65; }
+#h3FormalDashboard #h3CorrelationChart .axis path, #h3FormalDashboard #h3CorrelationChart .axis line { stroke: var(--border); }
+#h3FormalDashboard #h3CorrelationChart .axis text { fill: var(--muted-foreground); }
+#h3FormalDashboard #h3CorrelationChart .chart-frame { fill: transparent; stroke: var(--border); stroke-width: 1; }
+#h3FormalDashboard #h3CorrelationChart .error-line { stroke: var(--muted-foreground); stroke-width: 1.5; }
+#h3FormalDashboard #h3CorrelationChart .case-point { stroke: var(--card); stroke-width: 2; pointer-events: none; }
+#h3FormalDashboard #h3CorrelationChart .case-mark:hover .case-point { stroke: var(--foreground); stroke-width: 2.5; }
+#h3FormalDashboard #h3CorrelationChart .case-hit { fill: transparent; cursor: pointer; }
+#h3FormalDashboard #h3CorrelationChart .case-label { pointer-events: none; font-size: 11px; font-weight: 500; }
+#h3FormalDashboard .h3-chart-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 3px 0 3px 64px; color: var(--muted-foreground); font-size: 12px; }
+#h3FormalDashboard .h3-chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+#h3FormalDashboard .h3-legend-swatch { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+#h3FormalDashboard .h3-series-blue { background: var(--viz-series-1); }
+#h3FormalDashboard .h3-series-orange { background: var(--viz-series-2); }
+#h3FormalDashboard .h3-series-red { background: var(--viz-series-3); }
+#h3FormalDashboard .h3-series-purple { background: var(--viz-series-4); }
+#h3FormalDashboard .h3-series-yellow { background: var(--viz-series-5); }
+#h3FormalDashboard .tooltip { position: absolute; z-index: 2; display: none; min-width: 150px; max-width: 220px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--popover); color: var(--popover-foreground); box-shadow: 0 5px 18px light-dark(rgb(20 30 40 / .14), rgb(0 0 0 / .35)); font-size: 12px; pointer-events: none; }
+#h3FormalDashboard .tooltip strong, #h3FormalDashboard .tooltip span { display: block; }
+#h3FormalDashboard .tooltip span { color: var(--muted-foreground); margin-top: 2px; }
+#h3FormalDashboard .h3-results-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 22px; align-items: start; }
+#h3FormalDashboard .h3-table-wrap { min-width: 0; overflow-x: auto; }
+#h3FormalDashboard .h3-results-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+#h3FormalDashboard .h3-results-table th { padding: 10px 8px; color: var(--muted-foreground); border-bottom: 1px solid var(--border); font-weight: 500; text-align: left; white-space: nowrap; }
+#h3FormalDashboard .h3-results-table td { padding: 11px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+#h3FormalDashboard .h3-results-table tbody tr:last-child td { border-bottom: 0; }
+#h3FormalDashboard .h3-case-button { display: inline-flex; align-items: baseline; gap: 6px; padding: 0; border: 0; color: var(--primary); background: transparent; font: inherit; font-weight: 500; cursor: pointer; text-align: left; }
+#h3FormalDashboard .h3-case-button:hover, #h3FormalDashboard .h3-case-button:focus-visible { color: var(--accent-foreground); text-decoration: underline; }
+#h3FormalDashboard .h3-case-button small { color: var(--muted-foreground); font-size: 11px; font-weight: 400; }
+#h3FormalDashboard .h3-verdict { color: var(--muted-foreground); }
+#h3FormalDashboard .h3-verdict.alert { color: var(--destructive); }
+#h3FormalDashboard .h3-verdict.warn { color: var(--warning); }
+#h3FormalDashboard .h3-detail-card { padding: 17px; min-height: 360px; }
+#h3FormalDashboard .h3-detail-kicker { margin: 0 0 4px; color: var(--primary); font-size: 11px; font-weight: 500; letter-spacing: .08em; }
+#h3FormalDashboard .h3-detail-card h3 { margin: 0 0 6px; font-size: 18px; font-weight: 500; }
+#h3FormalDashboard .h3-detail-card .detail-summary { margin: 0 0 15px; color: var(--muted-foreground); font-size: 12px; }
+#h3FormalDashboard .h3-detail-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 15px; }
+#h3FormalDashboard .h3-detail-metric { padding: 9px; border-left: 2px solid var(--viz-series-1); background: var(--accent); }
+#h3FormalDashboard .h3-detail-metric:nth-child(2) { border-left-color: var(--viz-series-2); }
+#h3FormalDashboard .h3-detail-metric:nth-child(3) { border-left-color: var(--viz-series-3); }
+#h3FormalDashboard .h3-detail-metric span, #h3FormalDashboard .h3-detail-metric strong { display: block; }
+#h3FormalDashboard .h3-detail-metric span { color: var(--muted-foreground); font-size: 11px; }
+#h3FormalDashboard .h3-detail-metric strong { margin-top: 3px; font-size: 16px; font-weight: 500; }
+#h3FormalDashboard .h3-detail-note { margin: 0 0 14px; font-size: 12px; }
+#h3FormalDashboard .h3-detail-links { display: flex; flex-wrap: wrap; gap: 8px 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+#h3FormalDashboard .h3-detail-links a, #h3FormalDashboard .h3-dashboard-footer a { color: var(--primary); font-size: 12px; }
+#h3FormalDashboard .h3-trial-table { width: 100%; margin: 0 0 13px; border-collapse: collapse; font-size: 11px; }
+#h3FormalDashboard .h3-trial-table th, #h3FormalDashboard .h3-trial-table td { padding: 5px 4px; border-bottom: 1px solid var(--border); text-align: left; }
+#h3FormalDashboard .h3-trial-table th { color: var(--muted-foreground); font-weight: 500; }
+#h3FormalDashboard .h3-dashboard-footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 24px; padding-top: 13px; border-top: 1px solid var(--border); color: var(--muted-foreground); font-size: 11px; }
+#h3FormalDashboard .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+@media (max-width: 820px) {
+  #h3FormalDashboard .h3-dashboard-shell { padding: 22px 18px 28px; }
+  #h3FormalDashboard .h3-dashboard-header { display: block; }
+  #h3FormalDashboard .h3-run-meta { justify-content: flex-start; max-width: none; margin-top: 14px; text-align: left; }
+  #h3FormalDashboard .h3-run-meta span + span::before { margin-right: 9px; }
+  #h3FormalDashboard .h3-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #h3FormalDashboard .h3-decision-strip { grid-template-columns: 1fr; gap: 10px; }
+  #h3FormalDashboard .h3-results-layout { grid-template-columns: 1fr; }
+  #h3FormalDashboard .h3-detail-card { min-height: 0; }
+}
+
+@media (max-width: 520px) {
+  #h3FormalDashboard .h3-dashboard-shell { padding: 18px 12px 24px; }
+  #h3FormalDashboard h1 { font-size: 22px; }
+  #h3FormalDashboard .h3-summary-grid { gap: 8px; }
+  #h3FormalDashboard .h3-summary-card { min-height: 108px; padding: 12px; }
+  #h3FormalDashboard .h3-summary-card strong { font-size: 22px; }
+  #h3FormalDashboard .h3-section-heading { display: block; }
+  #h3FormalDashboard .h3-chart-note { display: block; margin-top: 8px; }
+  #h3FormalDashboard #h3CorrelationChart { height: 330px; }
+  #h3FormalDashboard .h3-chart-legend { padding-left: 0; gap: 7px 12px; }
+  #h3FormalDashboard .h3-results-table { min-width: 680px; }
+  #h3FormalDashboard .h3-detail-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #h3FormalDashboard .h3-dashboard-footer { display: block; }
+  #h3FormalDashboard .h3-dashboard-footer a { display: block; margin-top: 6px; }
+}
+&lt;/style&gt;
+
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+(() =&gt; {
+  const root = document.getElementById(&quot;h3FormalDashboard&quot;);
+  if (!root || typeof d3 === &quot;undefined&quot;) return;
+
+  const cases = [
+    { id: &quot;H3-RA-01&quot;, title: &quot;无参考基线&quot;, role: &quot;无参考音频&quot;, trials: [{ job: &quot;H3-RA-01__r1&quot;, corr: null, lufs: -14.8, peak: -0.9 }], kind: &quot;baseline&quot;, verdict: &quot;基线&quot;, note: &quot;默认生成有声视觉片段；用于和 RA-02 对照。&quot; },
+    { id: &quot;H3-RA-02&quot;, title: &quot;参考人声但不声明用途&quot;, role: &quot;官方 8.516s 人声&quot;, trials: [{ job: &quot;H3-RA-02__r1__mimefix&quot;, corr: .8905, lufs: -22.8, peak: -7.3 }], kind: &quot;influence&quot;, verdict: &quot;参考音频进入输出&quot;, note: &quot;即使 Prompt 不声明用途，输出仍与官方参考人声高度相关。&quot; },
+    { id: &quot;H3-RA-03&quot;, title: &quot;参考人声作为对白&quot;, role: &quot;15s 校准人声&quot;, trials: [{ job: &quot;H3-RA-03__r1&quot;, corr: .9653, lufs: -15.1, peak: -2.2 }], kind: &quot;influence&quot;, verdict: &quot;波形保留已证实&quot;, note: &quot;输出强烈保留参考人声；台词内容和顺序仍需 ASR。&quot; },
+    { id: &quot;H3-RA-04&quot;, title: &quot;Prompt 请求静音&quot;, role: &quot;人声 + 静音要求&quot;, trials: [{ job: &quot;H3-RA-04__r1&quot;, corr: .9527, lufs: -15.2, peak: -2.8 }, { job: &quot;H3-RA-04__r2&quot;, corr: .9580, lufs: -14.9, peak: -2.3 }, { job: &quot;H3-RA-04__r3&quot;, corr: .9523, lufs: -14.9, peak: -2.5 }], kind: &quot;policy&quot;, verdict: &quot;静音失败 3/3&quot;, note: &quot;三次均生成 AAC 音轨并保留参考人声，不能作为严格静音交付。&quot; },
+    { id: &quot;H3-RA-05&quot;, title: &quot;图片 + 人声口型驱动&quot;, role: &quot;人物图 + 15s 人声&quot;, trials: [{ job: &quot;H3-RA-05__r1&quot;, corr: .9802, lufs: -16.0, peak: -3.5 }, { job: &quot;H3-RA-05__r2&quot;, corr: .6291, lufs: -16.1, peak: -3.7 }, { job: &quot;H3-RA-05__r3&quot;, corr: .5039, lufs: -15.6, peak: -3.4 }], kind: &quot;evidence&quot;, verdict: &quot;口型证据不足&quot;, note: &quot;r1/r3 主脸和嘴部清晰，r2 有抱狗和更小嘴部；严格 250ms 尚未验证。&quot; },
+    { id: &quot;H3-RA-06&quot;, title: &quot;只参考音色、生成新台词&quot;, role: &quot;15s 人声 + 新文本&quot;, trials: [{ job: &quot;H3-RA-06__r1&quot;, corr: -.0547, lufs: -14.5, peak: -2.7 }, { job: &quot;H3-RA-06__r2&quot;, corr: .1057, lufs: -15.1, peak: -2.8 }, { job: &quot;H3-RA-06__r3&quot;, corr: .0633, lufs: -14.0, peak: -2.4 }], kind: &quot;evidence&quot;, verdict: &quot;需 ASR/盲听&quot;, note: &quot;输出没有原样复制输入波形，但新台词和音色相似度不能由当前证据确认。&quot; },
+    { id: &quot;H3-RA-07&quot;, title: &quot;click 只作画面时钟&quot;, role: &quot;15s click + 静音要求&quot;, trials: [{ job: &quot;H3-RA-07__r1&quot;, corr: .9501, lufs: -17.1, peak: -3.3 }, { job: &quot;H3-RA-07__r2&quot;, corr: .9468, lufs: -17.3, peak: -3.1 }, { job: &quot;H3-RA-07__r3&quot;, corr: .9332, lufs: -18.5, peak: -3.0 }], kind: &quot;policy&quot;, verdict: &quot;click 泄漏 3/3&quot;, note: &quot;视觉 montage 有节奏化分段，但 click 脉冲仍进入最终音轨。&quot; },
+    { id: &quot;H3-RA-08&quot;, title: &quot;click 作可听节拍 + 画面时钟&quot;, role: &quot;15s click&quot;, trials: [{ job: &quot;H3-RA-08__r1&quot;, corr: .9428, lufs: -17.9, peak: -3.2 }], kind: &quot;influence&quot;, verdict: &quot;可听节拍可观察&quot;, note: &quot;输出保留 click-like 脉冲并伴随 montage 变化，不等于字节级透传。&quot; },
+    { id: &quot;H3-RA-09&quot;, title: &quot;五个 marker 视觉事件&quot;, role: &quot;15s marker tones&quot;, trials: [{ job: &quot;H3-RA-09__r1&quot;, corr: .9624, lufs: -25.6, peak: -13.2 }, { job: &quot;H3-RA-09__r2&quot;, corr: .9260, lufs: -25.8, peak: -5.9 }, { job: &quot;H3-RA-09__r3&quot;, corr: .9392, lufs: -23.7, peak: -11.8 }], kind: &quot;policy&quot;, verdict: &quot;marker 泄漏 3/3&quot;, note: &quot;定点帧能看到主要纸飞机事件，但 marker tones 未被 Prompt 排除。&quot; },
+    { id: &quot;H3-RA-10&quot;, title: &quot;带原音视频 + 独立人声&quot;, role: &quot;带音视频 + 15s 人声&quot;, trials: [{ job: &quot;H3-RA-10__r1&quot;, corr: .8075, secondary: .3684, lufs: -11.7, peak: -.8 }], kind: &quot;conflict&quot;, verdict: &quot;源音轨主导/混合&quot;, note: &quot;输出画面跟随人物参考，但音频更接近源视频嵌入音轨，而非独立人声。&quot; },
+    { id: &quot;H3-RA-11&quot;, title: &quot;人声对白 + click 画面节奏&quot;, role: &quot;8s 人声 + 7s click&quot;, trials: [{ job: &quot;H3-RA-11__r1&quot;, corr: .6801, secondary: .7043, lag: &quot;8.0s&quot;, lufs: -17.4, peak: -2.0 }, { job: &quot;H3-RA-11__r2&quot;, corr: .6887, secondary: .1906, lag: &quot;2.0s&quot;, lufs: -20.0, peak: -1.8 }, { job: &quot;H3-RA-11__r3&quot;, corr: .9339, secondary: .8484, lag: &quot;9.0s&quot;, lufs: -19.2, peak: -2.2 }], kind: &quot;conflict&quot;, verdict: &quot;角色隔离不稳定&quot;, note: &quot;2/4/6s 附近可见构图变化，但三次都出现 0.5s 级 click 脉冲。&quot; },
+    { id: &quot;H3-RA-12&quot;, title: &quot;8.516s 参考延展到 15s&quot;, role: &quot;官方 8.516s 人声&quot;, trials: [{ job: &quot;H3-RA-12__r1&quot;, corr: .8948, lufs: -22.8, peak: -6.9 }], kind: &quot;evidence&quot;, verdict: &quot;未发现明显循环&quot;, note: &quot;9.25s 后仍有动作，尾段约 -52dBFS；无 ASR 时不能确认无台词延续。&quot; }
+  ];
+
+  const series = { baseline: 1, influence: 2, policy: 3, conflict: 4, evidence: 5 };
+  const labels = { baseline: &quot;基线&quot;, influence: &quot;参考音频进入输出&quot;, policy: &quot;静音/隔离失败&quot;, conflict: &quot;角色冲突&quot;, evidence: &quot;证据待补&quot; };
+  const fmt = (value, digits = 2) =&gt; value === null || value === undefined ? &quot;—&quot; : Number(value).toFixed(digits);
+  const average = (rows, key) =&gt; {
+    const values = rows.map(d =&gt; d[key]).filter(v =&gt; v !== null &amp;&amp; v !== undefined);
+    return values.length ? values.reduce((a, b) =&gt; a + b, 0) / values.length : null;
+  };
+  cases.forEach(d =&gt; {
+    d.avgCorr = d.id === &quot;H3-RA-01&quot; ? null : average(d.trials, &quot;corr&quot;);
+    d.avgLufs = average(d.trials, &quot;lufs&quot;);
+    d.minCorr = d.id === &quot;H3-RA-01&quot; ? null : Math.min(...d.trials.map(t =&gt; t.corr));
+    d.maxCorr = d.id === &quot;H3-RA-01&quot; ? null : Math.max(...d.trials.map(t =&gt; t.corr));
+  });
+
+  const body = root.querySelector(&quot;#h3ResultsBody&quot;);
+  const detail = root.querySelector(&quot;#h3CaseDetail&quot;);
+  const renderDetail = (item) =&gt; {
+    const trialRows = item.trials.map((t, i) =&gt; `&lt;tr&gt;&lt;td&gt;r${i + 1}&lt;/td&gt;&lt;td&gt;${fmt(t.corr, 4)}&lt;/td&gt;&lt;td&gt;${fmt(t.lufs, 1)}&lt;/td&gt;&lt;td&gt;${fmt(t.peak, 1)}&lt;/td&gt;&lt;td&gt;${t.lag ? `click +${t.lag}` : &quot;&quot;}&lt;/td&gt;&lt;/tr&gt;`).join(&quot;&quot;);
+    detail.innerHTML = `&lt;p class=&quot;h3-detail-kicker&quot;&gt;${item.id} / ${labels[item.kind]}&lt;/p&gt;
+      &lt;h3&gt;${item.title}&lt;/h3&gt;
+      &lt;p class=&quot;detail-summary&quot;&gt;输入角色：${item.role} · ${item.trials.length} 次有效试次&lt;/p&gt;
+      &lt;div class=&quot;h3-detail-metrics&quot;&gt;&lt;div class=&quot;h3-detail-metric&quot;&gt;&lt;span&gt;平均相关性&lt;/span&gt;&lt;strong&gt;${fmt(item.avgCorr, 4)}&lt;/strong&gt;&lt;/div&gt;&lt;div class=&quot;h3-detail-metric&quot;&gt;&lt;span&gt;平均 LUFS&lt;/span&gt;&lt;strong&gt;${fmt(item.avgLufs, 1)}&lt;/strong&gt;&lt;/div&gt;&lt;div class=&quot;h3-detail-metric&quot;&gt;&lt;span&gt;输出格式&lt;/span&gt;&lt;strong&gt;AAC / 32k&lt;/strong&gt;&lt;/div&gt;&lt;/div&gt;
+      &lt;table class=&quot;h3-trial-table&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;试次&lt;/th&gt;&lt;th&gt;相关性&lt;/th&gt;&lt;th&gt;LUFS&lt;/th&gt;&lt;th&gt;峰值&lt;/th&gt;&lt;th&gt;备注&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;${trialRows}&lt;/tbody&gt;&lt;/table&gt;
+      &lt;p class=&quot;h3-detail-note&quot;&gt;${item.note}&lt;/p&gt;`;
+  };
+  body.innerHTML = cases.map((item, index) =&gt; `&lt;tr&gt;&lt;td&gt;&lt;button type=&quot;button&quot; class=&quot;h3-case-button&quot; data-case=&quot;${item.id}&quot; aria-pressed=&quot;${index === 0 ? &quot;true&quot; : &quot;false&quot;}&quot;&gt;${item.id}&lt;small&gt;${item.title}&lt;/small&gt;&lt;/button&gt;&lt;/td&gt;&lt;td&gt;${item.role}&lt;/td&gt;&lt;td&gt;${item.trials.length}&lt;/td&gt;&lt;td&gt;${fmt(item.avgCorr, 4)}&lt;/td&gt;&lt;td&gt;${fmt(item.avgLufs, 1)}&lt;/td&gt;&lt;td class=&quot;h3-verdict ${item.kind === &quot;policy&quot; || item.kind === &quot;conflict&quot; ? &quot;alert&quot; : item.kind === &quot;evidence&quot; ? &quot;warn&quot; : &quot;&quot;}&quot;&gt;${item.verdict}&lt;/td&gt;&lt;/tr&gt;`).join(&quot;&quot;);
+  renderDetail(cases[0]);
+  body.querySelectorAll(&quot;.h3-case-button&quot;).forEach(button =&gt; {
+    button.addEventListener(&quot;click&quot;, () =&gt; {
+      body.querySelectorAll(&quot;.h3-case-button&quot;).forEach(node =&gt; node.setAttribute(&quot;aria-pressed&quot;, node === button ? &quot;true&quot; : &quot;false&quot;));
+      const item = cases.find(d =&gt; d.id === button.dataset.case);
+      if (item) renderDetail(item);
+    });
+  });
+
+  const svg = d3.select(root.querySelector(&quot;#h3CorrelationChart&quot;));
+  const tooltip = root.querySelector(&quot;#h3ChartTooltip&quot;);
+  const drawChart = () =&gt; {
+    const node = svg.node();
+    const width = Math.max(320, node.parentNode.clientWidth);
+    const height = width &lt; 520 ? 330 : 360;
+    const margin = { top: 18, right: 42, bottom: 50, left: 64 };
+    svg.attr(&quot;viewBox&quot;, `0 0 ${width} ${height}`).attr(&quot;height&quot;, height);
+    svg.selectAll(&quot;*&quot;).remove();
+    const points = cases.filter(d =&gt; d.avgCorr !== null);
+    const corrExtent = d3.extent(points.flatMap(d =&gt; [d.minCorr, d.maxCorr]));
+    const lufsExtent = d3.extent(points, d =&gt; d.avgLufs);
+    const corrPad = Math.max(.05, (corrExtent[1] - corrExtent[0]) * .06);
+    const lufsPad = Math.max(1.5, (lufsExtent[1] - lufsExtent[0]) * .12);
+    const x = d3.scaleLinear().domain([Math.max(-1, corrExtent[0] - corrPad), Math.min(1, corrExtent[1] + corrPad)]).nice().range([margin.left, width - margin.right]);
+    const y = d3.scaleLinear().domain([lufsExtent[0] - lufsPad, lufsExtent[1] + lufsPad]).nice().range([height - margin.bottom, margin.top]);
+    const chart = svg.append(&quot;g&quot;);
+    chart.append(&quot;rect&quot;).attr(&quot;class&quot;, &quot;chart-frame&quot;).attr(&quot;data-chart-frame&quot;, &quot;true&quot;).attr(&quot;x&quot;, margin.left).attr(&quot;y&quot;, margin.top).attr(&quot;width&quot;, width - margin.left - margin.right).attr(&quot;height&quot;, height - margin.top - margin.bottom);
+    chart.append(&quot;g&quot;).attr(&quot;class&quot;, &quot;grid&quot;).attr(&quot;transform&quot;, `translate(0,${height - margin.bottom})`).call(d3.axisBottom(x).ticks(width &lt; 520 ? 4 : 6).tickSize(-(height - margin.top - margin.bottom)).tickFormat(&quot;&quot;));
+    chart.append(&quot;g&quot;).attr(&quot;class&quot;, &quot;grid&quot;).attr(&quot;transform&quot;, `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(width - margin.left - margin.right)).tickFormat(&quot;&quot;));
+    chart.append(&quot;g&quot;).attr(&quot;class&quot;, &quot;axis&quot;).attr(&quot;transform&quot;, `translate(0,${height - margin.bottom})`).call(d3.axisBottom(x).ticks(width &lt; 520 ? 4 : 6).tickFormat(d3.format(&quot;.1f&quot;)));
+    chart.append(&quot;g&quot;).attr(&quot;class&quot;, &quot;axis&quot;).attr(&quot;transform&quot;, `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(d =&gt; `${d} LUFS`));
+    chart.append(&quot;text&quot;).attr(&quot;class&quot;, &quot;axis-title&quot;).attr(&quot;data-axis&quot;, &quot;x&quot;).attr(&quot;x&quot;, (margin.left + width - margin.right) / 2).attr(&quot;y&quot;, height - 9).attr(&quot;text-anchor&quot;, &quot;middle&quot;).text(&quot;参考音频相关性&quot;);
+    chart.append(&quot;text&quot;).attr(&quot;class&quot;, &quot;axis-title&quot;).attr(&quot;data-axis&quot;, &quot;y&quot;).attr(&quot;transform&quot;, `translate(15 ${(margin.top + height - margin.bottom) / 2}) rotate(-90)`).attr(&quot;text-anchor&quot;, &quot;middle&quot;).text(&quot;输出响度（LUFS）&quot;);
+    const marks = chart.append(&quot;g&quot;).selectAll(&quot;g.case-mark&quot;).data(points, d =&gt; d.id).join(&quot;g&quot;).attr(&quot;class&quot;, &quot;case-mark&quot;).attr(&quot;transform&quot;, d =&gt; `translate(${x(d.avgCorr)},${y(d.avgLufs)})`);
+    marks.append(&quot;line&quot;).attr(&quot;class&quot;, &quot;error-line&quot;).attr(&quot;x1&quot;, d =&gt; x(d.minCorr) - x(d.avgCorr)).attr(&quot;x2&quot;, d =&gt; x(d.maxCorr) - x(d.avgCorr)).attr(&quot;y1&quot;, 0).attr(&quot;y2&quot;, 0);
+    marks.append(&quot;circle&quot;).attr(&quot;class&quot;, &quot;case-point&quot;).attr(&quot;r&quot;, 7).attr(&quot;fill&quot;, d =&gt; `var(--viz-series-${series[d.kind]})`);
+    marks.append(&quot;circle&quot;).attr(&quot;class&quot;, &quot;case-hit&quot;).attr(&quot;data-chart-hit&quot;, &quot;true&quot;).attr(&quot;r&quot;, 16).on(&quot;mouseenter&quot;, (event, d) =&gt; {
+      tooltip.innerHTML = `&lt;strong&gt;${d.id} · ${d.title}&lt;/strong&gt;&lt;span&gt;相关性 ${fmt(d.avgCorr, 4)} · ${fmt(d.avgLufs, 1)} LUFS&lt;/span&gt;&lt;span&gt;${d.verdict}&lt;/span&gt;`;
+      tooltip.style.display = &quot;block&quot;;
+      const rect = root.querySelector(&quot;#h3CorrelationChart&quot;).getBoundingClientRect();
+      const rootRect = root.getBoundingClientRect();
+      tooltip.style.left = `${Math.min(width - 220, Math.max(8, event.clientX - rect.left + 12))}px`;
+      tooltip.style.top = `${Math.max(8, event.clientY - rootRect.top - 42)}px`;
+      tooltip.setAttribute(&quot;aria-hidden&quot;, &quot;false&quot;);
+    }).on(&quot;mouseleave&quot;, () =&gt; { tooltip.style.display = &quot;none&quot;; tooltip.setAttribute(&quot;aria-hidden&quot;, &quot;true&quot;); }).on(&quot;click&quot;, (event, d) =&gt; {
+      const button = body.querySelector(`[data-case=&quot;${d.id}&quot;]`);
+      if (button) button.click();
+    });
+    const labelY = { &quot;H3-RA-02&quot;: -8, &quot;H3-RA-03&quot;: -8, &quot;H3-RA-04&quot;: 12, &quot;H3-RA-07&quot;: -8, &quot;H3-RA-08&quot;: 12, &quot;H3-RA-12&quot;: 12 };
+    const compactLabels = new Set([&quot;H3-RA-04&quot;, &quot;H3-RA-06&quot;, &quot;H3-RA-09&quot;, &quot;H3-RA-10&quot;, &quot;H3-RA-11&quot;]);
+    const labelMarks = width &lt; 520 ? marks.filter(d =&gt; compactLabels.has(d.id)) : marks;
+    const leftThreshold = width &lt; 520 ? .72 : .84;
+    labelMarks.append(&quot;text&quot;).attr(&quot;class&quot;, &quot;case-label&quot;)
+      .attr(&quot;x&quot;, d =&gt; d.avgCorr &gt; leftThreshold ? -10 : 10)
+      .attr(&quot;y&quot;, d =&gt; labelY[d.id] ?? 4)
+      .attr(&quot;text-anchor&quot;, d =&gt; d.avgCorr &gt; leftThreshold ? &quot;end&quot; : &quot;start&quot;)
+      .text(d =&gt; d.id.replace(&quot;H3-&quot;, &quot;&quot;));
+  };
+  drawChart();
+  if (typeof ResizeObserver !== &quot;undefined&quot;) new ResizeObserver(drawChart).observe(root.querySelector(&quot;.h3-chart-wrap&quot;));
+})();
+&lt;/script&gt;
+
+&lt;script src=&quot;https://unpkg.com/@floating-ui/core@1.7.3/dist/floating-ui.core.umd.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://unpkg.com/@floating-ui/dom@1.7.4/dist/floating-ui.dom.umd.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+(() =&gt; {
+  if (window.FloatingUIDOM == null) {
+    return;
+  }
+  const { autoUpdate, computePosition, flip, offset, shift, size } =
+    window.FloatingUIDOM;
+  const tooltipPlacements = new Set([&quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, &quot;left&quot;]);
+  const tooltipId = `codex-visualization-tooltip-${
+    window.crypto?.randomUUID?.() ?? Date.now().toString(36)
+  }`;
+  const tooltipGap = 5;
+  const hoverDelay = 700;
+  const skipDelay = 300;
+  let activeTrigger = null;
+  let pendingTrigger = null;
+  let tooltip = null;
+  let openTimeout = null;
+  let autoUpdateCleanup = null;
+  let positionRequest = 0;
+  let skipDelayUntil = 0;
+
+  const getTrigger = (target) =&gt;
+    target?.nodeType === Node.ELEMENT_NODE
+      ? target.closest(&quot;[data-tooltip]&quot;)
+      : null;
+  const containsTarget = (trigger, target) =&gt;
+    target?.nodeType != null &amp;&amp; trigger.contains(target);
+  const getContent = (trigger) =&gt;
+    trigger.getAttribute(&quot;data-tooltip&quot;)?.trim() ?? &quot;&quot;;
+  const getPlacement = (trigger) =&gt; {
+    const placement = trigger.getAttribute(&quot;data-tooltip-placement&quot;);
+    return tooltipPlacements.has(placement) ? placement : &quot;top&quot;;
+  };
+  const getTooltip = () =&gt; {
+    if (tooltip == null) {
+      tooltip = document.createElement(&quot;div&quot;);
+      tooltip.id = tooltipId;
+      tooltip.className = &quot;tooltip&quot;;
+      tooltip.setAttribute(&quot;role&quot;, &quot;tooltip&quot;);
+    }
+    return tooltip;
+  };
+  const setDescribedBy = (trigger, described) =&gt; {
+    const ids = new Set(
+      (trigger.getAttribute(&quot;aria-describedby&quot;) ?? &quot;&quot;)
+        .split(/\s+/)
+        .filter(Boolean),
+    );
+    if (described) {
+      ids.add(tooltipId);
+    } else {
+      ids.delete(tooltipId);
+    }
+    if (ids.size === 0) {
+      trigger.removeAttribute(&quot;aria-describedby&quot;);
+    } else {
+      trigger.setAttribute(&quot;aria-describedby&quot;, [...ids].join(&quot; &quot;));
+    }
+  };
+  const clearOpenTimeout = () =&gt; {
+    if (openTimeout != null) {
+      window.clearTimeout(openTimeout);
+      openTimeout = null;
+    }
+    pendingTrigger = null;
+  };
+  const closeTooltip = (activateSkipDelay = true) =&gt; {
+    clearOpenTimeout();
+    positionRequest += 1;
+    autoUpdateCleanup?.();
+    autoUpdateCleanup = null;
+    if (activeTrigger == null) {
+      return;
+    }
+    setDescribedBy(activeTrigger, false);
+    activeTrigger = null;
+    tooltip?.remove();
+    if (activateSkipDelay) {
+      skipDelayUntil = Date.now() + skipDelay;
+    }
+  };
+  const updatePosition = (trigger, floating) =&gt; {
+    const request = ++positionRequest;
+    void computePosition(trigger, floating, {
+      middleware: [
+        offset(tooltipGap),
+        flip({ padding: tooltipGap }),
+        shift({ padding: tooltipGap }),
+        size({
+          padding: tooltipGap,
+          apply({ availableHeight, availableWidth, elements }) {
+            elements.floating.style.setProperty(
+              &quot;--tooltip-available-width&quot;,
+              `${Math.max(0, availableWidth)}px`,
+            );
+            elements.floating.style.setProperty(
+              &quot;--tooltip-available-height&quot;,
+              `${Math.max(0, availableHeight)}px`,
+            );
+          },
+        }),
+      ],
+      placement: getPlacement(trigger),
+      strategy: &quot;fixed&quot;,
+    })
+      .then(({ x, y }) =&gt; {
+        if (activeTrigger !== trigger || request !== positionRequest) {
+          return;
+        }
+        const scale = window.devicePixelRatio || 1;
+        floating.style.transform = `translate(${Math.round(x * scale) / scale}px, ${Math.round(y * scale) / scale}px)`;
+        floating.style.visibility = &quot;visible&quot;;
+      })
+      .catch(() =&gt; {
+        if (activeTrigger === trigger &amp;&amp; request === positionRequest) {
+          closeTooltip(false);
+        }
+      });
+  };
+  const openTooltip = (trigger) =&gt; {
+    const content = getContent(trigger);
+    if (!trigger.isConnected || content.length === 0) {
+      return;
+    }
+    clearOpenTimeout();
+    if (activeTrigger === trigger) {
+      return;
+    }
+    closeTooltip();
+    const floating = getTooltip();
+    floating.textContent = content;
+    floating.style.visibility = &quot;hidden&quot;;
+    floating.style.transform = &quot;translate(0, 0)&quot;;
+    document.body.appendChild(floating);
+    activeTrigger = trigger;
+    setDescribedBy(trigger, true);
+    autoUpdateCleanup = autoUpdate(trigger, floating, () =&gt; {
+      updatePosition(trigger, floating);
+    });
+  };
+  const requestOpen = (trigger, immediate = false) =&gt; {
+    if (
+      getContent(trigger).length === 0 ||
+      activeTrigger === trigger ||
+      pendingTrigger === trigger
+    ) {
+      return;
+    }
+    clearOpenTimeout();
+    pendingTrigger = trigger;
+    const delay =
+      immediate || activeTrigger != null || Date.now() &lt; skipDelayUntil
+        ? 0
+        : hoverDelay;
+    if (delay === 0) {
+      openTooltip(trigger);
+      return;
+    }
+    openTimeout = window.setTimeout(() =&gt; {
+      openTimeout = null;
+      pendingTrigger = null;
+      openTooltip(trigger);
+    }, delay);
+  };
+  const handlePointerOpen = (event) =&gt; {
+    if (event.pointerType === &quot;touch&quot;) {
+      return;
+    }
+    const trigger = getTrigger(event.target);
+    if (trigger == null || containsTarget(trigger, event.relatedTarget)) {
+      return;
+    }
+    requestOpen(trigger);
+  };
+  const handleLeave = (event) =&gt; {
+    const trigger = getTrigger(event.target);
+    if (trigger == null || containsTarget(trigger, event.relatedTarget)) {
+      return;
+    }
+    if (activeTrigger === trigger || pendingTrigger === trigger) {
+      closeTooltip();
+    }
+  };
+  const handleFocusIn = (event) =&gt; {
+    const trigger = getTrigger(event.target);
+    if (trigger?.matches(&quot;:focus-visible&quot;)) {
+      requestOpen(trigger, true);
+    }
+  };
+  const handleKeyDown = (event) =&gt; {
+    if (event.key === &quot;Escape&quot;) {
+      closeTooltip();
+    }
+  };
+  const handleContextMenu = (event) =&gt; {
+    const trigger = getTrigger(event.target);
+    if (activeTrigger === trigger || pendingTrigger === trigger) {
+      closeTooltip();
+    }
+  };
+  const destroy = () =&gt; {
+    closeTooltip(false);
+    document.removeEventListener(&quot;pointerover&quot;, handlePointerOpen);
+    document.removeEventListener(&quot;pointerout&quot;, handleLeave);
+    document.removeEventListener(&quot;focusin&quot;, handleFocusIn);
+    document.removeEventListener(&quot;focusout&quot;, handleLeave);
+    document.removeEventListener(&quot;keydown&quot;, handleKeyDown);
+    document.removeEventListener(&quot;contextmenu&quot;, handleContextMenu);
+    tooltip = null;
+  };
+
+  document.addEventListener(&quot;pointerover&quot;, handlePointerOpen);
+  document.addEventListener(&quot;pointerout&quot;, handleLeave);
+  document.addEventListener(&quot;focusin&quot;, handleFocusIn);
+  document.addEventListener(&quot;focusout&quot;, handleLeave);
+  document.addEventListener(&quot;keydown&quot;, handleKeyDown);
+  document.addEventListener(&quot;contextmenu&quot;, handleContextMenu);
+  window.addEventListener(&quot;pagehide&quot;, destroy, { once: true });
+})();
+&lt;/script&gt;
+&lt;script id=&quot;codex-visualization-lucide&quot; async src=&quot;https://unpkg.com/lucide@1.17.0/dist/umd/lucide.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+(() =&gt; {
+  const initialize = () =&gt; {
+    globalThis.lucide?.createIcons({ attrs: { width: 16, height: 16 } });
+  };
+  if (globalThis.lucide != null) {
+    initialize();
+    return;
+  }
+  document
+    .getElementById(&quot;codex-visualization-lucide&quot;)
+    ?.addEventListener(&quot;load&quot;, initialize, { once: true });
+})();
+&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+</body>
+</html>

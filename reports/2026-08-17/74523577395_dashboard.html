@@ -1,0 +1,2033 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case 74523577395 Dashboard</title>
+<style>
+:root {
+  --bg: #f5f7fb;
+  --panel: #ffffff;
+  --panel-2: #f0f4f8;
+  --ink: #18202f;
+  --muted: #647084;
+  --line: #d9e0ea;
+  --blue: #2563eb;
+  --cyan: #0f766e;
+  --green: #16803c;
+  --amber: #a15c05;
+  --red: #b42318;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: linear-gradient(180deg, #eef3f8 0, var(--bg) 260px, var(--bg) 100%);
+}
+a { color: var(--blue); }
+.shell { max-width: 1440px; margin: 0 auto; padding: 28px 28px 64px; }
+.hero-panel { background: #111827; color: #f8fafc; border-radius: 10px; padding: 22px; margin-bottom: 18px; display: grid; grid-template-columns: 1.35fr .65fr; gap: 20px; align-items: stretch; }
+.hero-panel h1 { margin: 0 0 10px; font-size: 34px; letter-spacing: 0; }
+.hero-panel p { margin: 0; color: #cbd5e1; line-height: 1.6; }
+.verdict { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-radius: 8px; padding: 16px; }
+.verdict h2 { margin: 0 0 12px; color: #fff; font-size: 17px; }
+.verdict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.verdict-item { border-radius: 8px; padding: 10px; background: rgba(255,255,255,.08); }
+.verdict-item span { display: block; color: #cbd5e1; font-size: 12px; }
+.verdict-item strong { display: block; margin-top: 4px; font-size: 18px; }
+.verdict-item.bad strong { color: #fca5a5; }
+.verdict-item.warn strong { color: #fcd34d; }
+.verdict-item.good strong { color: #86efac; }
+.topbar { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; margin-bottom: 20px; }
+.title h1 { margin: 0 0 8px; font-size: 30px; letter-spacing: 0; }
+.title p { margin: 0; color: var(--muted); }
+.nav { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.nav a { text-decoration: none; color: var(--ink); border: 1px solid var(--line); background: var(--panel); padding: 8px 10px; border-radius: 8px; font-size: 13px; }
+.stats { display: grid; grid-template-columns: repeat(6, minmax(130px, 1fr)); gap: 12px; margin: 18px 0 22px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+.stat span { display: block; color: var(--muted); font-size: 12px; }
+.stat strong { display: block; margin-top: 6px; font-size: 28px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.layout > main { min-width: 0; }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px; margin-bottom: 18px; min-width: 0; }
+h2 { margin: 0 0 14px; font-size: 20px; }
+h3 { margin: 0 0 8px; font-size: 15px; }
+.muted { color: var(--muted); }
+.mono, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+.linear-rail { position: relative; display: grid; gap: 14px; padding-left: 18px; min-width: 0; }
+.linear-rail::before { content: ""; position: absolute; left: 33px; top: 18px; bottom: 18px; width: 3px; background: #d5dde8; border-radius: 999px; }
+.kpop-visual { padding: 0; background: transparent; box-shadow: none; }
+.kpop-route { display: grid; grid-template-columns: minmax(150px, 1.2fr) 28px minmax(130px, 1fr) 28px minmax(130px, 1fr) 28px minmax(130px, 1fr) 28px minmax(150px, 1.1fr); align-items: stretch; margin: 4px 0 18px; }
+.route-node { min-height: 82px; border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: center; background: #f8fafc; }
+.route-node span { color: var(--muted); font-size: 12px; margin-bottom: 5px; }
+.route-node strong { font-size: 15px; line-height: 1.35; }
+.route-node.source { border-top: 4px solid var(--blue); }
+.route-node.active { border-top: 4px solid var(--green); background: #f0fdf4; }
+.route-node.warn { border-top: 4px solid var(--amber); background: #fffbeb; }
+.route-node.blocked { border-top: 4px solid var(--red); background: #fff7ed; }
+.route-arrow { display: grid; place-items: center; color: #94a3b8; font-size: 22px; }
+.kpop-visual-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; margin-top: 18px; }
+.kpop-visual-grid.generation-grid { grid-template-columns: 1fr 1fr; }
+.kpop-block { border-top: 1px solid var(--line); padding-top: 14px; min-width: 0; }
+.visual-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.visual-head h3 { margin: 0; font-size: 16px; }
+.visual-head span { color: var(--muted); font-size: 12px; text-align: right; }
+.version-lanes { display: grid; gap: 9px; }
+.version-lane { display: grid; grid-template-columns: 92px 1fr; align-items: center; gap: 10px; }
+.version-tag { color: #334155; font-weight: 800; font-size: 12px; }
+.lane-flow { min-height: 38px; display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: #f8fafc; border-left: 4px solid var(--blue); border-radius: 0 6px 6px 0; overflow: hidden; }
+.lane-flow b { white-space: nowrap; font-size: 12px; }
+.lane-flow i { font-style: normal; color: #94a3b8; }
+.lane-flow em { margin-left: auto; color: #92400e; font-style: normal; font-weight: 800; font-size: 12px; white-space: nowrap; }
+.version-lane.critical .lane-flow { border-left-color: var(--red); background: #fff7ed; }
+.duration-axis { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; margin-bottom: 5px; }
+.duration-track { display: flex; height: 46px; overflow: hidden; border-radius: 7px; background: #fee2e2; }
+.duration-track > div { display: flex; align-items: center; justify-content: center; min-width: 0; }
+.duration-track span { font-size: 12px; font-weight: 800; white-space: nowrap; }
+.duration-used { background: #bfdbfe; color: #1e3a8a; }
+.duration-missing { background: #ef4444; color: #fff; }
+.duration-note { display: flex; justify-content: space-between; gap: 12px; margin-top: 6px; font-size: 11px; }
+.duration-note span { color: var(--muted); }
+.duration-note strong { color: #991b1b; }
+.clock-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.clock-compare div { padding: 9px 10px; background: #f8fafc; border-left: 4px solid var(--blue); }
+.clock-compare .bad { background: #fff7ed; border-left-color: var(--red); }
+.clock-compare span, .clock-compare strong { display: block; }
+.clock-compare span { color: var(--muted); font-size: 11px; margin-bottom: 3px; }
+.clock-compare strong { font-size: 12px; }
+.attempt-chart { display: grid; gap: 7px; }
+.attempt-row { display: grid; grid-template-columns: 82px 1fr 48px; gap: 8px; align-items: center; }
+.attempt-row > span, .attempt-row > b { font-size: 11px; }
+.attempt-row > b { text-align: right; }
+.attempt-track { height: 16px; display: flex; overflow: hidden; border-radius: 4px; background: #e2e8f0; }
+.attempt-track i { display: block; height: 100%; }
+.attempt-track .ok { background: #22c55e; }
+.attempt-track .fail { background: #ef4444; }
+.route-compare { display: grid; align-content: start; }
+.route-lane { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.route-lane span { width: 40px; color: var(--muted); font-size: 11px; }
+.route-lane b { padding: 5px 7px; border-radius: 4px; background: #dcfce7; font-size: 11px; }
+.route-lane.actual b { background: #fee2e2; }
+.route-lane i { color: #94a3b8; font-style: normal; }
+.skip-count { display: flex; align-items: baseline; gap: 9px; padding-top: 14px; }
+.skip-count strong { font-size: 28px; color: #991b1b; }
+.skip-count span { color: var(--muted); font-size: 12px; }
+.evidence-head { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+.kpop-evidence-strip { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+.kpop-frame { margin: 0; min-width: 0; position: relative; }
+.kpop-frame img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; border-radius: 6px; }
+.kpop-frame figcaption { display: flex; align-items: baseline; gap: 7px; margin-top: 6px; }
+.kpop-frame figcaption strong { font-size: 24px; color: #991b1b; }
+.kpop-frame:first-child figcaption strong { color: #166534; }
+.kpop-frame figcaption span { color: var(--muted); font-size: 11px; }
+.kpop-unverified { min-height: 120px; border: 2px dashed #f59e0b; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fffbeb; text-align: center; padding: 12px; }
+.kpop-unverified strong { font-size: 34px; color: #92400e; }
+.kpop-unverified span, .kpop-unverified b { font-size: 11px; }
+.kpop-unverified b { margin-top: 5px; color: #991b1b; }
+.round-execution-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+.round-execution-head h2 { margin-bottom: 5px; }
+.round-execution-head p { margin: 0; color: var(--muted); font-size: 13px; }
+.round-tabs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.round-tab { appearance: none; border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 7px; padding: 8px 11px; font: inherit; font-size: 12px; cursor: pointer; }
+.round-tab:hover { background: #eff6ff; }
+.round-tab.is-active { background: #18202f; color: #fff; border-color: #18202f; }
+.round-panel[hidden] { display: none; }
+.round-summary { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)) minmax(220px, 1.35fr); gap: 8px; margin-bottom: 16px; }
+.round-summary > div { border-top: 3px solid #94a3b8; background: #f8fafc; padding: 10px; min-width: 0; }
+.round-summary > div:nth-child(3) { border-top-color: var(--green); }
+.round-summary > div:nth-child(4) { border-top-color: var(--amber); }
+.round-summary .round-output { border-top-color: var(--blue); }
+.round-summary span, .round-summary strong, .round-summary code { display: block; }
+.round-summary span { color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+.round-summary strong { font-size: 12px; overflow-wrap: anywhere; }
+.round-summary code { color: #1d4ed8; margin-top: 4px; overflow-wrap: anywhere; }
+.round-trace-band { display: grid; grid-template-columns: minmax(180px, 1fr) auto minmax(220px, 1.2fr); gap: 12px; align-items: center; background: #eff6ff; border-left: 4px solid var(--blue); padding: 9px 11px; margin-top: 14px; }
+.round-trace-band.recovery { background: #f0fdf4; border-left-color: var(--green); }
+.round-trace-band span { font-weight: 800; font-size: 12px; }
+.round-trace-band b { font-size: 11px; color: var(--muted); }
+.round-trace-band em { font-size: 11px; font-style: normal; text-align: right; }
+.round-step-list { position: relative; display: grid; gap: 0; padding: 8px 0 2px; }
+.round-step-list::before { content: ""; position: absolute; left: 16px; top: 8px; bottom: 2px; width: 2px; background: #d9e0ea; }
+.round-step { position: relative; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; padding: 8px 0; min-width: 0; }
+.round-step-marker { position: relative; z-index: 1; width: 34px; height: 34px; border-radius: 999px; display: grid; place-items: center; background: #e2e8f0; color: #475569; border: 4px solid #fff; font-size: 12px; font-weight: 800; }
+.round-step.ok .round-step-marker { background: #dcfce7; color: #166534; }
+.round-step.warn .round-step-marker { background: #fef3c7; color: #92400e; }
+.round-step.fail .round-step-marker { background: #fee2e2; color: #991b1b; }
+.round-step-body { border-left: 4px solid #94a3b8; background: #f8fafc; padding: 11px 12px; min-width: 0; }
+.round-step.ok .round-step-body { border-left-color: var(--green); }
+.round-step.warn .round-step-body { border-left-color: var(--amber); background: #fffbeb; }
+.round-step.fail .round-step-body { border-left-color: var(--red); background: #fff7ed; }
+.round-step-phase { color: var(--muted); font-size: 11px; margin-bottom: 3px; }
+.round-step-body h4 { margin: 0 0 5px; font-size: 14px; }
+.round-step-body p { margin: 0 0 7px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.round-step-result { font-size: 12px; font-weight: 800; margin-bottom: 8px; }
+.round-step-body .related-calls { background: rgba(255,255,255,.72); }
+.round-lineage { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 0 0; margin-top: 10px; border-top: 1px solid var(--line); }
+.round-lineage span, .round-lineage strong { padding: 6px 8px; background: #eff6ff; border-radius: 4px; font-size: 11px; }
+.round-lineage strong { background: #dcfce7; color: #166534; }
+.round-lineage i { color: #94a3b8; font-style: normal; }
+.round-media-row { display: grid; grid-template-columns: minmax(180px, 280px) minmax(180px, 280px) minmax(220px, 1fr); gap: 12px; align-items: stretch; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.round-media-row .kpop-frame img { aspect-ratio: 16 / 9; }
+.round-media-row .kpop-unverified { min-height: 150px; }
+.round-media-note { border-left: 4px solid var(--blue); background: #eff6ff; padding: 12px; display: flex; flex-direction: column; justify-content: center; }
+.round-media-note.fail { border-left-color: var(--red); background: #fff7ed; }
+.round-media-note strong, .round-media-note span { display: block; }
+.round-media-note strong { margin-bottom: 5px; font-size: 13px; }
+.round-media-note span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.biz-node { position: relative; display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 14px; align-items: start; min-width: 0; }
+.biz-marker { position: relative; z-index: 1; width: 34px; height: 34px; margin-top: 18px; display: grid; place-items: center; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-weight: 900; border: 4px solid var(--panel); box-shadow: 0 0 0 1px #bfdbfe; }
+.biz-marker.good { background: #dcfce7; color: var(--green); box-shadow: 0 0 0 1px #86efac; }
+.biz-marker.warn { background: #fef3c7; color: var(--amber); box-shadow: 0 0 0 1px #fcd34d; }
+.biz-marker.bad { background: #fee2e2; color: var(--red); box-shadow: 0 0 0 1px #fca5a5; }
+.biz-card { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 16px; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(260px, .8fr); gap: 16px; align-items: start; min-width: 0; }
+.biz-card.bad-card { border-color: #fecaca; background: linear-gradient(90deg, #fff7ed 0, #fff 52%); }
+.biz-card.warn-card { border-color: #fde68a; background: linear-gradient(90deg, #fffbeb 0, #fff 52%); }
+.biz-kicker { color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+.biz-main h3 { font-size: 20px; margin: 0 0 8px; }
+.biz-main p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.biz-main, .biz-proof { min-width: 0; }
+.biz-main h3, .biz-main p, .call-mini p { overflow-wrap: anywhere; }
+.biz-proof { border-left: 1px solid var(--line); padding-left: 16px; }
+.biz-label { display: block; color: var(--muted); font-size: 12px; font-weight: 800; margin-bottom: 6px; }
+.biz-proof > strong { display: block; font-size: 15px; margin-bottom: 10px; }
+.biz-media { display: grid; grid-template-columns: repeat(2, minmax(120px, 170px)); gap: 10px; margin-top: 12px; }
+.biz-media.wide { grid-template-columns: minmax(170px, 260px) minmax(140px, 220px); }
+.timeline-table { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 8px; margin-top: 12px; }
+.timeline-table div { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 9px; }
+.timeline-table span { display: block; color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+.timeline-table strong { display: block; font-size: 13px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.call-chip { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; padding: 4px 7px; border-radius: 999px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; text-decoration: none; font-size: 12px; font-weight: 800; }
+.call-chip:hover { background: #dbeafe; }
+.related-calls { border: 1px solid var(--line); border-radius: 8px; background: #fff; overflow: hidden; min-width: 0; }
+.related-calls summary { cursor: pointer; list-style: none; padding: 8px 9px; font-size: 12px; font-weight: 800; color: #334155; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.related-calls summary::-webkit-details-marker { display: none; }
+.related-calls summary::before { content: "▸"; color: var(--blue); margin-right: 4px; }
+.related-calls[open] summary::before { content: "▾"; }
+.related-calls summary span { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; text-transform: none; letter-spacing: 0; }
+.related-call-list { display: grid; gap: 7px; padding: 8px; border-top: 1px solid var(--line); max-height: 380px; overflow: auto; }
+.call-mini { border: 1px solid var(--line); background: #f8fafc; border-radius: 7px; padding: 8px; }
+.call-mini.bad { border-color: #fecaca; background: #fff7ed; }
+.call-mini-top { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.call-mini-top strong { font-size: 12px; }
+.call-mini-top span { margin-left: auto; color: var(--muted); font-size: 11px; text-transform: none; letter-spacing: 0; }
+.call-mini p { margin: 5px 0 0; font-size: 12px; line-height: 1.35; }
+.call-mini-problem { margin-top: 6px; border-left: 3px solid var(--red); padding-left: 7px; color: var(--red); font-size: 12px; font-weight: 700; }
+.bad-card { border-color: #fecaca; background: #fff7ed; }
+.warn-card { border-color: #fde68a; background: #fffbeb; }
+.evidence-media { margin: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #e2e8f0; }
+.evidence-media img, .evidence-media video { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; display: block; }
+.evidence-media figcaption { padding: 6px; font-size: 11px; color: var(--muted); background: white; }
+.evidence-grid { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 12px; min-width: 0; }
+.evidence-card { border: 1px solid var(--line); border-radius: 8px; padding: 14px; min-width: 0; overflow-wrap: anywhere; }
+.evidence-title { font-weight: 800; margin-bottom: 8px; }
+.evidence-card p { margin: 0 0 10px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.evidence-card a { font-size: 12px; font-weight: 700; text-decoration: none; }
+.evidence-card code { white-space: normal; overflow-wrap: anywhere; }
+.grid-assets { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.asset-card, .prompt-card { border: 1px solid var(--line); background: #fbfcfe; border-radius: 8px; overflow: hidden; }
+.asset-preview { background: #dfe7f1; min-height: 180px; display: grid; place-items: center; }
+.asset-preview img, .asset-preview video { max-width: 100%; width: 100%; max-height: 260px; object-fit: contain; display: block; }
+.asset-body, .prompt-card { padding: 12px; }
+.prompt-card p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+.row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.badge, .tool-pill { display: inline-flex; align-items: center; border: 1px solid #bfdbfe; background: #eff6ff; color: #1d4ed8; border-radius: 999px; padding: 3px 8px; font-size: 12px; white-space: nowrap; }
+.muted-badge { border-color: var(--line); background: var(--panel-2); color: var(--muted); }
+.controls { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+select, input { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: white; color: var(--ink); }
+input { min-width: 280px; flex: 1; }
+.technical-details { border: 1px solid var(--line); border-radius: 8px; background: #fbfcfe; overflow: hidden; min-width: 0; max-width: 100%; }
+.technical-details > summary { cursor: pointer; padding: 12px 14px; font-weight: 800; color: #334155; }
+.technical-details[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+.technical-details .controls, .technical-details .table-wrap { margin-left: 12px; margin-right: 12px; }
+.technical-details .table-wrap { margin-bottom: 12px; width: calc(100% - 24px); max-width: calc(100% - 24px); }
+.table-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--line); border-radius: 8px; min-width: 0; max-width: 100%; }
+table { width: 100%; border-collapse: collapse; min-width: 980px; }
+th, td { border-bottom: 1px solid var(--line); padding: 9px 10px; text-align: left; vertical-align: top; font-size: 13px; }
+th { position: sticky; top: 0; background: #f8fafc; color: #334155; z-index: 1; }
+tr.has-problem td { background: #fff7ed; }
+tr.call-highlight td { background: #dbeafe !important; box-shadow: inset 0 0 0 1px #93c5fd; }
+tr.hidden { display: none; }
+.side { display: grid; grid-template-columns: 1.2fr .8fr .8fr; gap: 18px; }
+.side section { position: static; }
+.issue-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; min-width: 0; }
+.issue-list li { border-left: 4px solid var(--red); background: #fff7ed; padding: 10px; border-radius: 6px; min-width: 0; overflow-wrap: anywhere; }
+.issue-list span, .issue-list code { display: block; margin-top: 4px; }
+.issue-list code { white-space: normal; overflow-wrap: anywhere; }
+.mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mini-stat { display: flex; justify-content: space-between; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 8px; background: #fbfcfe; font-size: 12px; }
+.step { border-left: 4px solid var(--green); background: #f7fee7; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+.step.bad { border-left-color: var(--red); background: #fff7ed; }
+.step p { margin: 6px 0 0; font-size: 13px; }
+.callout { border-left: 4px solid var(--amber); background: #fffbeb; padding: 12px; border-radius: 6px; color: #573a05; }
+@media (max-width: 1080px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .hero-panel { grid-template-columns: 1fr; }
+  .biz-card { grid-template-columns: 1fr; }
+  .biz-proof { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; padding-top: 14px; }
+  .timeline-table { grid-template-columns: 1fr; }
+  .evidence-grid { grid-template-columns: 1fr; }
+  .side { grid-template-columns: 1fr; }
+  .topbar { flex-direction: column; }
+  .nav { justify-content: flex-start; }
+  .kpop-route { grid-template-columns: 1fr; gap: 7px; }
+  .route-arrow { transform: rotate(90deg); min-height: 20px; }
+  .kpop-visual-grid, .kpop-visual-grid.generation-grid { grid-template-columns: 1fr; }
+  .kpop-evidence-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .round-execution-head { flex-direction: column; }
+  .round-tabs { justify-content: flex-start; }
+  .round-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .round-summary .round-output { grid-column: 1 / -1; }
+  .round-media-row { grid-template-columns: 1fr 1fr; }
+  .round-media-note { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  html, body { max-width: 100%; overflow-x: hidden; }
+  .shell { padding: 12px 8px 40px; }
+  .shell, .hero-panel, section, main, .layout { width: 100%; min-width: 0; }
+  .hero-panel, section { padding: 12px; }
+  .hero-panel h1, .title h1, .hero-panel p, .title p { max-width: 100%; overflow-wrap: anywhere; word-break: break-word; }
+  .hero-panel h1 { font-size: 24px; line-height: 1.3; }
+  .title h1 { font-size: 24px; line-height: 1.3; }
+  .verdict-grid { grid-template-columns: 1fr; }
+  .nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; gap: 6px; }
+  .nav a { min-width: 0; padding: 7px 4px; text-align: center; overflow-wrap: anywhere; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .biz-node { grid-template-columns: 32px minmax(0, 1fr); gap: 6px; }
+  .linear-rail { padding-left: 0; }
+  .biz-card { padding: 12px; }
+  .biz-media, .biz-media.wide { grid-template-columns: 1fr; }
+  .related-calls summary { flex-wrap: wrap; }
+  input { min-width: 0; width: 100%; }
+  .version-lane { grid-template-columns: 1fr; gap: 4px; }
+  .lane-flow { flex-wrap: wrap; }
+  .lane-flow em { margin-left: 0; width: 100%; }
+  .clock-compare { grid-template-columns: 1fr; }
+  .attempt-row { grid-template-columns: 72px 1fr 42px; }
+  .kpop-evidence-strip { grid-template-columns: 1fr; }
+  .round-tabs { display: grid; grid-template-columns: 1fr; width: 100%; }
+  .round-summary { grid-template-columns: 1fr; }
+  .round-summary .round-output { grid-column: auto; }
+  .round-trace-band { grid-template-columns: 1fr; gap: 3px; }
+  .round-trace-band em { text-align: left; }
+  .round-media-row { grid-template-columns: 1fr; }
+  .round-media-note { grid-column: auto; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <section class="hero-panel">
+    <div>
+      <h1>Case 74523577395：动态调用链摘要</h1>
+      <p>从 trace 自动提取用户输入、3 个生成调用、5 个 read_file 和 20 个本地媒体。业务流程不再使用固定案例模板文案。</p>
+    </div>
+    <div class="verdict">
+      <h2>一眼结论</h2>
+      <div class="verdict-grid">
+        
+        <div class="verdict-item good"><span>总调用</span><strong>71</strong></div>
+        <div class="verdict-item good"><span>生成调用</span><strong>3</strong></div>
+        <div class="verdict-item warn"><span>Reference 覆盖</span><strong>5/5</strong></div>
+        <div class="verdict-item warn"><span>风险调用</span><strong>2</strong></div>
+        
+      </div>
+    </div>
+  </section>
+
+  <div class="topbar">
+    <div class="title">
+      <h1>Case 74523577395 调用链看板</h1>
+      <p>素材、工具调用、skills/reference 读取覆盖、QA 信号和渲染风险汇总。</p>
+    </div>
+    <nav class="nav">
+      <a href="#assets">素材</a>
+      <a href="#rounds">轮次</a>
+      <a href="#story">流程</a>
+      <a href="#evidence">证据</a>
+      <a href="#prompts">生成参数</a>
+      <a href="#chain">调用链</a>
+      <a href="#skills">Skills</a>
+    </nav>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span>总调用</span><strong>71</strong></div>
+    <div class="stat"><span>资产记录</span><strong>4</strong></div>
+    <div class="stat"><span>本地素材</span><strong>20</strong></div>
+    <div class="stat"><span>风险调用</span><strong>2</strong></div>
+    <div class="stat"><span>读取文件</span><strong>5</strong></div>
+    <div class="stat"><span>规则覆盖</span><strong>5/5</strong></div>
+  </div>
+
+  <div class="layout">
+    <main>
+      
+      
+      <section id="story">
+        <h2>业务可视化调用链</h2>
+        <div class="linear-rail">
+      <article class="biz-node">
+        <div class="biz-marker good">1</div>
+        <div class="biz-card">
+          <div class="biz-main">
+            <div class="biz-kicker">用户需求</div>
+            <h3></h3>
+            <p></p>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">状态</span>
+            <strong>来自 trace 输入</strong>
+            
+          <details class="related-calls">
+            <summary>1 个关联调用 <span><a class="call-chip" href="#chain" data-call="1">#1</a></span></summary>
+            <div class="related-call-list">
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="1">#1</a>
+                  <strong>write_todos</strong>
+                  <span>11:16:53</span>
+                </div>
+                <p>读取创作技能文档，了解流程规范=in_progress; 分析两个视频的内容和音频=pending; 提取两个视频的字幕/口播文本=pending; 去除两个视频的原始音频并拼接=pending; 生成统一音色的口播配音=pending; 合成最终视频并交付=pending</p>
+                <p class="muted">Updated todo list to [{&#x27;content&#x27;: &#x27;读取创作技能文档，了解流程规范&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;分析两个视频的内容和音频&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}, {&#x27;content&#x27;...</p>
+                
+              </div>
+            </div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+
+      <article class="biz-node">
+        <div class="biz-marker warn">2</div>
+        <div class="biz-card warn-card">
+          <div class="biz-main">
+            <div class="biz-kicker">前置规则</div>
+            <h3>读取了 5 个 skill/reference 文件</h3>
+            <p>当前静态 reference 覆盖为 5/5，显式 lint 调用为 4。完整判断仍以报告里的 Skill & Reference Read Audit 为准。</p>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">读取调用</span>
+            <strong>5 次 read_file</strong>
+            
+          <details class="related-calls">
+            <summary>5 个关联调用 <span><a class="call-chip" href="#chain" data-call="4">#4</a><a class="call-chip" href="#chain" data-call="5">#5</a><a class="call-chip" href="#chain" data-call="30">#30</a><a class="call-chip" href="#chain" data-call="33">#33</a><a class="call-chip" href="#chain" data-call="34">#34</a></span></summary>
+            <div class="related-call-list">
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="4">#4</a>
+                  <strong>read_file</strong>
+                  <span>11:16:58</span>
+                </div>
+                <p>/.skills/0/assembly-skill/SKILL.md offset= limit=80</p>
+                <p class="muted">1 --- 2 name: assembly-skill 3 description: Prepare and lock actual video/audio materials for video projects, including probes, sequence co...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="5">#5</a>
+                  <strong>read_file</strong>
+                  <span>11:17:12</span>
+                </div>
+                <p>/.skills/0/assembly-skill/references/voice-production-and-resolution.md offset= limit=80</p>
+                <p class="muted">1 --- 2 id: voice-production-and-resolution 3 description: &quot;Shared rules for voice resolution, public search, preview, clone authorization,...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="30">#30</a>
+                  <strong>read_file</strong>
+                  <span>11:37:59</span>
+                </div>
+                <p>/.skills/0/motion-skill/SKILL.md offset= limit=80</p>
+                <p class="muted">1 --- 2 name: motion-skill 3 description: Compose and render final HTML video from locked production materials. Own composition.html, final...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="33">#33</a>
+                  <strong>read_file</strong>
+                  <span>11:40:19</span>
+                </div>
+                <p>/.skills/0/motion-skill/references/design-audio-and-assembly.md offset= limit=80</p>
+                <p class="muted">1 # Audio Assembly And Mix Contract 2 3 Read this before probing source audio, fitting post VO, assigning final ownership, placing VO/BGM/S...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="34">#34</a>
+                  <strong>read_file</strong>
+                  <span>11:40:19</span>
+                </div>
+                <p>/.skills/0/motion-skill/references/tech-html.md offset= limit=80</p>
+                <p class="muted">1 # tech-html — Motion HTML authoring guide 2 3 For `data-*` attribute shapes see `tech-data-attributes.md`. 4 5 **In-HTML resource referen...</p>
+                
+              </div>
+            </div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+
+      <article class="biz-node">
+        <div class="biz-marker good">3</div>
+        <div class="biz-card ">
+          <div class="biz-main">
+            <div class="biz-kicker">生成与素材</div>
+            <h3>audio_produce x2, music_generate x1</h3>
+            <p>本地提取到 20 个媒体文件，资产清单记录 4 个生成/交付资产；首个资产：<code>vo_segment_1</code>。</p>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">生成调用</span>
+            <strong>3 次</strong>
+            
+          <details class="related-calls">
+            <summary>3 个关联调用 <span><a class="call-chip" href="#chain" data-call="13">#13</a><a class="call-chip" href="#chain" data-call="14">#14</a><a class="call-chip" href="#chain" data-call="31">#31</a></span></summary>
+            <div class="related-call-list">
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="13">#13</a>
+                  <strong>audio_produce</strong>
+                  <span>11:31:57</span>
+                </div>
+                <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;vo_segment_1&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;:...</p>
+                <p class="muted">{&quot;trace_id&quot;: &quot;f069961c-e92a-43e0-aa11-4d88d5bb1b1f&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;14344ad2-ce4a...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="14">#14</a>
+                  <strong>audio_produce</strong>
+                  <span>11:31:57</span>
+                </div>
+                <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;vo_segment_2&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;:...</p>
+                <p class="muted">{&quot;trace_id&quot;: &quot;8df50876-fa29-4dc7-9a3c-55b8621d8497&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;5e9ab89c-41bd...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="31">#31</a>
+                  <strong>music_generate</strong>
+                  <span>11:37:59</span>
+                </div>
+                <p>name=bgm_positioning; elevenlabs/music_v1; duration_ms=; instrumental=</p>
+                <p class="muted">ok=True error=none file=/projects/74523577395/workspace/assets/bgm_positioning_20260814T033805_e8a9d09f.mp3</p>
+                
+              </div>
+            </div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+
+      <article class="biz-node">
+        <div class="biz-marker warn">4</div>
+        <div class="biz-card warn-card">
+          <div class="biz-main">
+            <div class="biz-kicker">风险信号</div>
+            <h3>2 个静态标记风险调用</h3>
+            <p>Composition lint failed; repaired later</p>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">问题调用</span>
+            <strong>2 个</strong>
+            
+          <details class="related-calls">
+            <summary>2 个关联调用 <span><a class="call-chip" href="#chain" data-call="39">#39</a><a class="call-chip" href="#chain" data-call="62">#62</a></span></summary>
+            <div class="related-call-list">
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="39">#39</a>
+                  <strong>lint_composition</strong>
+                  <span>11:40:50</span>
+                </div>
+                <p>{&#x27;fps&#x27;: 24, &#x27;html_file&#x27;: &#x27;/projects/74523577395/workspace/assets/composition_final.html&#x27;}</p>
+                <p class="muted">{&quot;success&quot;: true, &quot;valid&quot;: false, &quot;errors&quot;: [{&quot;code&quot;: &quot;MOTION_CONTRACT_DATA_ATTR_VALUE&quot;, &quot;severity&quot;: &quot;error&quot;, &quot;message&quot;: &quot;data-loop must be...</p>
+                <div class="call-mini-problem">Composition lint failed; repaired later</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="62">#62</a>
+                  <strong>lint_composition</strong>
+                  <span>13:18:39</span>
+                </div>
+                <p>{&#x27;fps&#x27;: 24, &#x27;html_file&#x27;: &#x27;/projects/74523577395/workspace/assets/mix_audio.html&#x27;}</p>
+                <p class="muted">{&quot;success&quot;: true, &quot;valid&quot;: false, &quot;errors&quot;: [{&quot;code&quot;: &quot;MOTION_CONTRACT_COVERAGE_VISUAL_GAP&quot;, &quot;severity&quot;: &quot;error&quot;, &quot;message&quot;: &quot;Picture surfa...</p>
+                <div class="call-mini-problem">Composition lint failed; repaired later</div>
+              </div>
+            </div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+
+      <article class="biz-node">
+        <div class="biz-marker good">5</div>
+        <div class="biz-card ">
+          <div class="biz-main">
+            <div class="biz-kicker">交付与证据</div>
+            <h3>最终/组装调用汇总</h3>
+            <p>看板现在只展示当前 case 的真实媒体与调用，不再复用固定 sticker 案例文案。</p>
+            <div class="biz-media wide"><figure class="evidence-media"><audio src="case-data/cases/74523577395/media/bgm_original.mp3" controls preload="metadata"></audio><figcaption>bgm_original.mp3</figcaption></figure><figure class="evidence-media"><audio src="case-data/cases/74523577395/media/bgm_positioning_20260814T033805_e8a9d09f.mp3" controls preload="metadata"></audio><figcaption>bgm_positioning_20260814T033805_e8a9d09f.mp3</figcaption></figure></div>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">交付调用</span>
+            <strong>13 次</strong>
+            
+          <details class="related-calls">
+            <summary>10 个关联调用 <span><a class="call-chip" href="#chain" data-call="11">#11</a><a class="call-chip" href="#chain" data-call="27">#27</a><a class="call-chip" href="#chain" data-call="46">#46</a><a class="call-chip" href="#chain" data-call="47">#47</a><a class="call-chip" href="#chain" data-call="48">#48</a><a class="call-chip" href="#chain" data-call="51">#51</a>…</span></summary>
+            <div class="related-call-list">
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="11">#11</a>
+                  <strong>add_attachments</strong>
+                  <span>11:31:08</span>
+                </div>
+                <p>voice_preview_c8d6442bac8ce3e2_20260814T033105_116ff966.mp3, voice_preview_4689b6890ff76b90_20260814T033105_822a9fc0.mp3, voice_preview_08b94dd3048d2...</p>
+                <p class="muted">[{&quot;asset_id&quot;: &quot;a_Spxkkpx&quot;, &quot;mime_type&quot;: &quot;audio/mpeg&quot;, &quot;name&quot;: &quot;voice_preview_c8d6442bac8ce3e2_20260814T033105_116ff966.mp3&quot;}, {&quot;asset_id&quot;: ...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="27">#27</a>
+                  <strong>show_final_video</strong>
+                  <span>11:33:10</span>
+                </div>
+                <p>file_path=/projects/74523577395/workspace/assets/final_with_vo.mp4</p>
+                <p class="muted">a_1ekQh2J</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="46">#46</a>
+                  <strong>submit_render</strong>
+                  <span>11:41:18</span>
+                </div>
+                <p>html=/projects/74523577395/workspace/assets/composition_final.html; output=positioning_final_with_bgm.mp4; fps=24; format=None; quality=high</p>
+                <p class="muted">success job=2a3ajgcs status=pending warnings=0</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="47">#47</a>
+                  <strong>query_render</strong>
+                  <span>11:41:21</span>
+                </div>
+                <p>job_id=2a3ajgcs</p>
+                <p class="muted">success=True status=running asset=None file=</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="48">#48</a>
+                  <strong>query_render</strong>
+                  <span>11:45:25</span>
+                </div>
+                <p>job_id=2a3ajgcs</p>
+                <p class="muted">success=True status=done asset=None file=/projects/74523577395/workspace/assets/positioning_final_with_bgm.mp4</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="51">#51</a>
+                  <strong>show_final_video</strong>
+                  <span>11:46:35</span>
+                </div>
+                <p>file_path=/projects/74523577395/workspace/assets/positioning_final_with_bgm.mp4</p>
+                <p class="muted">a_1T8kb8W</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="54">#54</a>
+                  <strong>submit_render</strong>
+                  <span>13:11:22</span>
+                </div>
+                <p>html=/projects/74523577395/workspace/assets/composition_final.html; output=positioning_bgm_louder.mp4; fps=24; format=None; quality=high</p>
+                <p class="muted">success job=930qvqip status=pending warnings=0</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="55">#55</a>
+                  <strong>query_render</strong>
+                  <span>13:11:25</span>
+                </div>
+                <p>job_id=930qvqip</p>
+                <p class="muted">success=True status=running asset=None file=</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="56">#56</a>
+                  <strong>query_render</strong>
+                  <span>13:12:27</span>
+                </div>
+                <p>job_id=930qvqip</p>
+                <p class="muted">success=True status=done asset=None file=/projects/74523577395/workspace/assets/positioning_bgm_louder.mp4</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="57">#57</a>
+                  <strong>show_final_video</strong>
+                  <span>13:12:36</span>
+                </div>
+                <p>file_path=/projects/74523577395/workspace/assets/positioning_bgm_louder.mp4</p>
+                <p class="muted">a_4CoXmeX</p>
+                
+              </div>
+            </div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+    </div>
+      </section>
+
+      <section id="evidence">
+        <h2>问题证据卡</h2>
+        <div class="evidence-grid">
+      <article class="evidence-card">
+        <div class="evidence-title">用户输入</div>
+        <p></p>
+        <a href="#overview">查看 trace 概览</a>
+      </article>
+      <article class="evidence-card">
+        <div class="evidence-title">生成调用</div>
+        <p>audio_produce x2, music_generate x1；资产清单 4 条，本地媒体 20 个。</p>
+        <a href="#prompts">查看生成参数</a>
+      </article>
+      <article class="evidence-card warn-card">
+        <div class="evidence-title">规则读取</div>
+        <p>读取文件 5 个；静态 reference 覆盖 5/5。这块用于快速扫查，深度结论以 markdown 报告为准。</p>
+        <a href="#skills">看 skill 读取审计</a>
+      </article>
+      <article class="evidence-card warn-card">
+        <div class="evidence-title">风险调用</div>
+        <p>Composition lint failed; repaired later</p>
+        <a href="#chain">查看调用链</a>
+      </article>
+    </div>
+      </section>
+
+      <section id="overview">
+        <h2>两轮会话概览</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Start UTC</th><th>Trace</th><th>User Input</th><th>Tools</th><th>Latency</th></tr></thead>
+            <tbody>
+        <tr>
+          <td>2026-08-14T11:16:53.351964+08:00</td>
+          <td><code>tool-chain.json</code><br><span class="muted">thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</span></td>
+          <td></td>
+          <td>71</td>
+          <td>s</td>
+        </tr>
+        </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="assets">
+        <h2>素材预览</h2>
+        <div class="grid-assets">
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/74523577395/media/bgm_original.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>bgm_original.mp3</h3>
+        <p>audio/mpeg · 578.8 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/74523577395/media/bgm_positioning_20260814T033805_e8a9d09f.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>bgm_positioning_20260814T033805_e8a9d09f.mp3</h3>
+        <p>audio/mpeg · 578.8 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/74523577395/media/bgm_ready.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>bgm_ready.mp3</h3>
+        <p>audio/mpeg · 582.9 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/74523577395/media/bgm_trimmed.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>bgm_trimmed.mp3</h3>
+        <p>audio/mpeg · 489.8 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><div class="file-preview">file</div></div>
+      <div class="asset-body">
+        <h3>composition_final.html</h3>
+        <p>text/html · 1.5 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><div class="file-preview">file</div></div>
+      <div class="asset-body">
+        <h3>mix_audio.html</h3>
+        <p>text/html · 1.4 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><video src="case-data/cases/74523577395/media/mixed_audio_track.mp4" controls muted loop playsinline></video></div>
+      <div class="asset-body">
+        <h3>mixed_audio_track.mp4</h3>
+        <p>video/mp4 · 958.2 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><video src="case-data/cases/74523577395/media/v1_bgm_claimed.mp4" controls loop playsinline></video></div>
+      <div class="asset-body">
+        <h3>v1_bgm_claimed.mp4</h3>
+        <p>video/mp4 · 9588.1 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><video src="case-data/cases/74523577395/media/v2_bgm_louder.mp4" controls loop playsinline></video></div>
+      <div class="asset-body">
+        <h3>v2_bgm_louder.mp4</h3>
+        <p>video/mp4 · 9600.1 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><video src="case-data/cases/74523577395/media/v3_explicit_mix.mp4" controls loop playsinline></video></div>
+      <div class="asset-body">
+        <h3>v3_explicit_mix.mp4</h3>
+        <p>video/mp4 · 13217.0 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/74523577395/media/vo_audio_only.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_audio_only.mp3</h3>
+        <p>audio/mpeg · 436.6 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/74523577395/media/vo_combined.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_combined.mp3</h3>
+        <p>audio/mpeg · 560.5 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><video src="case-data/cases/74523577395/media/vo_normalized.mp4" controls muted loop playsinline></video></div>
+      <div class="asset-body">
+        <h3>vo_normalized.mp4</h3>
+        <p>video/mp4 · 13215.1 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/74523577395/media/vo_segment_1_20260814T033202_78b545a1.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_segment_1_20260814T033202_78b545a1.mp3</h3>
+        <p>audio/mpeg · 227.4 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><div class="file-preview">file</div></div>
+      <div class="asset-body">
+        <h3>vo_segment_1_subtitle_20260814T033203_1fb61140.srt</h3>
+        <p>application/x-subrip · 0.5 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/74523577395/media/vo_segment_2_20260814T033203_84a516ea.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_segment_2_20260814T033203_84a516ea.mp3</h3>
+        <p>audio/mpeg · 333.5 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><div class="file-preview">file</div></div>
+      <div class="asset-body">
+        <h3>vo_segment_2_subtitle_20260814T033203_f5fc2c50.srt</h3>
+        <p>application/x-subrip · 0.5 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/74523577395/media/voice_preview_08b94dd3048d26cb_20260814T033105_42cc3879.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>voice_preview_08b94dd3048d26cb_20260814T033105_42cc3879.mp3</h3>
+        <p>audio/mpeg · 127.7 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/74523577395/media/voice_preview_4689b6890ff76b90_20260814T033105_822a9fc0.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>voice_preview_4689b6890ff76b90_20260814T033105_822a9fc0.mp3</h3>
+        <p>audio/mpeg · 167.4 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/74523577395/media/voice_preview_c8d6442bac8ce3e2_20260814T033105_116ff966.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>voice_preview_c8d6442bac8ce3e2_20260814T033105_116ff966.mp3</h3>
+        <p>audio/mpeg · 148.0 KB</p>
+      </div>
+    </article>
+    </div>
+      </section>
+
+      <section id="prompts">
+        <h2>资产记录与 Prompt</h2>
+        <div class="grid-assets">
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">audio</span>
+            <span class="badge muted-badge">audio_produce</span>
+            <span class="badge muted-badge">elevenlabs</span>
+          </div>
+          <h3>vo_segment_1</h3>
+          <p class="mono">eleven_v3</p>
+          <p>In the nineteen seventies, one idea changed marketing — and still decides who wins today. Al Ries called it positioning. You don&#x27;t sell a product. You sell the place it occupies in the customer&#x27;s mind. Why does that matter?</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">audio</span>
+            <span class="badge muted-badge">audio_produce</span>
+            <span class="badge muted-badge">elevenlabs</span>
+          </div>
+          <h3>vo_segment_2</h3>
+          <p class="mono">eleven_v3</p>
+          <p>Without one clear mental category, brands disappear into comparison. Strong brands own an idea. Coca-Cola: shared moments. FedEx: reliability and speed. Nike: pushing limits. Can you describe your brand in five words? Comment pos for the checklist.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">final</span>
+            <span class="badge muted-badge">show_final_video</span>
+            <span class="badge muted-badge">local</span>
+          </div>
+          <h3>final_video</h3>
+          <p class="mono">/projects/74523577395/workspace/assets/final_with_vo.mp4</p>
+          <p></p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">audio</span>
+            <span class="badge muted-badge">music_generate</span>
+            <span class="badge muted-badge">elevenlabs</span>
+          </div>
+          <h3>bgm_positioning</h3>
+          <p class="mono">music_v1</p>
+          <p></p>
+        </article>
+        </div>
+      </section>
+
+      <section>
+        <h2>生成/渲染主链路</h2>
+        
+        <div class="step good">
+          <div><strong>audio_produce</strong> <span>11:31:57</span></div>
+          <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;vo_segment_1&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &quot;In the nineteen seventies, o...</p>
+          <p class="muted">{&quot;trace_id&quot;: &quot;f069961c-e92a-43e0-aa11-4d88d5bb1b1f&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;14344ad2-ce4a-49ab-98ae-12be23bc2e8c&quot;, &quot;file&quot;: &quot;/proj...</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>audio_produce</strong> <span>11:31:57</span></div>
+          <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;vo_segment_2&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &#x27;Without one clear mental cat...</p>
+          <p class="muted">{&quot;trace_id&quot;: &quot;8df50876-fa29-4dc7-9a3c-55b8621d8497&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;5e9ab89c-41bd-4fb8-81bc-68f64be7caa2&quot;, &quot;file&quot;: &quot;/proj...</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>music_generate</strong> <span>11:37:59</span></div>
+          <p>name=bgm_positioning; elevenlabs/music_v1; duration_ms=; instrumental=</p>
+          <p class="muted">ok=True error=none file=/projects/74523577395/workspace/assets/bgm_positioning_20260814T033805_e8a9d09f.mp3</p>
+        </div>
+        
+      </section>
+
+      <section id="chain">
+        <h2>技术明细</h2>
+        <details id="chainDetails" class="technical-details">
+          <summary>展开完整调用表（71 行）</summary>
+          <div class="controls">
+            <select id="toolFilter">
+              <option value="">All tools (71)</option>
+              <option value="__problem">Only flagged (2)</option>
+              <option value="add_attachments">add_attachments (1)</option>
+<option value="analyze_file_content">analyze_file_content (4)</option>
+<option value="audio_produce">audio_produce (2)</option>
+<option value="edit_file">edit_file (8)</option>
+<option value="lint_composition">lint_composition (4)</option>
+<option value="media_probe">media_probe (11)</option>
+<option value="media_process">media_process (11)</option>
+<option value="music_generate">music_generate (1)</option>
+<option value="query_render">query_render (5)</option>
+<option value="read_file">read_file (5)</option>
+<option value="show_final_video">show_final_video (4)</option>
+<option value="submit_render">submit_render (3)</option>
+<option value="voice_preview">voice_preview (3)</option>
+<option value="voice_search">voice_search (1)</option>
+<option value="write_file">write_file (2)</option>
+<option value="write_todos">write_todos (6)</option>
+            </select>
+            <input id="searchBox" placeholder="搜索工具、参数、结果、问题">
+          </div>
+          <div class="table-wrap">
+            <table id="chainTable">
+              <thead><tr><th>#</th><th>UTC</th><th>Trace</th><th>Tool</th><th>Key params</th><th>Result</th><th>Problem</th></tr></thead>
+              <tbody>
+        <tr id="call-1" class="" data-index="1" data-tool="write_todos" data-problem="0">
+          <td>1</td>
+          <td>11:16:53</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>读取创作技能文档，了解流程规范=in_progress; 分析两个视频的内容和音频=pending; 提取两个视频的字幕/口播文本=pending; 去除两个视频的原始音频并拼接=pending; 生成统一音色的口播配音=pending; 合成最终视频并交付=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;读取创作技能文档，了解流程规范&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;分析两个视频的内容和音频&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}, {&#x27;content&#x27;: &#x27;提取两个视频的字幕/口播文本&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-2" class="" data-index="2" data-tool="analyze_file_content" data-problem="0">
+          <td>2</td>
+          <td>11:16:58</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=视频中的口播文字内容是什么？有哪些字幕或旁白？</td>
+          <td>[Visual Analysis] ### 结论 视频中可见的文字内容如下，无法确定口播内容，仅能识别到画面内的文字信息： 1. 0.0秒，画面显示数字“1940”，左上角有老式电视机图案。 2. 1.0秒，画面显示数字“1970”，左上角有老式电视机图案。 3. 2.0秒，画面放大显示数字“70”的局部。 4. 3.0秒，画面显示文字“Still dec...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-3" class="" data-index="3" data-tool="analyze_file_content" data-problem="0">
+          <td>3</td>
+          <td>11:16:58</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=视频中的口播文字内容是什么？有哪些字幕或旁白？</td>
+          <td>[Visual Analysis] ### 结论 视频中可见的字幕内容如下，口播文字内容无法从画面中确定。 ### 可见字幕证据 1. 0.0-1.0秒：画面顶部显示文字「Categories」 2. 1.0秒：画面下方显示文字「If you don&#x27;t own a clear mental category」 3. 2.0秒：画面中间显示文字「you b...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-4" class="" data-index="4" data-tool="read_file" data-problem="0">
+          <td>4</td>
+          <td>11:16:58</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/assembly-skill/SKILL.md offset= limit=80</td>
+          <td>1 --- 2 name: assembly-skill 3 description: Prepare and lock actual video/audio materials for video projects, including probes, sequence coverage, rough-cut windows, measured post...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-5" class="" data-index="5" data-tool="read_file" data-problem="0">
+          <td>5</td>
+          <td>11:17:12</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/assembly-skill/references/voice-production-and-resolution.md offset= limit=80</td>
+          <td>1 --- 2 id: voice-production-and-resolution 3 description: &quot;Shared rules for voice resolution, public search, preview, clone authorization, TTS production, measured fit, and spoke...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-6" class="" data-index="6" data-tool="write_todos" data-problem="0">
+          <td>6</td>
+          <td>11:17:17</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>读取创作技能文档，了解流程规范=completed; 分析两个视频的内容和音频=completed; 搜索合适的英文男声/女声，进行试听确认=in_progress; 去除两个视频的原始音频并拼接=pending; 生成统一音色的完整口播配音=pending; 合成最终视频并交付=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;读取创作技能文档，了解流程规范&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;分析两个视频的内容和音频&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;搜索合适的英文男声/女声，进行试听确认&#x27;, &#x27;status&#x27;: &#x27;in_p...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-7" class="" data-index="7" data-tool="voice_search" data-problem="0">
+          <td>7</td>
+          <td>11:30:51</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">voice_search</span></td>
+          <td>{&#x27;query&#x27;: &#x27;Marketing educational voiceover, target spoken language must be English, voice must be male, deep and authoritative tone preferred, clear articulation, confident delive...</td>
+          <td>{&quot;trace_id&quot;: &quot;bc188d90-75c9-48ba-89a9-5d1c1659c26a&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;status&quot;: &quot;success&quot;, &quot;final_tags&quot;: {&quot;gender&quot;: &quot;male&quot;, &quot;language&quot;: &quot;e...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-8" class="" data-index="8" data-tool="voice_preview" data-problem="0">
+          <td>8</td>
+          <td>11:31:05</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">voice_preview</span></td>
+          <td>{&#x27;name&#x27;: &#x27;Med - Educational&#x27;, &#x27;preview_url&#x27;: &#x27;https://api.us.elevenlabs.io/v1/voices/QIgtaJxWtSccY1pPkFei/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJjdXN0b20iLCJ3b3Jrc3BhY2VfaW...</td>
+          <td>{&quot;trace_id&quot;: &quot;86073802-8b2c-4c5b-9ce7-c063393489f3&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;file&quot;: &quot;/projects/74523577395/workspace/assets/voice_preview_c8d644...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-9" class="" data-index="9" data-tool="voice_preview" data-problem="0">
+          <td>9</td>
+          <td>11:31:05</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">voice_preview</span></td>
+          <td>{&#x27;name&#x27;: &#x27;Cory - Warm Confident&#x27;, &#x27;preview_url&#x27;: &#x27;https://storage.googleapis.com/eleven-public-prod/database/workspace/4a8634c6983e4c0d913b69c9debb8b9a/voices/Qlsy8VfImipwdkt0qtT8...</td>
+          <td>{&quot;trace_id&quot;: &quot;274d6d7c-6446-432a-837e-c734518a328e&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;file&quot;: &quot;/projects/74523577395/workspace/assets/voice_preview_4689b6...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-10" class="" data-index="10" data-tool="voice_preview" data-problem="0">
+          <td>10</td>
+          <td>11:31:05</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">voice_preview</span></td>
+          <td>{&#x27;name&#x27;: &#x27;Joshua - Captivating&#x27;, &#x27;preview_url&#x27;: &#x27;https://storage.googleapis.com/eleven-public-prod/database/workspace/f38b3f171c4d40098167d7158d91da4b/voices/PVcd7o4WIR7YeNZOizeg/...</td>
+          <td>{&quot;trace_id&quot;: &quot;609c6c52-5dcc-4e00-bf8a-3d35d0cb1fa3&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;file&quot;: &quot;/projects/74523577395/workspace/assets/voice_preview_08b94d...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-11" class="" data-index="11" data-tool="add_attachments" data-problem="0">
+          <td>11</td>
+          <td>11:31:08</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">add_attachments</span></td>
+          <td>voice_preview_c8d6442bac8ce3e2_20260814T033105_116ff966.mp3, voice_preview_4689b6890ff76b90_20260814T033105_822a9fc0.mp3, voice_preview_08b94dd3048d26cb_20260814T033105_42cc3879.mp3</td>
+          <td>[{&quot;asset_id&quot;: &quot;a_Spxkkpx&quot;, &quot;mime_type&quot;: &quot;audio/mpeg&quot;, &quot;name&quot;: &quot;voice_preview_c8d6442bac8ce3e2_20260814T033105_116ff966.mp3&quot;}, {&quot;asset_id&quot;: &quot;a_bL7hhri&quot;, &quot;mime_type&quot;: &quot;audio/mpeg&quot;, ...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-12" class="" data-index="12" data-tool="write_todos" data-problem="0">
+          <td>12</td>
+          <td>11:31:47</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>读取创作技能文档，了解流程规范=completed; 分析两个视频的内容和音频=completed; 搜索合适的英文男声/女声，进行试听确认=completed; 生成两段统一音色的完整口播配音=in_progress; 去除两个视频的原始音频并拼接=pending; 将配音合入拼接好的视频并交付=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;读取创作技能文档，了解流程规范&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;分析两个视频的内容和音频&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;搜索合适的英文男声/女声，进行试听确认&#x27;, &#x27;status&#x27;: &#x27;comp...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-13" class="" data-index="13" data-tool="audio_produce" data-problem="0">
+          <td>13</td>
+          <td>11:31:57</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">audio_produce</span></td>
+          <td>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;vo_segment_1&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &quot;In the nineteen seventies, o...</td>
+          <td>{&quot;trace_id&quot;: &quot;f069961c-e92a-43e0-aa11-4d88d5bb1b1f&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;14344ad2-ce4a-49ab-98ae-12be23bc2e8c&quot;, &quot;file&quot;: &quot;/proj...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-14" class="" data-index="14" data-tool="audio_produce" data-problem="0">
+          <td>14</td>
+          <td>11:31:57</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">audio_produce</span></td>
+          <td>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;vo_segment_2&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &#x27;Without one clear mental cat...</td>
+          <td>{&quot;trace_id&quot;: &quot;8df50876-fa29-4dc7-9a3c-55b8621d8497&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;5e9ab89c-41bd-4fb8-81bc-68f64be7caa2&quot;, &quot;file&quot;: &quot;/proj...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-15" class="" data-index="15" data-tool="media_probe" data-problem="0">
+          <td>15</td>
+          <td>11:32:11</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/74523577395/workspace/assets/a_UZyqzWd_Hailuo_Video_Create_the_SECOND_15-SECOND_se_544491038839386115.mp4</td>
+          <td>duration=15.084000 codec=h264 1440x2560 pix_fmt=yuv420p</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-16" class="" data-index="16" data-tool="media_probe" data-problem="0">
+          <td>16</td>
+          <td>11:32:11</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/74523577395/workspace/assets/vo_segment_1_20260814T033202_78b545a1.mp3</td>
+          <td>duration=14.524082 codec=mp3 NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-17" class="" data-index="17" data-tool="media_probe" data-problem="0">
+          <td>17</td>
+          <td>11:32:11</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/74523577395/workspace/assets/vo_segment_2_20260814T033203_84a516ea.mp3</td>
+          <td>duration=21.315918 codec=mp3 NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-18" class="" data-index="18" data-tool="media_probe" data-problem="0">
+          <td>18</td>
+          <td>11:32:11</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/74523577395/workspace/assets/a_gf9SWEu_Hailuo_Video_Create_the_FIRST_15-SECOND_segment_of_a_premium_9_16_vertical_editorial_motion-design_video._Output_544490897327747075.mp4</td>
+          <td>duration=15.084000 codec=h264 1440x2560 pix_fmt=yuv420p</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-19" class="" data-index="19" data-tool="media_process" data-problem="0">
+          <td>19</td>
+          <td>11:32:23</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/74523577395/workspace/assets/a_UZyqzWd_Hailuo_Video_Create_the_SECOND_15-SECOND_se_544491038839386115.mp4; output=seg2_extended.mp4; steps=speed(,,x,)</td>
+          <td>success=True asset=None file=/projects/74523577395/workspace/assets/seg2_extended.mp4 render_ms=13052</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-20" class="" data-index="20" data-tool="media_process" data-problem="0">
+          <td>20</td>
+          <td>11:32:23</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/74523577395/workspace/assets/a_gf9SWEu_Hailuo_Video_Create_the_FIRST_15-SECOND_segment_of_a_premium_9_16_vertical_editorial_motion-design_video._Output_544490897327747075.mp4; output=seg1_silent.mp4; steps=volume(,,x,)</td>
+          <td>success=True asset=None file=/projects/74523577395/workspace/assets/seg1_silent.mp4 render_ms=868</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-21" class="" data-index="21" data-tool="media_probe" data-problem="0">
+          <td>21</td>
+          <td>11:32:38</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/74523577395/workspace/assets/seg2_extended.mp4</td>
+          <td>duration=21.554000 codec=h264 1440x2560 pix_fmt=yuv420p</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-22" class="" data-index="22" data-tool="media_process" data-problem="0">
+          <td>22</td>
+          <td>11:32:42</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/74523577395/workspace/assets/seg2_extended.mp4; output=seg2_silent.mp4; steps=volume(,,x,)</td>
+          <td>success=True asset=None file=/projects/74523577395/workspace/assets/seg2_silent.mp4 render_ms=725</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-23" class="" data-index="23" data-tool="media_process" data-problem="0">
+          <td>23</td>
+          <td>11:32:46</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=None; output=combined_silent.mp4; steps=concat(,,x,)</td>
+          <td>success=True asset=None file=/projects/74523577395/workspace/assets/combined_silent.mp4 render_ms=1368</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-24" class="" data-index="24" data-tool="media_process" data-problem="0">
+          <td>24</td>
+          <td>11:32:52</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=None; output=vo_combined.mp3; steps=concat(,,x,)</td>
+          <td>success=True asset=None file=/projects/74523577395/workspace/assets/vo_combined.mp3 render_ms=255</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-25" class="" data-index="25" data-tool="media_process" data-problem="0">
+          <td>25</td>
+          <td>11:32:55</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/74523577395/workspace/assets/combined_silent.mp4; output=final_with_vo.mp4; steps=replace_audio(,,x,)</td>
+          <td>success=True asset=None file=/projects/74523577395/workspace/assets/final_with_vo.mp4 render_ms=2208</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-26" class="" data-index="26" data-tool="write_todos" data-problem="0">
+          <td>26</td>
+          <td>11:33:07</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>读取创作技能文档，了解流程规范=completed; 分析两个视频的内容和音频=completed; 搜索合适的英文男声/女声，进行试听确认=completed; 生成两段统一音色的完整口播配音=completed; 去除两个视频的原始音频并拼接=completed; 将配音合入拼接好的视频并交付=completed</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;读取创作技能文档，了解流程规范&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;分析两个视频的内容和音频&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;搜索合适的英文男声/女声，进行试听确认&#x27;, &#x27;status&#x27;: &#x27;comp...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-27" class="" data-index="27" data-tool="show_final_video" data-problem="0">
+          <td>27</td>
+          <td>11:33:10</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">show_final_video</span></td>
+          <td>file_path=/projects/74523577395/workspace/assets/final_with_vo.mp4</td>
+          <td>a_1ekQh2J</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-28" class="" data-index="28" data-tool="write_todos" data-problem="0">
+          <td>28</td>
+          <td>11:36:26</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>分析视频内容和节奏，规划音效与BGM方案=in_progress; 生成匹配视频风格的BGM=pending; 读取合成技能，搭建音频混合方案=pending; 合成BGM+口播的最终视频并交付=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;分析视频内容和节奏，规划音效与BGM方案&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;生成匹配视频风格的BGM&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}, {&#x27;content&#x27;: &#x27;读取合成技能，搭建音频混合方案&#x27;, &#x27;status&#x27;: &#x27;pen...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-29" class="" data-index="29" data-tool="analyze_file_content" data-problem="0">
+          <td>29</td>
+          <td>11:36:30</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=详细描述视频的视觉风格、画面切换节奏、每个关键画面的内容和大致时间点，以及整体气氛和情绪走向</td>
+          <td>### 结论 1. 视觉风格：整体是复古质感+现代极简结合的动态排版风格，前半段用米黄做旧底色、复古衬线字体、老电视元素营造年代感，后半段切换为纯黑背景搭配发光线条、高对比度品牌元素，走简约高级的商业科普视觉风格，转场以淡入淡出、元素缩放/滑动动态效果为主。 2. 画面切换节奏：整体节奏偏快，单画面停留时长多为1-3秒，文字逐行弹出、元素过渡流畅，年代引入...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-30" class="" data-index="30" data-tool="read_file" data-problem="0">
+          <td>30</td>
+          <td>11:37:59</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/SKILL.md offset= limit=80</td>
+          <td>1 --- 2 name: motion-skill 3 description: Compose and render final HTML video from locked production materials. Own composition.html, final packaging, DOM-native text/data/UI, ele...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-31" class="" data-index="31" data-tool="music_generate" data-problem="0">
+          <td>31</td>
+          <td>11:37:59</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">music_generate</span></td>
+          <td>name=bgm_positioning; elevenlabs/music_v1; duration_ms=; instrumental=</td>
+          <td>ok=True error=none file=/projects/74523577395/workspace/assets/bgm_positioning_20260814T033805_e8a9d09f.mp3</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-32" class="" data-index="32" data-tool="media_probe" data-problem="0">
+          <td>32</td>
+          <td>11:40:11</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/74523577395/workspace/assets/bgm_positioning_20260814T033805_e8a9d09f.mp3</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-33" class="" data-index="33" data-tool="read_file" data-problem="0">
+          <td>33</td>
+          <td>11:40:19</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/references/design-audio-and-assembly.md offset= limit=80</td>
+          <td>1 # Audio Assembly And Mix Contract 2 3 Read this before probing source audio, fitting post VO, assigning final ownership, placing VO/BGM/SFX on the timeline, aligning audio to pi...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-34" class="" data-index="34" data-tool="read_file" data-problem="0">
+          <td>34</td>
+          <td>11:40:19</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/references/tech-html.md offset= limit=80</td>
+          <td>1 # tech-html — Motion HTML authoring guide 2 3 For `data-*` attribute shapes see `tech-data-attributes.md`. 4 5 **In-HTML resource references:** 6 - Media, image, subtitle, poste...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-35" class="" data-index="35" data-tool="media_probe" data-problem="0">
+          <td>35</td>
+          <td>11:40:22</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/74523577395/workspace/assets/final_with_vo.mp4</td>
+          <td>duration=36.011000 codec=h264 1440x2560 pix_fmt=yuv420p</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-36" class="" data-index="36" data-tool="media_process" data-problem="0">
+          <td>36</td>
+          <td>11:40:32</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/74523577395/workspace/assets/final_with_vo.mp4; output=vo_normalized.mp4; steps=loudnorm(,,x,)</td>
+          <td>success=True asset=None file=/projects/74523577395/workspace/assets/vo_normalized.mp4 render_ms=3993</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-37" class="" data-index="37" data-tool="media_process" data-problem="0">
+          <td>37</td>
+          <td>11:40:32</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/74523577395/workspace/assets/bgm_positioning_20260814T033805_e8a9d09f.mp3; output=bgm_trimmed.mp3; steps=trim(,,x,), loudnorm(,,x,)</td>
+          <td>success=True asset=None file=/projects/74523577395/workspace/assets/bgm_trimmed.mp3 render_ms=2100</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-38" class="" data-index="38" data-tool="write_file" data-problem="0">
+          <td>38</td>
+          <td>11:40:47</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">write_file</span></td>
+          <td>/projects/74523577395/workspace/assets/composition_final.html; content=1540 chars</td>
+          <td>Updated file /projects/74523577395/workspace/assets/composition_final.html</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-39" class="has-problem" data-index="39" data-tool="lint_composition" data-problem="1">
+          <td>39</td>
+          <td>11:40:50</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">lint_composition</span></td>
+          <td>{&#x27;fps&#x27;: 24, &#x27;html_file&#x27;: &#x27;/projects/74523577395/workspace/assets/composition_final.html&#x27;}</td>
+          <td>{&quot;success&quot;: true, &quot;valid&quot;: false, &quot;errors&quot;: [{&quot;code&quot;: &quot;MOTION_CONTRACT_DATA_ATTR_VALUE&quot;, &quot;severity&quot;: &quot;error&quot;, &quot;message&quot;: &quot;data-loop must be \&quot;true\&quot;; got false&quot;, &quot;selector&quot;: &quot;#bgm...</td>
+          <td>Composition lint failed; repaired later</td>
+        </tr>
+        
+
+        <tr id="call-40" class="" data-index="40" data-tool="edit_file" data-problem="0">
+          <td>40</td>
+          <td>11:40:55</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">edit_file</span></td>
+          <td>/projects/74523577395/workspace/assets/composition_final.html; replace 127-&gt;152 chars</td>
+          <td>Successfully replaced 1 instance(s) of the string in &#x27;/projects/74523577395/workspace/assets/composition_final.html&#x27;</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-41" class="" data-index="41" data-tool="edit_file" data-problem="0">
+          <td>41</td>
+          <td>11:40:58</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">edit_file</span></td>
+          <td>/projects/74523577395/workspace/assets/composition_final.html; replace 80-&gt;51 chars</td>
+          <td>Successfully replaced 1 instance(s) of the string in &#x27;/projects/74523577395/workspace/assets/composition_final.html&#x27;</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-42" class="" data-index="42" data-tool="edit_file" data-problem="0">
+          <td>42</td>
+          <td>11:41:01</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">edit_file</span></td>
+          <td>/projects/74523577395/workspace/assets/composition_final.html; replace 102-&gt;104 chars</td>
+          <td>Successfully replaced 1 instance(s) of the string in &#x27;/projects/74523577395/workspace/assets/composition_final.html&#x27;</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-43" class="" data-index="43" data-tool="edit_file" data-problem="0">
+          <td>43</td>
+          <td>11:41:05</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">edit_file</span></td>
+          <td>/projects/74523577395/workspace/assets/composition_final.html; replace 48-&gt;24 chars</td>
+          <td>Successfully replaced 1 instance(s) of the string in &#x27;/projects/74523577395/workspace/assets/composition_final.html&#x27;</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-44" class="" data-index="44" data-tool="edit_file" data-problem="0">
+          <td>44</td>
+          <td>11:41:11</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">edit_file</span></td>
+          <td>/projects/74523577395/workspace/assets/composition_final.html; replace 74-&gt;76 chars</td>
+          <td>Successfully replaced 1 instance(s) of the string in &#x27;/projects/74523577395/workspace/assets/composition_final.html&#x27;</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-45" class="" data-index="45" data-tool="lint_composition" data-problem="0">
+          <td>45</td>
+          <td>11:41:13</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">lint_composition</span></td>
+          <td>{&#x27;fps&#x27;: 24, &#x27;html_file&#x27;: &#x27;/projects/74523577395/workspace/assets/composition_final.html&#x27;}</td>
+          <td>{&quot;success&quot;: true, &quot;valid&quot;: true, &quot;errors&quot;: [], &quot;questions&quot;: []}</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-46" class="" data-index="46" data-tool="submit_render" data-problem="0">
+          <td>46</td>
+          <td>11:41:18</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">submit_render</span></td>
+          <td>html=/projects/74523577395/workspace/assets/composition_final.html; output=positioning_final_with_bgm.mp4; fps=24; format=None; quality=high</td>
+          <td>success job=2a3ajgcs status=pending warnings=0</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-47" class="" data-index="47" data-tool="query_render" data-problem="0">
+          <td>47</td>
+          <td>11:41:21</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">query_render</span></td>
+          <td>job_id=2a3ajgcs</td>
+          <td>success=True status=running asset=None file=</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-48" class="" data-index="48" data-tool="query_render" data-problem="0">
+          <td>48</td>
+          <td>11:45:25</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">query_render</span></td>
+          <td>job_id=2a3ajgcs</td>
+          <td>success=True status=done asset=None file=/projects/74523577395/workspace/assets/positioning_final_with_bgm.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-49" class="" data-index="49" data-tool="media_probe" data-problem="0">
+          <td>49</td>
+          <td>11:46:15</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/74523577395/workspace/assets/positioning_final_with_bgm.mp4</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-50" class="" data-index="50" data-tool="write_todos" data-problem="0">
+          <td>50</td>
+          <td>11:46:32</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>分析视频内容和节奏，规划音效与BGM方案=completed; 生成匹配视频风格的BGM=completed; 读取合成技能，搭建音频混合方案=completed; 合成BGM+口播的最终视频并交付=completed</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;分析视频内容和节奏，规划音效与BGM方案&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;生成匹配视频风格的BGM&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;读取合成技能，搭建音频混合方案&#x27;, &#x27;status&#x27;: &#x27;com...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-51" class="" data-index="51" data-tool="show_final_video" data-problem="0">
+          <td>51</td>
+          <td>11:46:35</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">show_final_video</span></td>
+          <td>file_path=/projects/74523577395/workspace/assets/positioning_final_with_bgm.mp4</td>
+          <td>a_1T8kb8W</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-52" class="" data-index="52" data-tool="analyze_file_content" data-problem="0">
+          <td>52</td>
+          <td>13:10:53</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=视频中是否有背景音乐？除了人声口播之外还有其他音轨吗？描述所有可听到的声音层次。</td>
+          <td>### Conclusion There is confirmed background music in the audio. Only two distinct audible sound layers exist, and there are no additional separate audio tracks outside of the hum...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-53" class="" data-index="53" data-tool="edit_file" data-problem="0">
+          <td>53</td>
+          <td>13:11:18</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">edit_file</span></td>
+          <td>/projects/74523577395/workspace/assets/composition_final.html; replace 24-&gt;24 chars</td>
+          <td>Successfully replaced 1 instance(s) of the string in &#x27;/projects/74523577395/workspace/assets/composition_final.html&#x27;</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-54" class="" data-index="54" data-tool="submit_render" data-problem="0">
+          <td>54</td>
+          <td>13:11:22</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">submit_render</span></td>
+          <td>html=/projects/74523577395/workspace/assets/composition_final.html; output=positioning_bgm_louder.mp4; fps=24; format=None; quality=high</td>
+          <td>success job=930qvqip status=pending warnings=0</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-55" class="" data-index="55" data-tool="query_render" data-problem="0">
+          <td>55</td>
+          <td>13:11:25</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">query_render</span></td>
+          <td>job_id=930qvqip</td>
+          <td>success=True status=running asset=None file=</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-56" class="" data-index="56" data-tool="query_render" data-problem="0">
+          <td>56</td>
+          <td>13:12:27</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">query_render</span></td>
+          <td>job_id=930qvqip</td>
+          <td>success=True status=done asset=None file=/projects/74523577395/workspace/assets/positioning_bgm_louder.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-57" class="" data-index="57" data-tool="show_final_video" data-problem="0">
+          <td>57</td>
+          <td>13:12:36</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">show_final_video</span></td>
+          <td>file_path=/projects/74523577395/workspace/assets/positioning_bgm_louder.mp4</td>
+          <td>a_4CoXmeX</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-58" class="" data-index="58" data-tool="media_probe" data-problem="0">
+          <td>58</td>
+          <td>13:18:16</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/74523577395/workspace/assets/bgm_trimmed.mp3</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-59" class="" data-index="59" data-tool="media_process" data-problem="0">
+          <td>59</td>
+          <td>13:18:24</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/74523577395/workspace/assets/bgm_positioning_20260814T033805_e8a9d09f.mp3; output=bgm_ready.mp3; steps=trim(,,x,), loudnorm(,,x,)</td>
+          <td>success=True asset=None file=/projects/74523577395/workspace/assets/bgm_ready.mp3 render_ms=1777</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-60" class="" data-index="60" data-tool="media_process" data-problem="0">
+          <td>60</td>
+          <td>13:18:24</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/74523577395/workspace/assets/vo_normalized.mp4; output=vo_audio_only.mp3; steps=extract_audio(,,x,), loudnorm(,,x,)</td>
+          <td>success=True asset=None file=/projects/74523577395/workspace/assets/vo_audio_only.mp3 render_ms=2392</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-61" class="" data-index="61" data-tool="write_file" data-problem="0">
+          <td>61</td>
+          <td>13:18:36</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">write_file</span></td>
+          <td>/projects/74523577395/workspace/assets/mix_audio.html; content=1169 chars</td>
+          <td>Updated file /projects/74523577395/workspace/assets/mix_audio.html</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-62" class="has-problem" data-index="62" data-tool="lint_composition" data-problem="1">
+          <td>62</td>
+          <td>13:18:39</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">lint_composition</span></td>
+          <td>{&#x27;fps&#x27;: 24, &#x27;html_file&#x27;: &#x27;/projects/74523577395/workspace/assets/mix_audio.html&#x27;}</td>
+          <td>{&quot;success&quot;: true, &quot;valid&quot;: false, &quot;errors&quot;: [{&quot;code&quot;: &quot;MOTION_CONTRACT_COVERAGE_VISUAL_GAP&quot;, &quot;severity&quot;: &quot;error&quot;, &quot;message&quot;: &quot;Picture surface is empty for 35.875s starting at 0.00...</td>
+          <td>Composition lint failed; repaired later</td>
+        </tr>
+        
+
+        <tr id="call-63" class="" data-index="63" data-tool="edit_file" data-problem="0">
+          <td>63</td>
+          <td>13:18:44</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">edit_file</span></td>
+          <td>/projects/74523577395/workspace/assets/mix_audio.html; replace 144-&gt;121 chars</td>
+          <td>Successfully replaced 1 instance(s) of the string in &#x27;/projects/74523577395/workspace/assets/mix_audio.html&#x27;</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-64" class="" data-index="64" data-tool="edit_file" data-problem="0">
+          <td>64</td>
+          <td>13:18:48</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">edit_file</span></td>
+          <td>/projects/74523577395/workspace/assets/mix_audio.html; replace 35-&gt;290 chars</td>
+          <td>Successfully replaced 1 instance(s) of the string in &#x27;/projects/74523577395/workspace/assets/mix_audio.html&#x27;</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-65" class="" data-index="65" data-tool="lint_composition" data-problem="0">
+          <td>65</td>
+          <td>13:18:51</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">lint_composition</span></td>
+          <td>{&#x27;fps&#x27;: 24, &#x27;html_file&#x27;: &#x27;/projects/74523577395/workspace/assets/mix_audio.html&#x27;}</td>
+          <td>{&quot;success&quot;: true, &quot;valid&quot;: true, &quot;errors&quot;: [], &quot;questions&quot;: []}</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-66" class="" data-index="66" data-tool="submit_render" data-problem="0">
+          <td>66</td>
+          <td>13:18:55</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">submit_render</span></td>
+          <td>html=/projects/74523577395/workspace/assets/mix_audio.html; output=mixed_audio_track.mp4; fps=24; format=None; quality=high</td>
+          <td>success job=bod60zp9 status=pending warnings=0</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-67" class="" data-index="67" data-tool="query_render" data-problem="0">
+          <td>67</td>
+          <td>13:18:58</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">query_render</span></td>
+          <td>job_id=bod60zp9</td>
+          <td>success=True status=done asset=None file=/projects/74523577395/workspace/assets/mixed_audio_track.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-68" class="" data-index="68" data-tool="media_probe" data-problem="0">
+          <td>68</td>
+          <td>13:19:23</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/74523577395/workspace/assets/mixed_audio_track.mp4</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-69" class="" data-index="69" data-tool="media_process" data-problem="0">
+          <td>69</td>
+          <td>13:19:28</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/74523577395/workspace/assets/vo_normalized.mp4; output=final_vo_bgm.mp4; steps=replace_audio(,,x,)</td>
+          <td>success=True asset=None file=/projects/74523577395/workspace/assets/final_vo_bgm.mp4 render_ms=1969</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-70" class="" data-index="70" data-tool="media_probe" data-problem="0">
+          <td>70</td>
+          <td>13:19:33</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/74523577395/workspace/assets/final_vo_bgm.mp4</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-71" class="" data-index="71" data-tool="show_final_video" data-problem="0">
+          <td>71</td>
+          <td>13:19:38</td>
+          <td><code>thread_58137355935_74523577395_01KZZ4BD5Y3VSWVQPPC87C0J6W</code></td>
+          <td><span class="tool-pill">show_final_video</span></td>
+          <td>file_path=/projects/74523577395/workspace/assets/final_vo_bgm.mp4</td>
+          <td>a_uqNGBVG</td>
+          <td></td>
+        </tr>
+        </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section id="skills">
+        <h2>Skills / Reference 读取逻辑</h2>
+        <div class="callout">这是自动生成的通用 skill/reference 读取摘要。它只展示 trace 里实际 read_file 的覆盖情况和静态期望；case 级根因请以 markdown 分析报告为准。</div>
+        <h3>实际 read_file</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>File</th><th>Lines</th><th>Complete</th><th>Notes</th></tr></thead>
+            <tbody>
+        <tr>
+          <td>4</td>
+          <td><code>/.skills/0/assembly-skill/SKILL.md</code></td>
+          <td>1-96</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>5</td>
+          <td><code>/.skills/0/assembly-skill/references/voice-production-and-resolution.md</code></td>
+          <td>1-172</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>30</td>
+          <td><code>/.skills/0/motion-skill/SKILL.md</code></td>
+          <td>1-135</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>33</td>
+          <td><code>/.skills/0/motion-skill/references/design-audio-and-assembly.md</code></td>
+          <td>1-205</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>34</td>
+          <td><code>/.skills/0/motion-skill/references/tech-html.md</code></td>
+          <td>1-281</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        </tbody>
+          </table>
+        </div>
+        <h3 style="margin-top:18px">应读 reference 覆盖</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Expected Reference</th><th>Why Relevant</th><th>Status</th><th>Notes</th></tr></thead>
+            <tbody>
+        <tr class="">
+          <td><code>/.skills/0/assembly-skill/SKILL.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/assembly-skill/references/voice-production-and-resolution.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/motion-skill/SKILL.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/motion-skill/references/design-audio-and-assembly.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/motion-skill/references/tech-html.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <aside class="side">
+      <section>
+        <h2>风险点</h2>
+        <ul class="issue-list">
+        <li>
+          <strong>#39 · lint_composition</strong>
+          <span>Composition lint failed; repaired later</span>
+          <code>{&#x27;fps&#x27;: 24, &#x27;html_file&#x27;: &#x27;/projects/74523577395/workspace/assets/composition_final.html&#x27;}</code>
+        </li>
+        
+
+        <li>
+          <strong>#62 · lint_composition</strong>
+          <span>Composition lint failed; repaired later</span>
+          <code>{&#x27;fps&#x27;: 24, &#x27;html_file&#x27;: &#x27;/projects/74523577395/workspace/assets/mix_audio.html&#x27;}</code>
+        </li>
+        </ul>
+      </section>
+      <section>
+        <h2>Tool Mix</h2>
+        <div class="mini-grid"><div class="mini-stat"><span>media_probe</span><strong>11</strong></div>
+<div class="mini-stat"><span>media_process</span><strong>11</strong></div>
+<div class="mini-stat"><span>edit_file</span><strong>8</strong></div>
+<div class="mini-stat"><span>write_todos</span><strong>6</strong></div>
+<div class="mini-stat"><span>query_render</span><strong>5</strong></div>
+<div class="mini-stat"><span>read_file</span><strong>5</strong></div>
+<div class="mini-stat"><span>analyze_file_content</span><strong>4</strong></div>
+<div class="mini-stat"><span>lint_composition</span><strong>4</strong></div>
+<div class="mini-stat"><span>show_final_video</span><strong>4</strong></div>
+<div class="mini-stat"><span>submit_render</span><strong>3</strong></div>
+<div class="mini-stat"><span>voice_preview</span><strong>3</strong></div>
+<div class="mini-stat"><span>audio_produce</span><strong>2</strong></div>
+<div class="mini-stat"><span>write_file</span><strong>2</strong></div>
+<div class="mini-stat"><span>add_attachments</span><strong>1</strong></div>
+<div class="mini-stat"><span>music_generate</span><strong>1</strong></div>
+<div class="mini-stat"><span>voice_search</span><strong>1</strong></div></div>
+      </section>
+      <section>
+        <h2>结论</h2>
+        <p class="muted">本看板的业务链路已从当前 case 的 trace、assets 和本地媒体动态生成；它用于快速定位调用链证据，不再携带固定 sticker 案例结论。</p>
+        <p class="muted">显式 lint 调用次数：<strong>4</strong>。</p>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+const toolFilter = document.getElementById('toolFilter');
+const searchBox = document.getElementById('searchBox');
+const rows = Array.from(document.querySelectorAll('#chainTable tbody tr'));
+function applyFilters() {
+  const tool = toolFilter.value;
+  const q = searchBox.value.trim().toLowerCase();
+  rows.forEach(row => {
+    const toolOk = !tool || (tool === '__problem' ? row.dataset.problem === '1' : row.dataset.tool === tool);
+    const textOk = !q || row.innerText.toLowerCase().includes(q);
+    row.classList.toggle('hidden', !(toolOk && textOk));
+  });
+}
+toolFilter.addEventListener('change', applyFilters);
+searchBox.addEventListener('input', applyFilters);
+document.querySelectorAll('[data-filter]').forEach(link => {
+  link.addEventListener('click', () => {
+    toolFilter.value = link.dataset.filter;
+    applyFilters();
+  });
+});
+document.querySelectorAll('[data-call]').forEach(link => {
+  link.addEventListener('click', () => {
+    const details = document.getElementById('chainDetails');
+    if (details) details.open = true;
+    const target = document.getElementById(`call-${link.dataset.call}`);
+    if (!target) return;
+    toolFilter.value = '';
+    searchBox.value = '';
+    applyFilters();
+    document.querySelectorAll('.call-highlight').forEach(row => row.classList.remove('call-highlight'));
+    target.classList.add('call-highlight');
+    setTimeout(() => target.classList.remove('call-highlight'), 2600);
+  });
+});
+const roundTabs = Array.from(document.querySelectorAll('[data-round]'));
+const roundPanels = Array.from(document.querySelectorAll('[data-round-panel]'));
+roundTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    const selected = tab.dataset.round;
+    roundTabs.forEach(item => {
+      const active = item.dataset.round === selected;
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    roundPanels.forEach(panel => {
+      panel.hidden = panel.dataset.roundPanel !== selected;
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wan 3.0 模型效果看板</title>
+  <meta name="description" content="Wan 3.0 多模态视频生成模型内部实测效果看板">
+  <style>
+    :root {
+      --ink: #0b1118;
+      --ink-2: #111a24;
+      --ink-3: #182432;
+      --line: #2a3a49;
+      --text: #f4f0e8;
+      --muted: #9ba9b6;
+      --faint: #6d7d8b;
+      --cyan: #5fe0d2;
+      --cyan-dim: #183d3d;
+      --amber: #f3bd65;
+      --amber-dim: #4a371e;
+      --coral: #ff806e;
+      --coral-dim: #4c2928;
+      --paper: #f1ece2;
+      --paper-2: #ddd6c8;
+      --shadow: 0 18px 48px rgba(0,0,0,.22);
+      --radius: 7px;
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--ink); color: var(--text); }
+    body {
+      margin: 0;
+      min-width: 320px;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--ink);
+      color: var(--text);
+      letter-spacing: 0;
+    }
+    a { color: inherit; }
+    button { font: inherit; }
+    .shell { width: min(1480px, calc(100% - 40px)); margin: 0 auto; }
+
+    .topbar {
+      border-bottom: 1px solid var(--line);
+      background: #0b1118;
+    }
+    .topbar-inner {
+      min-height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .wordmark { display: flex; align-items: baseline; gap: 11px; }
+    .wordmark strong {
+      font-size: 14px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      font-weight: 760;
+    }
+    .wordmark span { color: var(--muted); font-size: 12px; }
+    .top-meta { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 12px; }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border: 1px solid #66512d;
+      border-radius: 999px;
+      color: var(--amber);
+      background: rgba(243,189,101,.08);
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+    .status-dot { width: 7px; height: 7px; background: var(--amber); border-radius: 50%; }
+
+    .hero {
+      padding: 48px 0 34px;
+      border-bottom: 1px solid var(--line);
+      background: #0e161f;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(320px, .85fr);
+      gap: 54px;
+      align-items: end;
+    }
+    .eyebrow {
+      margin: 0 0 16px;
+      color: var(--cyan);
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 780px;
+      margin: 0;
+      color: var(--paper);
+      font-size: clamp(38px, 5.6vw, 78px);
+      line-height: .98;
+      letter-spacing: -.035em;
+      font-weight: 760;
+      text-wrap: pretty;
+    }
+    .hero-copy {
+      max-width: 690px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.65;
+      text-wrap: pretty;
+    }
+    .hero-aside {
+      border-left: 1px solid var(--line);
+      padding-left: 28px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .hero-aside strong { display: block; color: var(--paper); font-size: 16px; margin-bottom: 8px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+    .scenario-band { padding: 30px 0 34px; border-bottom: 1px solid var(--line); background: #0d141d; }
+    .scenario-intro { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
+    .scenario-intro h2 { margin: 0; color: var(--paper); font-size: 24px; }
+    .scenario-intro p { max-width: 610px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; text-align: right; }
+    .scenario-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .scenario-card { min-height: 190px; padding: 17px 17px 15px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-2); }
+    .scenario-card.good { border-top: 3px solid var(--cyan); }
+    .scenario-card.watch { border-top: 3px solid var(--amber); }
+    .scenario-card.block { border-top: 3px solid var(--coral); }
+    .scenario-card header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .scenario-card header span { color: var(--faint); font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .fit-badge { padding: 5px 7px; border-radius: 4px; font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .fit-badge.good { color: var(--cyan); background: var(--cyan-dim); }
+    .fit-badge.watch { color: var(--amber); background: var(--amber-dim); }
+    .fit-badge.block { color: var(--coral); background: var(--coral-dim); }
+    .scenario-card h3 { margin: 15px 0 8px; color: var(--paper); font-size: 16px; line-height: 1.2; }
+    .scenario-card p { min-height: 53px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .scenario-card a { display: inline-block; margin-top: 13px; color: var(--cyan); text-decoration: none; font-size: 11px; }
+    .scenario-card a:hover { text-decoration: underline; }
+    .scenario-claim { margin-top: 14px; padding: 13px 15px; border-left: 3px solid var(--amber); background: rgba(243,189,101,.07); color: var(--paper-2); font-size: 12px; line-height: 1.55; }
+    .scenario-claim strong { color: var(--amber); }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-bottom: 1px solid var(--line);
+    }
+    .kpi {
+      min-height: 130px;
+      padding: 24px 24px 20px;
+      border-right: 1px solid var(--line);
+    }
+    .kpi:last-child { border-right: 0; }
+    .kpi-label { color: var(--muted); font-size: 12px; }
+    .kpi-value {
+      margin-top: 10px;
+      color: var(--paper);
+      font: 700 clamp(28px, 3.6vw, 48px)/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: -.06em;
+    }
+    .kpi-value.textual {
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: clamp(18px, 2.25vw, 29px);
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+    .kpi-note { margin-top: 9px; color: var(--faint); font-size: 11px; line-height: 1.4; }
+
+    .section { padding: 42px 0; border-bottom: 1px solid var(--line); }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
+    h2 { margin: 0; color: var(--paper); font-size: 24px; letter-spacing: -.02em; }
+    .section-head p { max-width: 630px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; text-align: right; }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--ink-2);
+      box-shadow: var(--shadow);
+    }
+    .gate-panel { padding: 22px 24px; }
+    .gate-label { color: var(--amber); font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; text-transform: uppercase; }
+    .gate-title { margin-top: 12px; color: var(--paper); font-size: 24px; line-height: 1.12; font-weight: 730; }
+    .gate-copy { margin: 13px 0 20px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .gate-list { list-style: none; margin: 0; padding: 0; }
+    .gate-list li { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); color: var(--paper-2); font-size: 12px; line-height: 1.45; }
+    .gate-list li::before { content: "!"; flex: 0 0 18px; height: 18px; display: grid; place-items: center; border: 1px solid #765528; border-radius: 50%; color: var(--amber); font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+    .benchmark-top { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-2); overflow: hidden; box-shadow: var(--shadow); }
+    .benchmark-stat { min-height: 118px; padding: 20px; border-right: 1px solid var(--line); }
+    .benchmark-stat:last-child { border-right: 0; }
+    .benchmark-stat span { color: var(--muted); font-size: 11px; }
+    .benchmark-stat strong { display: block; margin-top: 10px; color: var(--paper); font: 720 31px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: -.05em; }
+    .benchmark-stat small { display: block; margin-top: 8px; color: var(--faint); font-size: 10px; line-height: 1.45; }
+    .benchmark-layout { display: grid; grid-template-columns: minmax(320px, .72fr) minmax(0, 1.28fr); gap: 16px; margin-top: 16px; }
+    .benchmark-panel { border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-2); overflow: hidden; }
+    .benchmark-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 15px 17px; border-bottom: 1px solid var(--line); }
+    .benchmark-panel-head strong { color: var(--paper); font-size: 13px; }
+    .benchmark-panel-head span { color: var(--faint); font: 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .model-rank, .category-rank { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .model-rank th, .category-rank th { padding: 10px 14px; border-bottom: 1px solid var(--line); color: var(--faint); font: 700 9px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; text-align: right; letter-spacing: .07em; text-transform: uppercase; }
+    .model-rank th:first-child, .category-rank th:first-child { text-align: left; }
+    .model-rank td, .category-rank td { padding: 11px 14px; border-bottom: 1px solid rgba(42,58,73,.68); color: var(--muted); text-align: right; }
+    .model-rank tr:last-child td, .category-rank tr:last-child td { border-bottom: 0; }
+    .model-rank td:first-child, .category-rank td:first-child { color: var(--paper-2); text-align: left; }
+    .model-rank tr.wan-row td { background: rgba(95,224,210,.07); color: var(--cyan); font-weight: 760; }
+    .benchmark-insight { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+    .benchmark-card { min-height: 180px; padding: 17px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-2); }
+    .benchmark-card header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .benchmark-card header span { color: var(--cyan); font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .benchmark-card header b { color: var(--paper); font: 700 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .benchmark-card h3 { margin: 13px 0 8px; color: var(--paper); font-size: 15px; line-height: 1.3; }
+    .benchmark-card p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .benchmark-card a { display: inline-block; margin-top: 14px; color: var(--cyan); text-decoration: none; font-size: 11px; }
+    .benchmark-card a:hover { text-decoration: underline; }
+    .benchmark-note { margin-top: 16px; padding: 17px 18px; border-left: 3px solid var(--amber); background: rgba(243,189,101,.07); color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .benchmark-note strong { color: var(--amber); }
+    .data-integrity-warning { margin: 16px 0 0; padding: 15px 17px; border: 1px solid rgba(255,128,110,.42); border-left: 3px solid var(--coral); background: rgba(255,128,110,.08); color: var(--paper-2); font-size: 12px; line-height: 1.6; }
+    .data-integrity-warning strong { color: var(--coral); }
+
+    .evidence-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(300px, .7fr); gap: 20px; }
+    .evidence-panel { padding: 7px 24px 9px; }
+    .evidence-tier { padding: 17px 0 16px; border-bottom: 1px solid rgba(42,58,73,.72); }
+    .evidence-tier:last-child { border-bottom: 0; }
+    .evidence-tier-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+    .evidence-tier-label { color: var(--faint); font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; }
+    .evidence-tier h3 { margin: 0; color: var(--paper); font-size: 15px; line-height: 1.3; }
+    .evidence-tier p { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .evidence-proof { margin-top: 8px; color: var(--faint); font-size: 11px; line-height: 1.45; }
+    .evidence-tier.good { border-left: 3px solid var(--cyan); padding-left: 14px; }
+    .evidence-tier.watch { border-left: 3px solid var(--amber); padding-left: 14px; }
+    .evidence-tier.block { border-left: 3px solid var(--coral); padding-left: 14px; }
+
+    .case-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 7px; }
+    .filter {
+      cursor: pointer;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 11px;
+      font-size: 12px;
+      transition: border-color .18s ease, color .18s ease, background .18s ease;
+    }
+    .filter:hover, .filter.active { border-color: var(--cyan); color: var(--cyan); background: rgba(95,224,210,.08); }
+    .case-count { color: var(--faint); font: 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .case-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .case-card { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-2); }
+    .case-card[hidden] { display: none; }
+    .case-media { position: relative; aspect-ratio: 16 / 9; background: #121b24; overflow: hidden; }
+    .case-media img { width: 100%; height: 100%; display: block; object-fit: cover; }
+    .case-tag { position: absolute; top: 10px; left: 10px; padding: 5px 7px; border: 1px solid rgba(255,255,255,.22); border-radius: 4px; background: rgba(11,17,24,.84); color: var(--paper); font: 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .05em; }
+    .case-body { padding: 17px 18px 16px; }
+    .case-title { margin: 0; color: var(--paper); font-size: 17px; line-height: 1.2; }
+    .case-verdict { margin: 9px 0 13px; color: var(--muted); font-size: 12px; line-height: 1.55; min-height: 38px; }
+    .case-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--faint); font-size: 11px; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 7px; border-radius: 4px; font-size: 10px; font-weight: 720; letter-spacing: .04em; }
+    .pill.pass { color: var(--cyan); background: var(--cyan-dim); }
+    .pill.risk { color: var(--amber); background: var(--amber-dim); }
+    .pill.fail { color: var(--coral); background: var(--coral-dim); }
+    .case-links { display: flex; gap: 12px; margin-top: 13px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .case-links a { color: var(--paper-2); text-decoration: none; font-size: 11px; }
+    .case-links a:hover { color: var(--cyan); }
+
+    .audio-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .audio-card { min-height: 185px; padding: 19px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-2); }
+    .audio-card h3 { margin: 13px 0 7px; color: var(--paper); font-size: 16px; }
+    .audio-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .metric-line { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-top: 15px; margin-top: 14px; border-top: 1px solid var(--line); }
+    .metric-line span { color: var(--faint); font-size: 11px; }
+    .metric-line strong { color: var(--paper); font: 700 15px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+    .route-layout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .route { padding: 21px 22px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-2); }
+    .route h3 { margin: 0 0 13px; color: var(--paper); font-size: 17px; }
+    .route ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .route.good { border-top: 3px solid var(--cyan); }
+    .route.bad { border-top: 3px solid var(--coral); }
+
+    .sources { display: flex; flex-wrap: wrap; gap: 8px; }
+    .source-link { display: inline-flex; align-items: center; gap: 7px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 4px; color: var(--paper-2); text-decoration: none; font-size: 11px; background: var(--ink-2); }
+    .source-link:hover { border-color: var(--cyan); color: var(--cyan); }
+    .catalog-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-2); box-shadow: var(--shadow); }
+    .catalog { width: 100%; min-width: 840px; border-collapse: collapse; font-size: 12px; }
+    .catalog th { padding: 13px 15px; border-bottom: 1px solid var(--line); color: var(--faint); font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .09em; text-align: left; text-transform: uppercase; }
+    .catalog td { padding: 13px 15px; border-bottom: 1px solid rgba(42,58,73,.72); color: var(--muted); vertical-align: top; line-height: 1.45; }
+    .catalog tr:last-child td { border-bottom: 0; }
+    .catalog td:first-child { color: var(--paper); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
+    .catalog td:nth-child(2) { color: var(--paper-2); }
+    .catalog a { color: var(--cyan); text-decoration: none; white-space: nowrap; }
+    .catalog a:hover { text-decoration: underline; }
+    .result-pass { color: var(--cyan) !important; font-weight: 700; }
+    .result-risk { color: var(--amber) !important; font-weight: 700; }
+    .result-fail { color: var(--coral) !important; font-weight: 700; }
+    .material-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+    .material-tile { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-2); }
+    .material-tile img { display: block; width: 100%; aspect-ratio: 16 / 5; object-fit: cover; background: #121b24; }
+    .material-tile-body { padding: 12px 13px 13px; }
+    .material-tile-body strong { display: block; color: var(--paper); font-size: 13px; }
+    .material-tile-body span { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .material-tile-body a { display: inline-block; margin-top: 9px; color: var(--cyan); text-decoration: none; font-size: 11px; }
+    .material-tile-body a:hover { text-decoration: underline; }
+    footer { padding: 24px 0 42px; color: var(--faint); font-size: 11px; line-height: 1.6; }
+
+    @media (max-width: 980px) {
+      .hero-grid, .evidence-layout { grid-template-columns: 1fr; gap: 26px; }
+      .hero-aside { border-left: 0; border-top: 1px solid var(--line); padding: 18px 0 0; }
+      .case-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .benchmark-layout { grid-template-columns: 1fr; }
+      .benchmark-insight { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .scenario-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 680px) {
+      .shell { width: min(100% - 28px, 1480px); }
+      .topbar-inner { min-height: 58px; }
+      .top-meta span:first-child { display: none; }
+      .hero { padding: 36px 0 28px; }
+      h1 { font-size: clamp(36px, 12vw, 58px); }
+      .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi:nth-child(2) { border-right: 0; }
+      .kpi:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .section { padding: 32px 0; }
+      .section-head { display: block; }
+      .section-head p { margin-top: 10px; text-align: left; }
+      .scenario-intro { display: block; }
+      .scenario-intro p { margin-top: 10px; text-align: left; }
+      .evidence-tier-head { display: block; }
+      .evidence-tier-label { display: block; margin-bottom: 7px; }
+      .case-toolbar { display: block; }
+      .case-count { display: block; margin-top: 12px; }
+      .case-grid, .audio-grid, .route-layout { grid-template-columns: 1fr; }
+      .benchmark-top { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .benchmark-stat:nth-child(2) { border-right: 0; }
+      .benchmark-stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .benchmark-insight { grid-template-columns: 1fr; }
+      .scenario-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <div class="wordmark"><strong>Wan 3.0</strong><span>MODEL EFFECT BOARD / INTERNAL EVAL</span></div>
+      <div class="top-meta"><span class="mono">2026-08-17</span><span class="status"><i class="status-dot"></i>限场景使用</span></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div>
+          <p class="eyebrow">Executive readout · 13–14 Aug 2026</p>
+          <h1>输入很宽，<br>交付边界仍窄。</h1>
+          <p class="hero-copy">Wan 3.0 能读图、视频、音频、文件和网页，能把结构化资料快速变成视频草稿；但精确文字、事实保真、连续运动和严格口型仍需要后验收。</p>
+        </div>
+        <aside class="hero-aside">
+          <strong>当前定位</strong>
+          <div>多模态资料视觉摘要 / 产品预览 / 概念验证</div>
+          <div class="mono" style="margin-top:12px;color:var(--amber)">默认生产：暂不建议</div>
+          <div style="margin-top:7px">本看板将“接口产出”“语义相关”“媒体健康”“生产可交付”分开统计。</div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="scenario-band" aria-label="场景优劣势">
+      <div class="shell">
+        <div class="scenario-intro">
+          <h2>场景路由</h2>
+          <p>先看任务类型，再决定是否使用 Wan 3.0。主判断是：创作感和视觉覆盖较强，严格事实和动作精度较弱。</p>
+        </div>
+        <div class="scenario-grid">
+          <article class="scenario-card good">
+            <header><span>Best fit</span><b class="fit-badge good">优先</b></header>
+            <h3>产品广告 / 电商视觉</h3>
+            <p>产品外观、颜色、包装和简单文字表现稳定，适合做 SKU 展示、产品概念片和视觉预览。</p>
+            <a href="../wan30-long-input-2026-08-13/file_product_pptx.mp4">看产品 PPTX 成片 ↗</a>
+          </article>
+          <article class="scenario-card good">
+            <header><span>Best fit</span><b class="fit-badge good">优先</b></header>
+            <h3>短叙事 / 流程动画</h3>
+            <p>四镜头短故事、流程节点和简单 Explainer 的叙事完整度较好，跨镜人物和道具也有强样本。</p>
+            <a href="https://test-admin.pexo.ai/api/strategy-packages/45/preview/H3%E5%AF%B9%E6%AF%94%E8%AF%84%E6%B5%8B-%E5%8F%8C%E8%AF%84%E5%88%86%E7%89%88%202/fal-tests/results/FAB-03/wan3/output.mp4">看 FAB-03 Wan 成片 ↗</a>
+          </article>
+          <article class="scenario-card watch">
+            <header><span>Watch</span><b class="fit-badge watch">谨慎</b></header>
+            <h3>角色 / 参考图生视频</h3>
+            <p>人物身份和风格通常能延续，但高速运动、遮挡、手部动作和参考板残留会拉低可靠性。</p>
+            <a href="https://test-admin.pexo.ai/api/strategy-packages/45/preview/H3%E5%AF%B9%E6%AF%94%E8%AF%84%E6%B5%8B-%E5%8F%8C%E8%AF%84%E5%88%86%E7%89%88%202/fal-tests/results/KAB-05/wan3/output.mp4">看 KAB-05 Wan 成片 ↗</a>
+          </article>
+          <article class="scenario-card watch">
+            <header><span>Watch</span><b class="fit-badge watch">谨慎</b></header>
+            <h3>物理 / 空间 / 大运镜</h3>
+            <p>简单液体、碰撞和跟拍可以尝试；复杂因果、刚体拓扑、建筑穿越和严格数量不稳定。</p>
+            <a href="https://test-admin.pexo.ai/api/strategy-packages/45/preview/H3%E5%AF%B9%E6%AF%94%E8%AF%84%E6%B5%8B-%E5%8F%8C%E8%AF%84%E5%88%86%E7%89%88%202/fal-tests/results/KAB-07/wan3/output.mp4">看 KAB-07 Wan 成片 ↗</a>
+          </article>
+          <article class="scenario-card watch">
+            <header><span>Watch</span><b class="fit-badge watch">谨慎</b></header>
+            <h3>文档 / 网页 / 数据资料</h3>
+            <p>能抓住主题，但容易自创 UI、命令、数字、品牌字样；适合做视觉意象，不适合事实复述。</p>
+            <a href="../wan30-long-input-2026-08-13/file_chinese_md.mp4">看技术 Markdown 成片 ↗</a>
+          </article>
+          <article class="scenario-card block">
+            <header><span>Do not route</span><b class="fit-badge block">默认不推荐</b></header>
+            <h3>严格口播 / 逐帧编辑</h3>
+            <p>台词和声音可能正确，但嘴部会停住；原音、动作轨迹和首尾状态也不能按逐帧合同承诺。</p>
+            <a href="../video-model-talking-head-audio-drive-20260813/wan-3.0-output.mp4">看口播成片 ↗</a>
+          </article>
+        </div>
+        <div class="scenario-claim"><strong>核心取舍：</strong>Wan 3.0 更适合“把想法变成一段像样的视频”，不适合“把输入内容一字不差、一帧不偏地复现出来”。</div>
+      </div>
+    </section>
+
+    <section class="shell kpis" aria-label="关键指标">
+      <div class="kpi"><div class="kpi-label">生产结论</div><div class="kpi-value textual">限场景使用</div><div class="kpi-note">当前不建议直接进入默认生产路由，先按场景做人工验收</div></div>
+      <div class="kpi"><div class="kpi-label">相对稳定场景</div><div class="kpi-value textual">产品 · 叙事 · 流程</div><div class="kpi-note">适合概念片、产品预览和简单流程动画</div></div>
+      <div class="kpi"><div class="kpi-label">高风险场景</div><div class="kpi-value textual">事实 · 数据 · 口型</div><div class="kpi-note">文字、数字、技术资料和口型必须单独复核</div></div>
+      <div class="kpi"><div class="kpi-label">最大评审分歧</div><div class="kpi-value">47 分</div><div class="kpi-note">FAB-12 的 Gemini / Kimi 差值；不能当作生产通过率</div></div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-head">
+          <h2>38 Case 四模型受控对照</h2>
+          <p>H3、Kling 3 Pro、Seedance 2.0 与 Wan 3.0 使用同一 Prompt、参考素材、时长和画幅；Wan 原生 720P、有声、无水印。Gemini 与 Kimi 独立盲评。</p>
+        </div>
+        <div class="data-integrity-warning"><strong>数据口径警告：</strong>接口成功、视频可解码、音频波形相关度和评审平均分都不能单独证明生产质量。生产结论以场景级证据、反例和人工抽查为准。</div>
+        <div class="benchmark-top">
+          <div class="benchmark-stat"><span>受控场景</span><strong>38</strong><small>17 个纯文本 + 21 个参考图</small></div>
+          <div class="benchmark-stat"><span>双评审参考值 · Gemini</span><strong>77.2</strong><small>全视频盲评；不是生产评分</small></div>
+          <div class="benchmark-stat"><span>双评审参考值 · Kimi</span><strong>81.2</strong><small>官方原生视频复评；不是生产评分</small></div>
+          <div class="benchmark-stat"><span>Case 胜场参考</span><strong>6 / 11</strong><small>Gemini / Kimi；不可外推生产通过率</small></div>
+        </div>
+
+        <div class="benchmark-layout">
+          <div class="benchmark-panel">
+            <div class="benchmark-panel-head"><strong>四模型对照（仅供相对参考）</strong><span>GEMINI / KIMI</span></div>
+            <table class="model-rank">
+              <thead><tr><th>模型</th><th>Gemini</th><th>Kimi</th></tr></thead>
+              <tbody>
+                <tr><td>MiniMax H3</td><td>82.8</td><td>85.2</td></tr>
+                <tr><td>Seedance 2.0</td><td>81.2</td><td>82.3</td></tr>
+                <tr class="wan-row"><td>Wan 3.0</td><td>77.2</td><td>81.2</td></tr>
+                <tr><td>Kling 3 Pro</td><td>74.2</td><td>71.4</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="benchmark-panel">
+            <div class="benchmark-panel-head"><strong>Wan 3.0 场景分布（双评审参考）</strong><span>GEMINI / KIMI</span></div>
+            <table class="category-rank">
+              <thead><tr><th>业务类别</th><th>Case</th><th>Gemini</th><th>Kimi</th></tr></thead>
+              <tbody>
+                <tr><td>物理与因果关系</td><td>5</td><td>75.0</td><td>94.6</td></tr>
+                <tr><td>产品与商业视觉</td><td>7</td><td>75.7</td><td>81.7</td></tr>
+                <tr><td>数据与信息可视化</td><td>2</td><td>79.5</td><td>81.0</td></tr>
+                <tr><td>运镜与空间连续</td><td>4</td><td>69.5</td><td>79.5</td></tr>
+                <tr><td>人物与角色一致性</td><td>9</td><td>82.7</td><td>79.1</td></tr>
+                <tr><td>叙事与多镜头</td><td>3</td><td>86.0</td><td>78.0</td></tr>
+                <tr><td>动画与 Explainer</td><td>8</td><td>73.8</td><td>77.0</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="benchmark-insight">
+          <article class="benchmark-card"><header><span>HIGH · FAB-04</span><b>100 / 98</b></header><h3>电商产品与精确文字</h3><p>AERIN 大写清晰且唯一，瓶体、瓶盖、转台和冷凝水流程稳定，是本轮最可靠的产品样本。</p><a href="https://test-admin.pexo.ai/api/strategy-packages/45/preview/H3%E5%AF%B9%E6%AF%94%E8%AF%84%E6%B5%8B-%E5%8F%8C%E8%AF%84%E5%88%86%E7%89%88%202/fal-tests/results/FAB-04/wan3/output.mp4">观看 Wan 输出 ↗</a></article>
+          <article class="benchmark-card"><header><span>HIGH · ANM-06</span><b>100 / 97</b></header><h3>等距物流流程动画</h3><p>包裹出仓、传送、扫描、装车、送达流程完整，身份和流程节点保持稳定；双评审均判 Wan 胜。</p><a href="https://test-admin.pexo.ai/api/strategy-packages/45/preview/H3%E5%AF%B9%E6%AF%94%E8%AF%84%E6%B5%8B-%E5%8F%8C%E8%AF%84%E5%88%86%E7%89%88%202/fal-tests/results/ANM-06/wan3/output.mp4">观看 Wan 输出 ↗</a></article>
+          <article class="benchmark-card"><header><span>HIGH · FAB-03</span><b>92 / 95</b></header><h3>四镜头微叙事</h3><p>四个约 3 秒硬切镜头完整呈现取件、骑行、交付、开箱，跨镜人物和道具一致性较强。</p><a href="https://test-admin.pexo.ai/api/strategy-packages/45/preview/H3%E5%AF%B9%E6%AF%94%E8%AF%84%E6%B5%8B-%E5%8F%8C%E8%AF%84%E5%88%86%E7%89%88%202/fal-tests/results/FAB-03/wan3/output.mp4">观看 Wan 输出 ↗</a></article>
+          <article class="benchmark-card"><header><span>LOW · ANM-08</span><b>53 / 61</b></header><h3>企业预算分配</h3><p>开场筹码数量不准、剩余筹码消失，碗到柱的变化出现连续拉伸变形，数量与形变边界未守住。</p><a href="https://test-admin.pexo.ai/api/strategy-packages/45/preview/H3%E5%AF%B9%E6%AF%94%E8%AF%84%E6%B5%8B-%E5%8F%8C%E8%AF%84%E5%88%86%E7%89%88%202/fal-tests/results/ANM-08/wan3/output.mp4">观看 Wan 输出 ↗</a></article>
+          <article class="benchmark-card"><header><span>LOW · KAB-07</span><b>58 / 69</b></header><h3>刚体产品首尾匹配</h3><p>起始状态未严格匹配，末段出现拖影/重影，内部螺旋像实体几何，刚体拓扑和终帧定格存在疑虑。</p><a href="https://test-admin.pexo.ai/api/strategy-packages/45/preview/H3%E5%AF%B9%E6%AF%94%E8%AF%84%E6%B5%8B-%E5%8F%8C%E8%AF%84%E5%88%86%E7%89%88%202/fal-tests/results/KAB-07/wan3/output.mp4">观看 Wan 输出 ↗</a></article>
+          <article class="benchmark-card"><header><span>RISK · KAB-05</span><b>64 / 75</b></header><h3>建筑空间连续穿越</h3><p>主体穿行路径清楚，但开场直接露出三联参考板，进入场景有拼接感，并出现轻微建筑形变和天际线漂移。</p><a href="https://test-admin.pexo.ai/api/strategy-packages/45/preview/H3%E5%AF%B9%E6%AF%94%E8%AF%84%E6%B5%8B-%E5%8F%8C%E8%AF%84%E5%88%86%E7%89%88%202/fal-tests/results/KAB-05/wan3/output.mp4">观看 Wan 输出 ↗</a></article>
+        </div>
+        <div class="benchmark-note"><strong>双评审不能简单合并：</strong>FAB-12 的 Gemini / Kimi 差值达到 47 分，KAB-08 为 42 分，FAB-06 为 32 分。Wan 的物理与因果类也出现 75.0 vs 94.6 的大差异，因此单评审高分不能直接转成生产结论，必须保留逐条反证和人工抽查。</div>
+        <div class="sources" style="margin-top:16px"><a class="source-link" href="https://test-admin.pexo.ai/api/strategy-packages/45/preview/H3%E5%AF%B9%E6%AF%94%E8%AF%84%E6%B5%8B-%E5%8F%8C%E8%AF%84%E5%88%86%E7%89%88%202/index.html">打开完整 38 Case 四模型评测 ↗</a></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-head">
+          <h2>证据分层与准入</h2>
+          <p>不再用主观百分比模拟能力边界；只按已有样本决定该场景是优先尝试、需 QA，还是不应进入默认路由。</p>
+        </div>
+        <div class="evidence-layout">
+          <div class="panel evidence-panel">
+            <article class="evidence-tier good">
+              <div class="evidence-tier-head"><span class="evidence-tier-label">优先尝试</span><h3>产品广告、电商视觉、短叙事、流程动画</h3></div>
+              <p>外观、颜色、包装、简单镜头和流程节点有较强样本，适合概念片、SKU 预览和非关键事实的创意草稿。</p>
+              <div class="evidence-proof">代表证据：FAB-03、FAB-04、ANM-06，以及产品 PPTX 长时测试。</div>
+            </article>
+            <article class="evidence-tier watch">
+              <div class="evidence-tier-head"><span class="evidence-tier-label">需 QA 后尝试</span><h3>角色一致性、参考图生视频、简单物理、简单跟拍</h3></div>
+              <p>身份和风格通常能延续，但遮挡、手部、高速运动、刚体拓扑和相邻镜头连续性仍可能失真。</p>
+              <div class="evidence-proof">代表证据：KAB-05、KAB-07，以及角色 / 参考图输出。</div>
+            </article>
+            <article class="evidence-tier watch">
+              <div class="evidence-tier-head"><span class="evidence-tier-label">仅供参考</span><h3>文档、网页、图表、技术资料、复杂空间运镜</h3></div>
+              <p>主题召回可能成立，但文字、命令、数字、品牌 UI 和空间结构会被模型补写或改写，不能直接作为事实视频交付。</p>
+              <div class="evidence-proof">代表证据：中文 Markdown、API 网页、XLSX 图表和 KAB-05 空间穿越。</div>
+            </article>
+            <article class="evidence-tier block">
+              <div class="evidence-tier-head"><span class="evidence-tier-label">默认不准入</span><h3>严格口型、逐帧编辑、精确首尾状态、原音轨逐帧保持</h3></div>
+              <p>声音或台词正确不等于嘴部连续同步；首尾画面、动作轨迹和原音时间关系目前不能按合同承诺。</p>
+              <div class="evidence-proof">代表证据：talking-head drive 的停嘴与后段面部冻结。</div>
+            </article>
+          </div>
+          <aside class="panel gate-panel">
+            <div class="gate-label">Production gate</div>
+            <div class="gate-title">暂不默认使用</div>
+            <p class="gate-copy">不要因为任务返回 <span class="mono">SUCCEEDED</span> 就加入默认路由。Wan 3.0 的不同能力必须拆开过 Gate。</p>
+            <ul class="gate-list">
+              <li>文件 / 网页：先做 URL 可达性、事实召回和 OCR 比对</li>
+              <li>口播：必须检查嘴部连续运动和音画时间关系</li>
+              <li>长视频：加入 freezedetect、blackdetect 与人工抽帧</li>
+              <li>资产：成功后立即转存临时视频 URL</li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-head">
+          <h2>案例证据</h2>
+          <p>每张图都是实际输出的代表性抽帧；点击“成片”可打开对应 MP4，点击“分析”可查看媒体检查结果。</p>
+        </div>
+        <div class="case-toolbar">
+          <div class="filters" role="group" aria-label="案例筛选">
+            <button class="filter active" data-filter="all">全部</button>
+            <button class="filter" data-filter="strong">强项</button>
+            <button class="filter" data-filter="risk">事实 / 媒体风险</button>
+            <button class="filter" data-filter="audio">声音</button>
+          </div>
+          <div class="case-count"><span id="caseCount">6</span> FEATURED / 64 WAN OUTPUTS TRACKED</div>
+        </div>
+        <div class="case-grid" id="caseGrid">
+          <article class="case-card" data-type="strong">
+            <div class="case-media"><img loading="lazy" src="../wan30-long-input-2026-08-13/file_product_pptx-contact-sheet.jpg" alt="PPTX 产品摘要抽帧"><span class="case-tag">PPTX / 30S</span></div>
+            <div class="case-body"><h3 class="case-title">产品 PPTX</h3><p class="case-verdict">三种配色、外观视角、结构拆解和办公佩戴场景覆盖完整；无明显冻结。</p><div class="case-meta"><span class="pill pass">强项</span><span>0s freeze</span></div><div class="case-links"><a href="../wan30-long-input-2026-08-13/file_product_pptx.mp4">查看成片 ↗</a><a href="../wan30-long-input-2026-08-13/file_product_pptx-analysis.json">媒体分析 ↗</a></div></div>
+          </article>
+          <article class="case-card" data-type="risk">
+            <div class="case-media"><img loading="lazy" src="../wan30-long-input-2026-08-13/file_chart_xlsx-contact-sheet.jpg" alt="XLSX 图表摘要抽帧"><span class="case-tag">XLSX / 20S</span></div>
+            <div class="case-body"><h3 class="case-title">图表 XLSX</h3><p class="case-verdict">主题和图例相关，但具体数值不宜核准；累计约 12.73 秒近静止。</p><div class="case-meta"><span class="pill risk">高风险</span><span>63.7% freeze</span></div><div class="case-links"><a href="../wan30-long-input-2026-08-13/file_chart_xlsx.mp4">查看成片 ↗</a><a href="../wan30-long-input-2026-08-13/file_chart_xlsx-analysis.json">媒体分析 ↗</a></div></div>
+          </article>
+          <article class="case-card" data-type="risk">
+            <div class="case-media"><img loading="lazy" src="../wan30-long-input-2026-08-13/file_chinese_md-contact-sheet.jpg" alt="Markdown 技术文档摘要抽帧"><span class="case-tag">MARKDOWN / 15S</span></div>
+            <div class="case-body"><h3 class="case-title">技术 Markdown</h3><p class="case-verdict">识别 npm、Node、鉴权主题，但改写命令并生成虚构登录页和 Token UI。</p><div class="case-meta"><span class="pill fail">事实不通过</span><span>67.3% freeze</span></div><div class="case-links"><a href="../wan30-long-input-2026-08-13/file_chinese_md.mp4">查看成片 ↗</a><a href="../wan30-long-input-2026-08-13/file_chinese_md-analysis.json">媒体分析 ↗</a></div></div>
+          </article>
+          <article class="case-card" data-type="risk">
+            <div class="case-media"><img loading="lazy" src="../wan30-long-input-2026-08-13/link_chinese_long_fixed-contact-sheet.jpg" alt="API 网页摘要抽帧"><span class="case-tag">WEB / 30S</span></div>
+            <div class="case-body"><h3 class="case-title">API 网页</h3><p class="case-verdict">抓住 Wan 3.0、输入类型和分辨率等主题，但页面基本由模型自创。</p><div class="case-meta"><span class="pill risk">主题通过 / 事实不通过</span><span>0.60s freeze</span></div><div class="case-links"><a href="../wan30-long-input-2026-08-13/link_chinese_long_fixed.mp4">查看成片 ↗</a><a href="../wan30-long-input-2026-08-13/link_chinese_long_fixed-analysis.json">媒体分析 ↗</a></div></div>
+          </article>
+          <article class="case-card" data-type="audio">
+            <div class="case-media"><img loading="lazy" src="../video-model-talking-head-audio-drive-20260813/wan-3.0-mouth-contact.jpg" alt="口播口型抽帧"><span class="case-tag">SPEECH / 6S</span></div>
+            <div class="case-body"><h3 class="case-title">口播与口型</h3><p class="case-verdict">台词和原音准确，但 2.2–3.7 秒停嘴，后段面部冻结，严格口型不通过。</p><div class="case-meta"><span class="pill fail">Lip-sync fail</span><span>0.935 waveform</span></div><div class="case-links"><a href="../video-model-talking-head-audio-drive-20260813/wan-3.0-output.mp4">查看成片 ↗</a><a href="../video-model-talking-head-audio-drive-20260813/final-report.md">测试报告 ↗</a></div></div>
+          </article>
+          <article class="case-card" data-type="audio">
+            <div class="case-media"><img loading="lazy" src="../video-model-audio-semantics-test-suite-20260814/derived/wan-3.0__voice_reference_cn/contact-sheet.jpg" alt="音色参考输出抽帧"><span class="case-tag">VOICE REF / 6S</span></div>
+            <div class="case-body"><h3 class="case-title">音色参考</h3><p class="case-verdict">参考音频影响明显，相似度 90；但仍需多样本、多次复测，不能宣称稳定克隆。</p><div class="case-meta"><span class="pill pass">Promising</span><span>90 vs 25</span></div><div class="case-links"><a href="../video-model-audio-semantics-test-suite-20260814/outputs/wan-3.0__voice_reference_cn.mp4">查看成片 ↗</a><a href="../video-model-audio-semantics-test-suite-20260814/derived/wan-3.0__voice_reference_cn/summary.json">测试摘要 ↗</a></div></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-head">
+          <h2>完整测试目录</h2>
+          <p>精选案例之外，以下目录覆盖 5 个测试组、26 次任务运行。失败任务也保留，方便看清 URL、权限和格式边界。</p>
+        </div>
+        <div class="catalog-wrap">
+          <table class="catalog">
+            <thead><tr><th>Case</th><th>输入 / 规格</th><th>结果</th><th>关键观察</th><th>物料</th></tr></thead>
+            <tbody>
+              <tr><td>file_pdf</td><td>PDF / 2s</td><td class="result-pass">SUCCEEDED</td><td>准确呈现 Dummy PDF file；格式 smoke</td><td><a href="../wan30-expanded-input-2026-08-13/file_pdf.mp4">MP4 ↗</a></td></tr>
+              <tr><td>file_docx</td><td>DOCX / 2s</td><td class="result-pass">SUCCEEDED</td><td>两行源文字准确；约 1.37s 视觉冻结</td><td><a href="../wan30-expanded-input-2026-08-13/file_docx.mp4">MP4 ↗</a></td></tr>
+              <tr><td>file_xlsx</td><td>XLSX 原始 URL / 2s</td><td class="result-fail">FAILED</td><td>Provider 下载失败</td><td><a href="../wan30-expanded-input-2026-08-13/file_xlsx.json">JSON ↗</a></td></tr>
+              <tr><td>file_xlsx_query</td><td>XLSX + ?download=1 / 2s</td><td class="result-risk">SUCCEEDED</td><td>相同文件因 URL 形态改变而成功；部分乱码和长冻结</td><td><a href="../wan30-expanded-input-2026-08-13/file_xlsx_query.mp4">MP4 ↗</a></td></tr>
+              <tr><td>file_md</td><td>Markdown / 2s</td><td class="result-risk">SUCCEEDED</td><td>主题相关，但命令和工具概念被改写</td><td><a href="../wan30-expanded-input-2026-08-13/file_md.mp4">MP4 ↗</a></td></tr>
+              <tr><td>file_txt</td><td>RFC 2606 TXT / 2s</td><td class="result-risk">SUCCEEDED</td><td>识别保留域名主题，但把 .localhost 弱化为 .local</td><td><a href="../wan30-expanded-input-2026-08-13/file_txt.mp4">MP4 ↗</a></td></tr>
+              <tr><td>link_react</td><td>React 官网 / 2s</td><td class="result-risk">SUCCEEDED</td><td>品牌相关，但未体现组件式 UI 核心信息</td><td><a href="../wan30-expanded-input-2026-08-13/link_react.mp4">MP4 ↗</a></td></tr>
+              <tr><td>link_iana</td><td>IANA 静态页 / 2s</td><td class="result-risk">SUCCEEDED</td><td>主题相关，但自创源码、禁止符号和冻结</td><td><a href="../wan30-expanded-input-2026-08-13/link_iana.mp4">MP4 ↗</a></td></tr>
+              <tr><td>link_redirect</td><td>302 → example.com / 2s</td><td class="result-pass">SUCCEEDED</td><td>跟随重定向并准确呈现 Example Domain；约 1.2s 冻结</td><td><a href="../wan30-expanded-input-2026-08-13/link_redirect.mp4">MP4 ↗</a></td></tr>
+              <tr><td>link_auth_negative</td><td>HTTP Basic Auth / 2s</td><td class="result-fail">FAILED</td><td>PENDING 约 6 分钟后才报 URL 无效</td><td><a href="../wan30-expanded-input-2026-08-13/link_auth_negative.json">JSON ↗</a></td></tr>
+              <tr><td>file_complex_pdf_fixed</td><td>14 页论文 PDF / 30s</td><td class="result-risk">SUCCEEDED</td><td>跨页召回成立；标题、代码和结论文字有乱码；冻结 6.63s</td><td><a href="../wan30-long-input-2026-08-13/file_complex_pdf_fixed.mp4">MP4 ↗</a></td></tr>
+              <tr><td>file_complex_pdf_auto</td><td>同论文 / -1 → 20s</td><td class="result-risk">SUCCEEDED</td><td>更紧凑但没有更高事实保真；冻结 7.53s</td><td><a href="../wan30-long-input-2026-08-13/file_complex_pdf_auto-final2.mp4">MP4 ↗</a></td></tr>
+              <tr><td>file_scanned_pdf</td><td>扫描 PDF / 20s</td><td class="result-risk">SUCCEEDED</td><td>识别书页、插图和图表；跨页覆盖不完整</td><td><a href="../wan30-long-input-2026-08-13/file_scanned_pdf.mp4">MP4 ↗</a></td></tr>
+              <tr><td>file_image_docx</td><td>图片 DOCX / 20s</td><td class="result-pass">SUCCEEDED</td><td>三张图片主题召回正确；尾部约 3.10s 近静止</td><td><a href="../wan30-long-input-2026-08-13/file_image_docx.mp4">MP4 ↗</a></td></tr>
+              <tr><td>file_chart_xlsx</td><td>图表 XLSX / 20s</td><td class="result-risk">SUCCEEDED</td><td>年份、Revenue 和品类总体对应；冻结 12.73s</td><td><a href="../wan30-long-input-2026-08-13/file_chart_xlsx.mp4">MP4 ↗</a></td></tr>
+              <tr><td>file_product_pptx</td><td>产品 PPTX / 30s</td><td class="result-pass">SUCCEEDED</td><td>本轮最完整；覆盖颜色、拆解和使用场景；无冻结</td><td><a href="../wan30-long-input-2026-08-13/file_product_pptx.mp4">MP4 ↗</a></td></tr>
+              <tr><td>file_chinese_md</td><td>中文 CLI Markdown / 15s</td><td class="result-fail">QUALITY FAIL</td><td>主题识别正确，但错误命令、拟制登录页；冻结 10.10s</td><td><a href="../wan30-long-input-2026-08-13/file_chinese_md.mp4">MP4 ↗</a></td></tr>
+              <tr><td>link_chinese_long_fixed</td><td>API 长网页 / 30s</td><td class="result-risk">QUALITY FAIL</td><td>参数主题正确，控制台和品牌字样自创</td><td><a href="../wan30-long-input-2026-08-13/link_chinese_long_fixed.mp4">MP4 ↗</a></td></tr>
+              <tr><td>link_chinese_long_auto</td><td>API 长网页 / -1 → 30s</td><td class="result-risk">QUALITY FAIL</td><td>覆盖更广，但仍是拟制 UI；冻结 1.37s</td><td><a href="../wan30-long-input-2026-08-13/link_chinese_long_auto-retry.mp4">MP4 ↗</a></td></tr>
+              <tr><td>link_react_js</td><td>React 动态页 / 20s</td><td class="result-risk">QUALITY FAIL</td><td>React 标志和主题相关；后续活动与视频站界面自创</td><td><a href="../wan30-long-input-2026-08-13/link_react_js.mp4">MP4 ↗</a></td></tr>
+              <tr><td>file/link smoke</td><td>PPTX + API 网页 / 2s</td><td class="result-risk">2/2 API PASS</td><td>接口和媒体健康通过；网页事实保真不通过</td><td><a href="../2026-08-13_wan30-file-link-input-smoke-test.md">报告 ↗</a></td></tr>
+              <tr><td>exact_speech_cn</td><td>目标台词 / 6s</td><td class="result-pass">SPEECH PASS</td><td>逐字正确；无额外音乐、音效和重叠人声</td><td><a href="../video-model-audio-semantics-test-suite-20260814/outputs/wan-3.0__exact_speech_cn.mp4">MP4 ↗</a></td></tr>
+              <tr><td>prompt_only_cn</td><td>Prompt-only 声音 / 6s</td><td class="result-risk">LIP-SYNC UNKNOWN</td><td>台词正确；抽帧嘴型有变化，连续同步无法确认</td><td><a href="../video-model-audio-semantics-test-suite-20260814/outputs/wan-3.0__prompt_only_cn.mp4">MP4 ↗</a></td></tr>
+              <tr><td>voice_reference_cn</td><td>音色参考 / 6s</td><td class="result-risk">PROMISING</td><td>相似度 90 vs 对照 25；需要多样本、多次复测</td><td><a href="../video-model-audio-semantics-test-suite-20260814/outputs/wan-3.0__voice_reference_cn.mp4">MP4 ↗</a></td></tr>
+              <tr><td>talking-head drive</td><td>原声驱动 / 6s</td><td class="result-fail">LIP-SYNC FAIL</td><td>波形相关 0.935；嘴部停顿和后段冻结</td><td><a href="../video-model-talking-head-audio-drive-20260813/wan-3.0-output.mp4">MP4 ↗</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section-head" style="margin-top:34px;margin-bottom:0"><h2>补充物料</h2><p>这些素材不再重复放进精选卡片，但保留在看板里作为完整证据入口。</p></div>
+        <div class="material-strip">
+          <article class="material-tile"><img loading="lazy" src="../wan30-expanded-input-2026-08-13/file_pdf-contact-sheet.jpg" alt="PDF smoke 抽帧"><div class="material-tile-body"><strong>PDF / 简单文本召回</strong><span>格式合同 smoke，结果接近逐字复现。</span><a href="../wan30-expanded-input-2026-08-13/file_pdf.mp4">打开成片 ↗</a></div></article>
+          <article class="material-tile"><img loading="lazy" src="../wan30-expanded-input-2026-08-13/file_docx-contact-sheet.jpg" alt="DOCX smoke 抽帧"><div class="material-tile-body"><strong>DOCX / 文本召回</strong><span>两行源文本准确，但短片出现近静止。</span><a href="../wan30-expanded-input-2026-08-13/file_docx.mp4">打开成片 ↗</a></div></article>
+          <article class="material-tile"><img loading="lazy" src="../wan30-expanded-input-2026-08-13/file_xlsx_query-contact-sheet.jpg" alt="XLSX query 抽帧"><div class="material-tile-body"><strong>XLSX / URL 形态边界</strong><span>增加 ?download=1 后成功；仍有乱码和冻结。</span><a href="../wan30-expanded-input-2026-08-13/file_xlsx_query.mp4">打开成片 ↗</a></div></article>
+          <article class="material-tile"><img loading="lazy" src="../wan30-expanded-input-2026-08-13/link_redirect-contact-sheet.jpg" alt="302 redirect 抽帧"><div class="material-tile-body"><strong>302 / 重定向跟随</strong><span>准确呈现 Example Domain；约 1.2 秒冻结。</span><a href="../wan30-expanded-input-2026-08-13/link_redirect.mp4">打开成片 ↗</a></div></article>
+          <article class="material-tile"><img loading="lazy" src="../wan30-expanded-input-2026-08-13/link_iana-contact-sheet.jpg" alt="IANA 抽帧"><div class="material-tile-body"><strong>IANA / 自创事实</strong><span>抓住主题，但生成源码和禁止符号并非源页面。</span><a href="../wan30-expanded-input-2026-08-13/link_iana.mp4">打开成片 ↗</a></div></article>
+          <article class="material-tile"><img loading="lazy" src="../wan30-expanded-input-2026-08-13/link_react-contact-sheet.jpg" alt="React smoke 抽帧"><div class="material-tile-body"><strong>React / 动态网页</strong><span>品牌和社区主题相关，核心组件信息缺失。</span><a href="../wan30-expanded-input-2026-08-13/link_react.mp4">打开成片 ↗</a></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-head"><h2>声音专项</h2><p>声音内容和画面口型是两个独立问题；本轮证据支持前者，不支持后者。</p></div>
+        <div class="audio-grid">
+          <article class="audio-card"><span class="pill pass">PROMPT-ONLY</span><h3>目标台词正确</h3><p>完整说出“今天我们测试声音、口型和人物是否稳定”，无额外台词、音乐或音效。</p><div class="metric-line"><span>内容准确</span><strong>PASS</strong></div></article>
+          <article class="audio-card"><span class="pill pass">ORIGINAL AUDIO</span><h3>原音保留较强</h3><p>波形相关度 0.935、约 46ms 偏移，声音继续播放时画面仍可能停嘴。</p><div class="metric-line"><span>严格口型</span><strong>FAIL</strong></div></article>
+          <article class="audio-card"><span class="pill risk">VOICE REFERENCE</span><h3>参考音色有效</h3><p>相似度 90，对照组 25；这个结果说明参考起作用，但还不是稳定克隆合同。</p><div class="metric-line"><span>复测要求</span><strong>3×</strong></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-head"><h2>路由建议</h2><p>把模型能力拆成子能力，避免一个总开关掩盖事实保真或口型问题。</p></div>
+        <div class="route-layout">
+          <article class="route good"><h3>可以继续验证</h3><ul><li>产品 PPT / 产品图视觉摘要</li><li>概念片和非关键事实的创意预览</li><li>多模态资料消费后的视觉草稿</li><li>有声音但不要求严格口型的短视频</li></ul></article>
+          <article class="route bad"><h3>默认阻断或人工复核</h3><ul><li>技术命令、价格、财务数字和法规内容</li><li>网页页面复刻、品牌文字和 UI 事实</li><li>严格逐音素口型、原音轨逐帧保持</li><li>长视频未经冻结检测直接交付</li></ul></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-head"><h2>证据与原始物料</h2><p>以下链接指向本地原始报告、视频和媒体分析 JSON，便于复核结论。</p></div>
+        <div class="sources">
+          <a class="source-link" href="../2026-08-13_wan30-capability-api-deep-dive-v1.md">能力接口与准入裁定 ↗</a>
+          <a class="source-link" href="../2026-08-13_wan30-file-link-long-duration-phase3-test.md">文件 / 网页长时报告 ↗</a>
+          <a class="source-link" href="../video-model-audio-semantics-test-suite-20260814/FINAL-REPORT.md">声音专项报告 ↗</a>
+          <a class="source-link" href="../video-model-talking-head-audio-drive-20260813/final-report.md">口播测试报告 ↗</a>
+          <a class="source-link" href="../wan30-long-input-2026-08-13/freeze-summary.tsv">冻结统计 TSV ↗</a>
+          <a class="source-link" href="https://test-admin.pexo.ai/api/strategy-packages/45/preview/H3%E5%AF%B9%E6%AF%94%E8%AF%84%E6%B5%8B-%E5%8F%8C%E8%AF%84%E5%88%86%E7%89%88%202/index.html">38 Case 双评审对照 ↗</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="shell">内部评测看板 · 数据日期 2026-08-13～14 · 定性结论用于路由讨论；数字只作原始证据，不替代逐案 QA。</div></footer>
+
+  <script>
+    (function () {
+      var buttons = Array.prototype.slice.call(document.querySelectorAll('.filter'));
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.case-card'));
+      var count = document.getElementById('caseCount');
+      function applyFilter(filter) {
+        var visible = 0;
+        cards.forEach(function (card) {
+          var show = filter === 'all' || card.dataset.type === filter;
+          card.hidden = !show;
+          if (show) visible += 1;
+        });
+        count.textContent = visible;
+      }
+      buttons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          buttons.forEach(function (item) { item.classList.remove('active'); });
+          button.classList.add('active');
+          applyFilter(button.dataset.filter);
+        });
+      });
+    }());
+  </script>
+</body>
+</html>

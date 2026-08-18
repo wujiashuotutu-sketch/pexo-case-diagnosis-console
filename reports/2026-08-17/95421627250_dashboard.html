@@ -1,0 +1,3438 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case 95421627250 Dashboard</title>
+<style>
+:root {
+  --bg: #f5f7fb;
+  --panel: #ffffff;
+  --panel-2: #f0f4f8;
+  --ink: #18202f;
+  --muted: #647084;
+  --line: #d9e0ea;
+  --blue: #2563eb;
+  --cyan: #0f766e;
+  --green: #16803c;
+  --amber: #a15c05;
+  --red: #b42318;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: linear-gradient(180deg, #eef3f8 0, var(--bg) 260px, var(--bg) 100%);
+}
+a { color: var(--blue); }
+.shell { max-width: 1440px; margin: 0 auto; padding: 28px 28px 64px; }
+.hero-panel { background: #111827; color: #f8fafc; border-radius: 10px; padding: 22px; margin-bottom: 18px; display: grid; grid-template-columns: 1.35fr .65fr; gap: 20px; align-items: stretch; }
+.hero-panel h1 { margin: 0 0 10px; font-size: 34px; letter-spacing: 0; }
+.hero-panel p { margin: 0; color: #cbd5e1; line-height: 1.6; }
+.verdict { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-radius: 8px; padding: 16px; }
+.verdict h2 { margin: 0 0 12px; color: #fff; font-size: 17px; }
+.verdict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.verdict-item { border-radius: 8px; padding: 10px; background: rgba(255,255,255,.08); }
+.verdict-item span { display: block; color: #cbd5e1; font-size: 12px; }
+.verdict-item strong { display: block; margin-top: 4px; font-size: 18px; }
+.verdict-item.bad strong { color: #fca5a5; }
+.verdict-item.warn strong { color: #fcd34d; }
+.verdict-item.good strong { color: #86efac; }
+.topbar { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; margin-bottom: 20px; }
+.title h1 { margin: 0 0 8px; font-size: 30px; letter-spacing: 0; }
+.title p { margin: 0; color: var(--muted); }
+.nav { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.nav a { text-decoration: none; color: var(--ink); border: 1px solid var(--line); background: var(--panel); padding: 8px 10px; border-radius: 8px; font-size: 13px; }
+.stats { display: grid; grid-template-columns: repeat(6, minmax(130px, 1fr)); gap: 12px; margin: 18px 0 22px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+.stat span { display: block; color: var(--muted); font-size: 12px; }
+.stat strong { display: block; margin-top: 6px; font-size: 28px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.layout > main { min-width: 0; }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px; margin-bottom: 18px; min-width: 0; }
+h2 { margin: 0 0 14px; font-size: 20px; }
+h3 { margin: 0 0 8px; font-size: 15px; }
+.muted { color: var(--muted); }
+.mono, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+.linear-rail { position: relative; display: grid; gap: 14px; padding-left: 18px; min-width: 0; }
+.linear-rail::before { content: ""; position: absolute; left: 33px; top: 18px; bottom: 18px; width: 3px; background: #d5dde8; border-radius: 999px; }
+.kpop-visual { padding: 0; background: transparent; box-shadow: none; }
+.kpop-route { display: grid; grid-template-columns: minmax(150px, 1.2fr) 28px minmax(130px, 1fr) 28px minmax(130px, 1fr) 28px minmax(130px, 1fr) 28px minmax(150px, 1.1fr); align-items: stretch; margin: 4px 0 18px; }
+.route-node { min-height: 82px; border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: center; background: #f8fafc; }
+.route-node span { color: var(--muted); font-size: 12px; margin-bottom: 5px; }
+.route-node strong { font-size: 15px; line-height: 1.35; }
+.route-node.source { border-top: 4px solid var(--blue); }
+.route-node.active { border-top: 4px solid var(--green); background: #f0fdf4; }
+.route-node.warn { border-top: 4px solid var(--amber); background: #fffbeb; }
+.route-node.blocked { border-top: 4px solid var(--red); background: #fff7ed; }
+.route-arrow { display: grid; place-items: center; color: #94a3b8; font-size: 22px; }
+.kpop-visual-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; margin-top: 18px; }
+.kpop-visual-grid.generation-grid { grid-template-columns: 1fr 1fr; }
+.kpop-block { border-top: 1px solid var(--line); padding-top: 14px; min-width: 0; }
+.visual-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.visual-head h3 { margin: 0; font-size: 16px; }
+.visual-head span { color: var(--muted); font-size: 12px; text-align: right; }
+.version-lanes { display: grid; gap: 9px; }
+.version-lane { display: grid; grid-template-columns: 92px 1fr; align-items: center; gap: 10px; }
+.version-tag { color: #334155; font-weight: 800; font-size: 12px; }
+.lane-flow { min-height: 38px; display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: #f8fafc; border-left: 4px solid var(--blue); border-radius: 0 6px 6px 0; overflow: hidden; }
+.lane-flow b { white-space: nowrap; font-size: 12px; }
+.lane-flow i { font-style: normal; color: #94a3b8; }
+.lane-flow em { margin-left: auto; color: #92400e; font-style: normal; font-weight: 800; font-size: 12px; white-space: nowrap; }
+.version-lane.critical .lane-flow { border-left-color: var(--red); background: #fff7ed; }
+.duration-axis { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; margin-bottom: 5px; }
+.duration-track { display: flex; height: 46px; overflow: hidden; border-radius: 7px; background: #fee2e2; }
+.duration-track > div { display: flex; align-items: center; justify-content: center; min-width: 0; }
+.duration-track span { font-size: 12px; font-weight: 800; white-space: nowrap; }
+.duration-used { background: #bfdbfe; color: #1e3a8a; }
+.duration-missing { background: #ef4444; color: #fff; }
+.duration-note { display: flex; justify-content: space-between; gap: 12px; margin-top: 6px; font-size: 11px; }
+.duration-note span { color: var(--muted); }
+.duration-note strong { color: #991b1b; }
+.clock-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.clock-compare div { padding: 9px 10px; background: #f8fafc; border-left: 4px solid var(--blue); }
+.clock-compare .bad { background: #fff7ed; border-left-color: var(--red); }
+.clock-compare span, .clock-compare strong { display: block; }
+.clock-compare span { color: var(--muted); font-size: 11px; margin-bottom: 3px; }
+.clock-compare strong { font-size: 12px; }
+.attempt-chart { display: grid; gap: 7px; }
+.attempt-row { display: grid; grid-template-columns: 82px 1fr 48px; gap: 8px; align-items: center; }
+.attempt-row > span, .attempt-row > b { font-size: 11px; }
+.attempt-row > b { text-align: right; }
+.attempt-track { height: 16px; display: flex; overflow: hidden; border-radius: 4px; background: #e2e8f0; }
+.attempt-track i { display: block; height: 100%; }
+.attempt-track .ok { background: #22c55e; }
+.attempt-track .fail { background: #ef4444; }
+.route-compare { display: grid; align-content: start; }
+.route-lane { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.route-lane span { width: 40px; color: var(--muted); font-size: 11px; }
+.route-lane b { padding: 5px 7px; border-radius: 4px; background: #dcfce7; font-size: 11px; }
+.route-lane.actual b { background: #fee2e2; }
+.route-lane i { color: #94a3b8; font-style: normal; }
+.skip-count { display: flex; align-items: baseline; gap: 9px; padding-top: 14px; }
+.skip-count strong { font-size: 28px; color: #991b1b; }
+.skip-count span { color: var(--muted); font-size: 12px; }
+.evidence-head { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+.kpop-evidence-strip { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+.kpop-frame { margin: 0; min-width: 0; position: relative; }
+.kpop-frame img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; border-radius: 6px; }
+.kpop-frame figcaption { display: flex; align-items: baseline; gap: 7px; margin-top: 6px; }
+.kpop-frame figcaption strong { font-size: 24px; color: #991b1b; }
+.kpop-frame:first-child figcaption strong { color: #166534; }
+.kpop-frame figcaption span { color: var(--muted); font-size: 11px; }
+.kpop-unverified { min-height: 120px; border: 2px dashed #f59e0b; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fffbeb; text-align: center; padding: 12px; }
+.kpop-unverified strong { font-size: 34px; color: #92400e; }
+.kpop-unverified span, .kpop-unverified b { font-size: 11px; }
+.kpop-unverified b { margin-top: 5px; color: #991b1b; }
+.round-execution-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+.round-execution-head h2 { margin-bottom: 5px; }
+.round-execution-head p { margin: 0; color: var(--muted); font-size: 13px; }
+.round-tabs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.round-tab { appearance: none; border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 7px; padding: 8px 11px; font: inherit; font-size: 12px; cursor: pointer; }
+.round-tab:hover { background: #eff6ff; }
+.round-tab.is-active { background: #18202f; color: #fff; border-color: #18202f; }
+.round-panel[hidden] { display: none; }
+.round-summary { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)) minmax(220px, 1.35fr); gap: 8px; margin-bottom: 16px; }
+.round-summary > div { border-top: 3px solid #94a3b8; background: #f8fafc; padding: 10px; min-width: 0; }
+.round-summary > div:nth-child(3) { border-top-color: var(--green); }
+.round-summary > div:nth-child(4) { border-top-color: var(--amber); }
+.round-summary .round-output { border-top-color: var(--blue); }
+.round-summary span, .round-summary strong, .round-summary code { display: block; }
+.round-summary span { color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+.round-summary strong { font-size: 12px; overflow-wrap: anywhere; }
+.round-summary code { color: #1d4ed8; margin-top: 4px; overflow-wrap: anywhere; }
+.round-trace-band { display: grid; grid-template-columns: minmax(180px, 1fr) auto minmax(220px, 1.2fr); gap: 12px; align-items: center; background: #eff6ff; border-left: 4px solid var(--blue); padding: 9px 11px; margin-top: 14px; }
+.round-trace-band.recovery { background: #f0fdf4; border-left-color: var(--green); }
+.round-trace-band span { font-weight: 800; font-size: 12px; }
+.round-trace-band b { font-size: 11px; color: var(--muted); }
+.round-trace-band em { font-size: 11px; font-style: normal; text-align: right; }
+.round-step-list { position: relative; display: grid; gap: 0; padding: 8px 0 2px; }
+.round-step-list::before { content: ""; position: absolute; left: 16px; top: 8px; bottom: 2px; width: 2px; background: #d9e0ea; }
+.round-step { position: relative; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; padding: 8px 0; min-width: 0; }
+.round-step-marker { position: relative; z-index: 1; width: 34px; height: 34px; border-radius: 999px; display: grid; place-items: center; background: #e2e8f0; color: #475569; border: 4px solid #fff; font-size: 12px; font-weight: 800; }
+.round-step.ok .round-step-marker { background: #dcfce7; color: #166534; }
+.round-step.warn .round-step-marker { background: #fef3c7; color: #92400e; }
+.round-step.fail .round-step-marker { background: #fee2e2; color: #991b1b; }
+.round-step-body { border-left: 4px solid #94a3b8; background: #f8fafc; padding: 11px 12px; min-width: 0; }
+.round-step.ok .round-step-body { border-left-color: var(--green); }
+.round-step.warn .round-step-body { border-left-color: var(--amber); background: #fffbeb; }
+.round-step.fail .round-step-body { border-left-color: var(--red); background: #fff7ed; }
+.round-step-phase { color: var(--muted); font-size: 11px; margin-bottom: 3px; }
+.round-step-body h4 { margin: 0 0 5px; font-size: 14px; }
+.round-step-body p { margin: 0 0 7px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.round-step-result { font-size: 12px; font-weight: 800; margin-bottom: 8px; }
+.round-step-body .related-calls { background: rgba(255,255,255,.72); }
+.round-lineage { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 0 0; margin-top: 10px; border-top: 1px solid var(--line); }
+.round-lineage span, .round-lineage strong { padding: 6px 8px; background: #eff6ff; border-radius: 4px; font-size: 11px; }
+.round-lineage strong { background: #dcfce7; color: #166534; }
+.round-lineage i { color: #94a3b8; font-style: normal; }
+.round-media-row { display: grid; grid-template-columns: minmax(180px, 280px) minmax(180px, 280px) minmax(220px, 1fr); gap: 12px; align-items: stretch; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.round-media-row .kpop-frame img { aspect-ratio: 16 / 9; }
+.round-media-row .kpop-unverified { min-height: 150px; }
+.round-media-note { border-left: 4px solid var(--blue); background: #eff6ff; padding: 12px; display: flex; flex-direction: column; justify-content: center; }
+.round-media-note.fail { border-left-color: var(--red); background: #fff7ed; }
+.round-media-note strong, .round-media-note span { display: block; }
+.round-media-note strong { margin-bottom: 5px; font-size: 13px; }
+.round-media-note span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.biz-node { position: relative; display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 14px; align-items: start; min-width: 0; }
+.biz-marker { position: relative; z-index: 1; width: 34px; height: 34px; margin-top: 18px; display: grid; place-items: center; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-weight: 900; border: 4px solid var(--panel); box-shadow: 0 0 0 1px #bfdbfe; }
+.biz-marker.good { background: #dcfce7; color: var(--green); box-shadow: 0 0 0 1px #86efac; }
+.biz-marker.warn { background: #fef3c7; color: var(--amber); box-shadow: 0 0 0 1px #fcd34d; }
+.biz-marker.bad { background: #fee2e2; color: var(--red); box-shadow: 0 0 0 1px #fca5a5; }
+.biz-card { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 16px; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(260px, .8fr); gap: 16px; align-items: start; min-width: 0; }
+.biz-card.bad-card { border-color: #fecaca; background: linear-gradient(90deg, #fff7ed 0, #fff 52%); }
+.biz-card.warn-card { border-color: #fde68a; background: linear-gradient(90deg, #fffbeb 0, #fff 52%); }
+.biz-kicker { color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+.biz-main h3 { font-size: 20px; margin: 0 0 8px; }
+.biz-main p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.biz-main, .biz-proof { min-width: 0; }
+.biz-main h3, .biz-main p, .call-mini p { overflow-wrap: anywhere; }
+.biz-proof { border-left: 1px solid var(--line); padding-left: 16px; }
+.biz-label { display: block; color: var(--muted); font-size: 12px; font-weight: 800; margin-bottom: 6px; }
+.biz-proof > strong { display: block; font-size: 15px; margin-bottom: 10px; }
+.biz-media { display: grid; grid-template-columns: repeat(2, minmax(120px, 170px)); gap: 10px; margin-top: 12px; }
+.biz-media.wide { grid-template-columns: minmax(170px, 260px) minmax(140px, 220px); }
+.timeline-table { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 8px; margin-top: 12px; }
+.timeline-table div { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 9px; }
+.timeline-table span { display: block; color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+.timeline-table strong { display: block; font-size: 13px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.call-chip { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; padding: 4px 7px; border-radius: 999px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; text-decoration: none; font-size: 12px; font-weight: 800; }
+.call-chip:hover { background: #dbeafe; }
+.related-calls { border: 1px solid var(--line); border-radius: 8px; background: #fff; overflow: hidden; min-width: 0; }
+.related-calls summary { cursor: pointer; list-style: none; padding: 8px 9px; font-size: 12px; font-weight: 800; color: #334155; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.related-calls summary::-webkit-details-marker { display: none; }
+.related-calls summary::before { content: "▸"; color: var(--blue); margin-right: 4px; }
+.related-calls[open] summary::before { content: "▾"; }
+.related-calls summary span { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; text-transform: none; letter-spacing: 0; }
+.related-call-list { display: grid; gap: 7px; padding: 8px; border-top: 1px solid var(--line); max-height: 380px; overflow: auto; }
+.call-mini { border: 1px solid var(--line); background: #f8fafc; border-radius: 7px; padding: 8px; }
+.call-mini.bad { border-color: #fecaca; background: #fff7ed; }
+.call-mini-top { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.call-mini-top strong { font-size: 12px; }
+.call-mini-top span { margin-left: auto; color: var(--muted); font-size: 11px; text-transform: none; letter-spacing: 0; }
+.call-mini p { margin: 5px 0 0; font-size: 12px; line-height: 1.35; }
+.call-mini-problem { margin-top: 6px; border-left: 3px solid var(--red); padding-left: 7px; color: var(--red); font-size: 12px; font-weight: 700; }
+.bad-card { border-color: #fecaca; background: #fff7ed; }
+.warn-card { border-color: #fde68a; background: #fffbeb; }
+.evidence-media { margin: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #e2e8f0; }
+.evidence-media img, .evidence-media video { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; display: block; }
+.evidence-media figcaption { padding: 6px; font-size: 11px; color: var(--muted); background: white; }
+.evidence-grid { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 12px; min-width: 0; }
+.evidence-card { border: 1px solid var(--line); border-radius: 8px; padding: 14px; min-width: 0; overflow-wrap: anywhere; }
+.evidence-title { font-weight: 800; margin-bottom: 8px; }
+.evidence-card p { margin: 0 0 10px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.evidence-card a { font-size: 12px; font-weight: 700; text-decoration: none; }
+.evidence-card code { white-space: normal; overflow-wrap: anywhere; }
+.grid-assets { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.asset-card, .prompt-card { border: 1px solid var(--line); background: #fbfcfe; border-radius: 8px; overflow: hidden; }
+.asset-preview { background: #dfe7f1; min-height: 180px; display: grid; place-items: center; }
+.asset-preview img, .asset-preview video { max-width: 100%; width: 100%; max-height: 260px; object-fit: contain; display: block; }
+.asset-body, .prompt-card { padding: 12px; }
+.prompt-card p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+.row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.badge, .tool-pill { display: inline-flex; align-items: center; border: 1px solid #bfdbfe; background: #eff6ff; color: #1d4ed8; border-radius: 999px; padding: 3px 8px; font-size: 12px; white-space: nowrap; }
+.muted-badge { border-color: var(--line); background: var(--panel-2); color: var(--muted); }
+.controls { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+select, input { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: white; color: var(--ink); }
+input { min-width: 280px; flex: 1; }
+.technical-details { border: 1px solid var(--line); border-radius: 8px; background: #fbfcfe; overflow: hidden; min-width: 0; max-width: 100%; }
+.technical-details > summary { cursor: pointer; padding: 12px 14px; font-weight: 800; color: #334155; }
+.technical-details[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+.technical-details .controls, .technical-details .table-wrap { margin-left: 12px; margin-right: 12px; }
+.technical-details .table-wrap { margin-bottom: 12px; width: calc(100% - 24px); max-width: calc(100% - 24px); }
+.table-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--line); border-radius: 8px; min-width: 0; max-width: 100%; }
+table { width: 100%; border-collapse: collapse; min-width: 980px; }
+th, td { border-bottom: 1px solid var(--line); padding: 9px 10px; text-align: left; vertical-align: top; font-size: 13px; }
+th { position: sticky; top: 0; background: #f8fafc; color: #334155; z-index: 1; }
+tr.has-problem td { background: #fff7ed; }
+tr.call-highlight td { background: #dbeafe !important; box-shadow: inset 0 0 0 1px #93c5fd; }
+tr.hidden { display: none; }
+.side { display: grid; grid-template-columns: 1.2fr .8fr .8fr; gap: 18px; }
+.side section { position: static; }
+.issue-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; min-width: 0; }
+.issue-list li { border-left: 4px solid var(--red); background: #fff7ed; padding: 10px; border-radius: 6px; min-width: 0; overflow-wrap: anywhere; }
+.issue-list span, .issue-list code { display: block; margin-top: 4px; }
+.issue-list code { white-space: normal; overflow-wrap: anywhere; }
+.mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mini-stat { display: flex; justify-content: space-between; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 8px; background: #fbfcfe; font-size: 12px; }
+.step { border-left: 4px solid var(--green); background: #f7fee7; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+.step.bad { border-left-color: var(--red); background: #fff7ed; }
+.step p { margin: 6px 0 0; font-size: 13px; }
+.callout { border-left: 4px solid var(--amber); background: #fffbeb; padding: 12px; border-radius: 6px; color: #573a05; }
+@media (max-width: 1080px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .hero-panel { grid-template-columns: 1fr; }
+  .biz-card { grid-template-columns: 1fr; }
+  .biz-proof { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; padding-top: 14px; }
+  .timeline-table { grid-template-columns: 1fr; }
+  .evidence-grid { grid-template-columns: 1fr; }
+  .side { grid-template-columns: 1fr; }
+  .topbar { flex-direction: column; }
+  .nav { justify-content: flex-start; }
+  .kpop-route { grid-template-columns: 1fr; gap: 7px; }
+  .route-arrow { transform: rotate(90deg); min-height: 20px; }
+  .kpop-visual-grid, .kpop-visual-grid.generation-grid { grid-template-columns: 1fr; }
+  .kpop-evidence-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .round-execution-head { flex-direction: column; }
+  .round-tabs { justify-content: flex-start; }
+  .round-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .round-summary .round-output { grid-column: 1 / -1; }
+  .round-media-row { grid-template-columns: 1fr 1fr; }
+  .round-media-note { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  html, body { max-width: 100%; overflow-x: hidden; }
+  .shell { padding: 12px 8px 40px; }
+  .shell, .hero-panel, section, main, .layout { width: 100%; min-width: 0; }
+  .hero-panel, section { padding: 12px; }
+  .hero-panel h1, .title h1, .hero-panel p, .title p { max-width: 100%; overflow-wrap: anywhere; word-break: break-word; }
+  .hero-panel h1 { font-size: 24px; line-height: 1.3; }
+  .title h1 { font-size: 24px; line-height: 1.3; }
+  .verdict-grid { grid-template-columns: 1fr; }
+  .nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; gap: 6px; }
+  .nav a { min-width: 0; padding: 7px 4px; text-align: center; overflow-wrap: anywhere; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .biz-node { grid-template-columns: 32px minmax(0, 1fr); gap: 6px; }
+  .linear-rail { padding-left: 0; }
+  .biz-card { padding: 12px; }
+  .biz-media, .biz-media.wide { grid-template-columns: 1fr; }
+  .related-calls summary { flex-wrap: wrap; }
+  input { min-width: 0; width: 100%; }
+  .version-lane { grid-template-columns: 1fr; gap: 4px; }
+  .lane-flow { flex-wrap: wrap; }
+  .lane-flow em { margin-left: 0; width: 100%; }
+  .clock-compare { grid-template-columns: 1fr; }
+  .attempt-row { grid-template-columns: 72px 1fr 42px; }
+  .kpop-evidence-strip { grid-template-columns: 1fr; }
+  .round-tabs { display: grid; grid-template-columns: 1fr; width: 100%; }
+  .round-summary { grid-template-columns: 1fr; }
+  .round-summary .round-output { grid-column: auto; }
+  .round-trace-band { grid-template-columns: 1fr; gap: 3px; }
+  .round-trace-band em { text-align: left; }
+  .round-media-row { grid-template-columns: 1fr; }
+  .round-media-note { grid-column: auto; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <section class="hero-panel">
+    <div>
+      <h1>Case 95421627250：动态调用链摘要</h1>
+      <p>从 trace 自动提取用户输入、25 个生成调用、14 个 read_file 和 31 个本地媒体。业务流程不再使用固定案例模板文案。</p>
+    </div>
+    <div class="verdict">
+      <h2>一眼结论</h2>
+      <div class="verdict-grid">
+        
+        <div class="verdict-item good"><span>总调用</span><strong>136</strong></div>
+        <div class="verdict-item good"><span>生成调用</span><strong>25</strong></div>
+        <div class="verdict-item warn"><span>Reference 覆盖</span><strong>9/9</strong></div>
+        <div class="verdict-item warn"><span>风险调用</span><strong>1</strong></div>
+        
+      </div>
+    </div>
+  </section>
+
+  <div class="topbar">
+    <div class="title">
+      <h1>Case 95421627250 调用链看板</h1>
+      <p>素材、工具调用、skills/reference 读取覆盖、QA 信号和渲染风险汇总。</p>
+    </div>
+    <nav class="nav">
+      <a href="#assets">素材</a>
+      <a href="#rounds">轮次</a>
+      <a href="#story">流程</a>
+      <a href="#evidence">证据</a>
+      <a href="#prompts">生成参数</a>
+      <a href="#chain">调用链</a>
+      <a href="#skills">Skills</a>
+    </nav>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span>总调用</span><strong>136</strong></div>
+    <div class="stat"><span>资产记录</span><strong>26</strong></div>
+    <div class="stat"><span>本地素材</span><strong>31</strong></div>
+    <div class="stat"><span>风险调用</span><strong>1</strong></div>
+    <div class="stat"><span>读取文件</span><strong>14</strong></div>
+    <div class="stat"><span>规则覆盖</span><strong>9/9</strong></div>
+  </div>
+
+  <div class="layout">
+    <main>
+      
+      
+      <section id="story">
+        <h2>业务可视化调用链</h2>
+        <div class="linear-rail">
+      <article class="biz-node">
+        <div class="biz-marker good">1</div>
+        <div class="biz-card">
+          <div class="biz-main">
+            <div class="biz-kicker">用户需求</div>
+            <h3>后半段嘴型有点没对上，Now you can create videos the way you vibe-code. Meet Pexo. The AI video age...</h3>
+            <p>后半段嘴型有点没对上，Now you can create videos the way you vibe-code. Meet Pexo. The AI video agent that works like a creative partner. Tell it what you want. Pexo handles the production. Start with your website, your assets, or even a half-formed idea. Pexo understands what you do, shapes the creative direction, and turns it into a plan. It remembers your brand voice, preferences, and decisions—so you never have to start ove...</p>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">状态</span>
+            <strong>来自 trace 输入</strong>
+            
+          <details class="related-calls">
+            <summary>1 个关联调用 <span><a class="call-chip" href="#chain" data-call="1">#1</a></span></summary>
+            <div class="related-call-list">
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="1">#1</a>
+                  <strong>write_todos</strong>
+                  <span>11:23:53</span>
+                </div>
+                <p>读取制作技能文件，了解生产流程=in_progress; 分析已有素材（图片和音频）=pending; 生成完整视频（口型对齐）=pending; 合成并交付最终视频=pending</p>
+                <p class="muted">Updated todo list to [{&#x27;content&#x27;: &#x27;读取制作技能文件，了解生产流程&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;分析已有素材（图片和音频）&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}, {&#x27;content...</p>
+                
+              </div>
+            </div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+
+      <article class="biz-node">
+        <div class="biz-marker warn">2</div>
+        <div class="biz-card warn-card">
+          <div class="biz-main">
+            <div class="biz-kicker">前置规则</div>
+            <h3>读取了 14 个 skill/reference 文件</h3>
+            <p>当前静态 reference 覆盖为 9/9，显式 lint 调用为 0。完整判断仍以报告里的 Skill & Reference Read Audit 为准。</p>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">读取调用</span>
+            <strong>14 次 read_file</strong>
+            
+          <details class="related-calls">
+            <summary>8 个关联调用 <span><a class="call-chip" href="#chain" data-call="2">#2</a><a class="call-chip" href="#chain" data-call="3">#3</a><a class="call-chip" href="#chain" data-call="4">#4</a><a class="call-chip" href="#chain" data-call="12">#12</a><a class="call-chip" href="#chain" data-call="20">#20</a><a class="call-chip" href="#chain" data-call="21">#21</a>…</span></summary>
+            <div class="related-call-list">
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="2">#2</a>
+                  <strong>read_file</strong>
+                  <span>11:23:56</span>
+                </div>
+                <p>/.skills/0/generation-skill/SKILL.md offset= limit=80</p>
+                <p class="muted">1 --- 2 name: generation-skill 3 description: Execute production generation for video projects from Script Handoff and any required Subject...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="3">#3</a>
+                  <strong>read_file</strong>
+                  <span>11:23:56</span>
+                </div>
+                <p>/.skills/0/modification-skill/SKILL.md offset= limit=80</p>
+                <p class="muted">1 --- 2 name: modification-skill 3 description: Use whenever a user wants an already-delivered video changed, including Comments.texts / Ma...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="4">#4</a>
+                  <strong>read_file</strong>
+                  <span>11:24:00</span>
+                </div>
+                <p>/.skills/0/generation-skill/references/voice-production-and-resolution.md offset= limit=80</p>
+                <p class="muted">1 --- 2 id: voice-production-and-resolution 3 description: &quot;Shared rules for voice resolution, public search, preview, clone authorization,...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="12">#12</a>
+                  <strong>read_file</strong>
+                  <span>11:35:26</span>
+                </div>
+                <p>/projects/95421627250/workspace/assets/transcribe_chris_v3_20260816T033524_e93485c3.json</p>
+                <p class="muted">1 {&quot;language_code&quot;:&quot;eng&quot;,&quot;language_probability&quot;:0.9343974590301514,&quot;text&quot;:&quot;Today you can vibe code a product, launch a storefront, or turn ...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="20">#20</a>
+                  <strong>read_file</strong>
+                  <span>11:45:20</span>
+                </div>
+                <p>/.skills/0/generation-skill/references/video-models-routing.md offset= limit=100</p>
+                <p class="muted">1 --- 2 id: video-models-routing 3 description: &quot;Executable video model routing contract for HappyHorse, Seedance Fast, Seedance, and Kling...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="21">#21</a>
+                  <strong>read_file</strong>
+                  <span>11:45:23</span>
+                </div>
+                <p>/.skills/0/generation-skill/references/generation-voice-strategy-execution.md offset= limit=100</p>
+                <p class="muted">1 --- 2 id: voice-strategy-execution 3 description: &quot;Generation-stage execution rules for Script Handoff v2 speech: exact-source exclusivit...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="54">#54</a>
+                  <strong>read_file</strong>
+                  <span>11:58:46</span>
+                </div>
+                <p>/.skills/0/assembly-skill/SKILL.md offset= limit=80</p>
+                <p class="muted">1 --- 2 name: assembly-skill 3 description: Prepare and lock actual video/audio materials for video projects, including probes, sequence co...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="72">#72</a>
+                  <strong>read_file</strong>
+                  <span>12:08:01</span>
+                </div>
+                <p>/.skills/0/generation-skill/SKILL.md offset= limit=100</p>
+                <p class="muted">1 --- 2 name: generation-skill 3 description: Execute production generation for video projects from Script Handoff and any required Subject...</p>
+                
+              </div>
+            </div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+
+      <article class="biz-node">
+        <div class="biz-marker good">3</div>
+        <div class="biz-card ">
+          <div class="biz-main">
+            <div class="biz-kicker">生成与素材</div>
+            <h3>audio_produce x3, video_generate x22</h3>
+            <p>本地提取到 31 个媒体文件，资产清单记录 26 个生成/交付资产；首个资产：<code>transcribe_chris_v3</code>。</p>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">生成调用</span>
+            <strong>25 次</strong>
+            
+          <details class="related-calls">
+            <summary>10 个关联调用 <span><a class="call-chip" href="#chain" data-call="11">#11</a><a class="call-chip" href="#chain" data-call="14">#14</a><a class="call-chip" href="#chain" data-call="32">#32</a><a class="call-chip" href="#chain" data-call="33">#33</a><a class="call-chip" href="#chain" data-call="34">#34</a><a class="call-chip" href="#chain" data-call="35">#35</a>…</span></summary>
+            <div class="related-call-list">
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="11">#11</a>
+                  <strong>audio_produce</strong>
+                  <span>11:35:21</span>
+                </div>
+                <p>{&#x27;mode&#x27;: &#x27;speech2text&#x27;, &#x27;name&#x27;: &#x27;transcribe_chris_v3&#x27;, &#x27;model&#x27;: &#x27;scribe_v2&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_speech2text&#x27;: {...</p>
+                <p class="muted">{&quot;trace_id&quot;: &quot;fbe1cb41-8f41-4ff6-9de5-b7b7afa58772&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;4aa01ac0-104e...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="14">#14</a>
+                  <strong>audio_produce</strong>
+                  <span>11:35:53</span>
+                </div>
+                <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;pexo_vo_chris_final_v4&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;...</p>
+                <p class="muted">{&quot;trace_id&quot;: &quot;f1509922-2f14-4385-b2d3-f91f3a29529c&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;401d0817-3ca4...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="32">#32</a>
+                  <strong>video_generate</strong>
+                  <span>11:47:34</span>
+                </div>
+                <p>name=lipsync_s4; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=15; sound=on; aspect=16:9</p>
+                <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s4_20260816T035153_0a501486.mp4</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="33">#33</a>
+                  <strong>video_generate</strong>
+                  <span>11:47:34</span>
+                </div>
+                <p>name=lipsync_s1; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=8; sound=on; aspect=16:9</p>
+                <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s1_20260816T035138_4164df4e.mp4</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="34">#34</a>
+                  <strong>video_generate</strong>
+                  <span>11:47:34</span>
+                </div>
+                <p>name=lipsync_s2; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=14; sound=on; aspect=16:9</p>
+                <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s2_20260816T035208_2bc39389.mp4</p>
+                
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="35">#35</a>
+                  <strong>video_generate</strong>
+                  <span>11:47:34</span>
+                </div>
+                <p>name=lipsync_s3; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=15; sound=on; aspect=16:9</p>
+                <p class="muted">ok=False error=media_orchestrator.execution_failed file=None</p>
+                <div class="call-mini-problem">Generation failed: The parameter `content[2]` specified in the request is not valid: the parameter audio duration (seconds) specified in t...</div>
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="36">#36</a>
+                  <strong>video_generate</strong>
+                  <span>11:47:34</span>
+                </div>
+                <p>name=lipsync_s5; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=12; sound=on; aspect=16:9</p>
+                <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s5_20260816T035134_2443f6ba.mp4</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="37">#37</a>
+                  <strong>video_generate</strong>
+                  <span>11:47:34</span>
+                </div>
+                <p>name=lipsync_s6; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=10; sound=on; aspect=16:9</p>
+                <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s6_20260816T035148_13202bfe.mp4</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="38">#38</a>
+                  <strong>video_generate</strong>
+                  <span>11:47:34</span>
+                </div>
+                <p>name=lipsync_s7; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=6; sound=on; aspect=16:9</p>
+                <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s7_20260816T035038_473b8b24.mp4</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="41">#41</a>
+                  <strong>video_generate</strong>
+                  <span>11:52:29</span>
+                </div>
+                <p>name=lipsync_s3a; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=12; sound=on; aspect=16:9</p>
+                <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s3a_20260816T035547_6f003173.mp4</p>
+                
+              </div>
+            </div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+
+      <article class="biz-node">
+        <div class="biz-marker warn">4</div>
+        <div class="biz-card warn-card">
+          <div class="biz-main">
+            <div class="biz-kicker">风险信号</div>
+            <h3>1 个静态标记风险调用</h3>
+            <p>Generation failed: The parameter `content[2]` specified in the request is not valid: the parameter audio duration (seconds) specified in t....</p>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">问题调用</span>
+            <strong>1 个</strong>
+            
+          <details class="related-calls">
+            <summary>1 个关联调用 <span><a class="call-chip" href="#chain" data-call="35">#35</a></span></summary>
+            <div class="related-call-list">
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="35">#35</a>
+                  <strong>video_generate</strong>
+                  <span>11:47:34</span>
+                </div>
+                <p>name=lipsync_s3; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=15; sound=on; aspect=16:9</p>
+                <p class="muted">ok=False error=media_orchestrator.execution_failed file=None</p>
+                <div class="call-mini-problem">Generation failed: The parameter `content[2]` specified in the request is not valid: the parameter audio duration (seconds) specified in t...</div>
+              </div>
+            </div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+
+      <article class="biz-node">
+        <div class="biz-marker good">5</div>
+        <div class="biz-card ">
+          <div class="biz-main">
+            <div class="biz-kicker">交付与证据</div>
+            <h3>最终/组装调用汇总</h3>
+            <p>看板现在只展示当前 case 的真实媒体与调用，不再复用固定 sticker 案例文案。</p>
+            <div class="biz-media wide"><figure class="evidence-media"><img src="case-data/cases/95421627250/media/20260816-103332.jpeg" alt="20260816-103332.jpeg" loading="lazy"><figcaption>20260816-103332.jpeg</figcaption></figure><figure class="evidence-media"><audio src="case-data/cases/95421627250/media/Product-Lead-opening-line.mp3" controls preload="metadata"></audio><figcaption>Product-Lead-opening-line.mp3</figcaption></figure></div>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">交付调用</span>
+            <strong>5 次</strong>
+            
+          <details class="related-calls">
+            <summary>5 个关联调用 <span><a class="call-chip" href="#chain" data-call="17">#17</a><a class="call-chip" href="#chain" data-call="19">#19</a><a class="call-chip" href="#chain" data-call="52">#52</a><a class="call-chip" href="#chain" data-call="68">#68</a><a class="call-chip" href="#chain" data-call="119">#119</a></span></summary>
+            <div class="related-call-list">
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="17">#17</a>
+                  <strong>add_attachments</strong>
+                  <span>11:36:44</span>
+                </div>
+                <p>pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3</p>
+                <p class="muted">[{&quot;asset_id&quot;: &quot;a_4fw6hsw&quot;, &quot;mime_type&quot;: &quot;audio/mpeg&quot;, &quot;name&quot;: &quot;pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3&quot;}]</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="19">#19</a>
+                  <strong>add_attachments</strong>
+                  <span>11:38:41</span>
+                </div>
+                <p>pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3</p>
+                <p class="muted">[{&quot;asset_id&quot;: &quot;a_4fw6hsw&quot;, &quot;mime_type&quot;: &quot;audio/mpeg&quot;, &quot;name&quot;: &quot;pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3&quot;}]</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="52">#52</a>
+                  <strong>add_attachments</strong>
+                  <span>11:56:44</span>
+                </div>
+                <p>lipsync_s1_20260816T035138_4164df4e.mp4, lipsync_s2_20260816T035208_2bc39389.mp4, lipsync_s3a_20260816T035547_6f003173.mp4, lipsync_s3b_20260816T0355...</p>
+                <p class="muted">[{&quot;asset_id&quot;: &quot;a_AZv75on&quot;, &quot;mime_type&quot;: &quot;video/mp4&quot;, &quot;name&quot;: &quot;lipsync_s1_20260816T035138_4164df4e.mp4&quot;}, {&quot;asset_id&quot;: &quot;a_gwVybxN&quot;, &quot;mime_ty...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="68">#68</a>
+                  <strong>show_final_video</strong>
+                  <span>12:00:05</span>
+                </div>
+                <p>file_path=/projects/95421627250/workspace/assets/pexo_lipsync_full_82s.mp4</p>
+                <p class="muted">a_W6Hon4R</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="119">#119</a>
+                  <strong>show_final_video</strong>
+                  <span>12:14:47</span>
+                </div>
+                <p>file_path=/projects/95421627250/workspace/assets/pexo_lipsync_v4_final_82s.mp4</p>
+                <p class="muted">a_t8zxyfY</p>
+                
+              </div>
+            </div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+    </div>
+      </section>
+
+      <section id="evidence">
+        <h2>问题证据卡</h2>
+        <div class="evidence-grid">
+      <article class="evidence-card">
+        <div class="evidence-title">用户输入</div>
+        <p>后半段嘴型有点没对上，Now you can create videos the way you vibe-code. Meet Pexo. The AI video agent that works like a creative partner. Tell it what you want. Pexo handles the production. Start with your website, your assets, or ...</p>
+        <a href="#overview">查看 trace 概览</a>
+      </article>
+      <article class="evidence-card">
+        <div class="evidence-title">生成调用</div>
+        <p>audio_produce x3, video_generate x22；资产清单 26 条，本地媒体 31 个。</p>
+        <a href="#prompts">查看生成参数</a>
+      </article>
+      <article class="evidence-card warn-card">
+        <div class="evidence-title">规则读取</div>
+        <p>读取文件 14 个；静态 reference 覆盖 9/9。这块用于快速扫查，深度结论以 markdown 报告为准。</p>
+        <a href="#skills">看 skill 读取审计</a>
+      </article>
+      <article class="evidence-card warn-card">
+        <div class="evidence-title">风险调用</div>
+        <p>Generation failed: The parameter `content[2]` specified in the request is not valid: the parameter audio duration (seconds) specified in t....</p>
+        <a href="#chain">查看调用链</a>
+      </article>
+    </div>
+      </section>
+
+      <section id="overview">
+        <h2>两轮会话概览</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Start UTC</th><th>Trace</th><th>User Input</th><th>Tools</th><th>Latency</th></tr></thead>
+            <tbody>
+        <tr>
+          <td>2026-08-16T11:23:48.880442+08:00</td>
+          <td><code>messages.json</code><br><span class="muted">thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</span></td>
+          <td>后半段嘴型有点没对上，Now you can create videos the way you vibe-code. Meet Pexo. The AI video agent that works like a creative partner. Tell it what you want. Pexo handles the production. Start with your website, your assets, or even a half-formed idea. Pexo understands what you do, shapes the creative direction, and turns it into a plan. It remembers your brand voice, preferences, and decisions—so you never have to start over. Need to change a scene? Just ask. Want to extend the story? Keep going. If something feels off, skip the timeline. Circle what you want changed and leave a comment—like Google D...
+你前面有生成过 一个 Chris音色版本，就是 用这个音色重新生成下 音频 &lt;original-audio&gt;a_xJwhr8u&lt;/original-audio&gt;
+请把刚刚生成的82秒新版 Chris 音色口播，作为可试听和下载的音频资产发出来。先不要开始生成视频。
+可以的，生成口型视频吧
+16:9
+8段确认没问题，请按 S1 → S2 → S3a → S3b → S4 → S5 → S6 → S7 的顺序拼接成完整视频。
+跟上面给我的 音频文件完全不一样啊，语速变慢了很多 &lt;original-audio&gt;a_4fw6hsw&lt;/original-audio&gt;
+A。但不要只做简单换音轨：请使用原始 82.1 秒 Chris 音频逐段重新驱动口型，原音频必须原样保留，不得重新配音、变速或拉伸；视频按原音频时间轴对齐并输出 82.1 秒。&lt;original-audio&gt;a_4fw6hsw&lt;/original-audio&gt;
+{&#x27;comments&#x27;: {&#x27;texts&#x27;: {&#x27;final_video_id&#x27;: &#x27;a_W6Hon4R&#x27;, &#x27;single_comments&#x27;: [{&#x27;text&#x27;: &#x27;delete the two people&#x27;, &#x27;frame&#x27;: {&#x27;mask_id&#x27;: &#x27;a_KnAFdq3&#x27;, &#x27;timestamp&#x27;: 25.63, &#x27;marker_coordinate_ratio&#x27;: {&#x27;x&#x27;: 0, &#x27;y&#x27;: 0}}, &#x27;timestamp&#x27;: &#x27;1786856782814&#x27;}, {&#x27;text&#x27;: &#x27;change the color into yellow &#x27;, &#x27;frame&#x27;: {&#x27;mask_id&#x27;: &#x27;a_j7XZneD&#x27;, &#x27;timestamp&#x27;: 9.66, &#x27;marker_coordinate_ratio&#x27;: {&#x27;x&#x27;: 0, &#x27;y&#x27;: 0}}, &#x27;timestamp&#x27;: &#x27;1786856782814&#x27;}]}}, &#x27;timestamp&#x27;: &#x27;1786856782814&#x27;, &#x27;project_id&#x27;: &#x27;95421627250&#x27;, &#x27;native_inputs&#x27;: {&#x27;text&#x27;: &#x27;&#x27;}, &#x27;billing_confirmation_policy&#x27;: {&#x27;mode&#x27;: &#x27;threshold&#x27;}}
+{&#x27;action&#x27;: &#x27;message&#x27;, &#x27;comments&#x27;: {&#x27;texts&#x27;: {&#x27;final_video_id&#x27;: &#x27;a_t8zxyfY&#x27;, &#x27;single_comments&#x27;: [{&#x27;text&#x27;: &#x27;delete the two people&#x27;, &#x27;frame&#x27;: {&#x27;mask_id&#x27;: &#x27;a_Lss2wef&#x27;, &#x27;timestamp&#x27;: 16.3, &#x27;marker_coordinate_ratio&#x27;: {&#x27;x&#x27;: 0, &#x27;y&#x27;: 0}}, &#x27;timestamp&#x27;: &#x27;1786857033357&#x27;}, {&#x27;text&#x27;: &#x27;change the color into yellow&#x27;, &#x27;frame&#x27;: {&#x27;mask_id&#x27;: &#x27;a_hNdNQxn&#x27;, &#x27;timestamp&#x27;: 0.85, &#x27;marker_coordinate_ratio&#x27;: {&#x27;x&#x27;: 0, &#x27;y&#x27;: 0}}, &#x27;timestamp&#x27;: &#x27;1786857033357&#x27;}]}}, &#x27;timestamp&#x27;: &#x27;1786857033357&#x27;, &#x27;project_id&#x27;: &#x27;95421627250&#x27;, &#x27;native_inputs&#x27;: {&#x27;text&#x27;: &#x27;&#x27;}, &#x27;billing_confirmation_policy&#x27;: {&#x27;mode&#x27;: &#x27;threshold&#x27;}, &#x27;billing_confirmation...</td>
+          <td>136</td>
+          <td>s</td>
+        </tr>
+        </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="assets">
+        <h2>素材预览</h2>
+        <div class="grid-assets">
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/95421627250/media/20260816-103332.jpeg" alt="20260816-103332.jpeg" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>20260816-103332.jpeg</h3>
+        <p>image/jpeg · 21.0 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/Product-Lead-opening-line.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>Product-Lead-opening-line.mp3</h3>
+        <p>audio/mpeg · 169.9 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/a_cDbf2jS-pexo_voiceover_chris_v3_90s.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>a_cDbf2jS-pexo_voiceover_chris_v3_90s.mp3</h3>
+        <p>audio/mpeg · 1014.1 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><p class="muted">远程签名源已过期，未保留可播放本地副本。时长与合成证据见调用链。</p></div>
+      <div class="asset-body">
+        <h3>pexo_lipsync_v4_final_82s.mp4</h3>
+        <p>video/mp4 · source expired</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3</h3>
+        <p>audio/mpeg · 1283.7 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><div class="file-preview">file</div></div>
+      <div class="asset-body">
+        <h3>pexo_vo_chris_final_v4_subtitle_20260816T033633_a3256fc5.srt</h3>
+        <p>application/x-subrip · 2.6 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><div class="file-preview">file</div></div>
+      <div class="asset-body">
+        <h3>transcribe_chris_v3_20260816T033524_e93485c3.json</h3>
+        <p>application/json · 122.0 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><div class="file-preview">file</div></div>
+      <div class="asset-body">
+        <h3>transcribe_v4_final_20260816T040829_664a7c43.json</h3>
+        <p>application/json · 94.3 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/95421627250/media/video_annotation_617uzd76jfg_start_mask.png" alt="video_annotation_617uzd76jfg_start_mask.png" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>video_annotation_617uzd76jfg_start_mask.png</h3>
+        <p>image/png · 10.0 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/95421627250/media/video_annotation_l8gsab75vrf_start_mask.png" alt="video_annotation_l8gsab75vrf_start_mask.png" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>video_annotation_l8gsab75vrf_start_mask.png</h3>
+        <p>image/png · 10.0 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/95421627250/media/video_annotation_vssi9udvqd_start_mask.png" alt="video_annotation_vssi9udvqd_start_mask.png" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>video_annotation_vssi9udvqd_start_mask.png</h3>
+        <p>image/png · 10.0 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/95421627250/media/video_annotation_w09m6oemxgh_start_mask.png" alt="video_annotation_w09m6oemxgh_start_mask.png" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>video_annotation_w09m6oemxgh_start_mask.png</h3>
+        <p>image/png · 10.0 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_s1.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_s1.mp3</h3>
+        <p>audio/mpeg · 113.5 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_s2.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_s2.mp3</h3>
+        <p>audio/mpeg · 216.4 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_s3.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_s3.mp3</h3>
+        <p>audio/mpeg · 298.0 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_s3a.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_s3a.mp3</h3>
+        <p>audio/mpeg · 180.9 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_s3b.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_s3b.mp3</h3>
+        <p>audio/mpeg · 118.0 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_s4.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_s4.mp3</h3>
+        <p>audio/mpeg · 235.1 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_s5.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_s5.mp3</h3>
+        <p>audio/mpeg · 188.2 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_s6.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_s6.mp3</h3>
+        <p>audio/mpeg · 157.2 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_s7.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_s7.mp3</h3>
+        <p>audio/mpeg · 80.5 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_v4_s1.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_v4_s1.mp3</h3>
+        <p>audio/mpeg · 118.4 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_v4_s2.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_v4_s2.mp3</h3>
+        <p>audio/mpeg · 102.1 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_v4_s3a.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_v4_s3a.mp3</h3>
+        <p>audio/mpeg · 98.0 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_v4_s3b.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_v4_s3b.mp3</h3>
+        <p>audio/mpeg · 93.1 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_v4_s4.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_v4_s4.mp3</h3>
+        <p>audio/mpeg · 233.5 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_v4_s5.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_v4_s5.mp3</h3>
+        <p>audio/mpeg · 336.8 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_v4_s5a.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_v4_s5a.mp3</h3>
+        <p>audio/mpeg · 168.2 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_v4_s5b.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_v4_s5b.mp3</h3>
+        <p>audio/mpeg · 169.4 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_v4_s6.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_v4_s6.mp3</h3>
+        <p>audio/mpeg · 196.4 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/95421627250/media/vo_v4_s7.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>vo_v4_s7.mp3</h3>
+        <p>audio/mpeg · 111.5 KB</p>
+      </div>
+    </article>
+    </div>
+      </section>
+
+      <section id="prompts">
+        <h2>资产记录与 Prompt</h2>
+        <div class="grid-assets">
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">audio</span>
+            <span class="badge muted-badge">audio_produce</span>
+            <span class="badge muted-badge">elevenlabs</span>
+          </div>
+          <h3>transcribe_chris_v3</h3>
+          <p class="mono">scribe_v2</p>
+          <p></p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">audio</span>
+            <span class="badge muted-badge">audio_produce</span>
+            <span class="badge muted-badge">elevenlabs</span>
+          </div>
+          <h3>pexo_vo_chris_final_v4</h3>
+          <p class="mono">eleven_v3</p>
+          <p>Now you can create videos the way you vibe-code.
+
+Meet Pexo.
+
+The AI video agent that works like a creative partner.
+Tell it what you want. Pexo handles the production.
+
+Start with your website, your assets, or even a half-formed idea. Pexo understands what you do, shapes the creative direction, and turns it into a plan.
+It remembers your brand voice, preferences, and decisions—so you never have to start over.
+Need to change a scene? Just ask. Want to extend the story? Keep going.
+
+If something feels off, skip the timeline. Circle what you want changed and leave a comment—like Google Docs, but for video.
+U can call it editing without editing.
+
+Pexo doesn&#x27;t just generate clips. It builds the complete video—the edit, voiceover, motion graphics, captions, music, pacing, and final delivery.
+
+Whether you&#x27;re launching a product, selling something, explaining an idea, or telling a story, you stay focused on what you want to say.
+Pexo handles how it gets made.
+
+And if you&#x27;re wondering what that looks like... You&#x27;re already watching it.
+Everything in this video:
+The visuals. The product demo. The voiceover. Every scene. Every edit. Even me.
+All made with Pexo.
+
+Pexo is now available to everyone.
+
+You vibe-coded what you built. Now vibe-create how the world sees it.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_s4</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>A man in his late 20s with short wavy brown hair, light stubble, wearing a dark green knit polo shirt, seated at a light wood table in a bright modern open-plan office. He speaks directly to camera with natural lip sync matching the audio exactly. The audio in audio 1 is the speech he is speaking — sync his mouth movements to it precisely. Soft natural light from large windows. Medium close-up, shallow depth of field. Calm confident delivery. &quot;Need to change a scene? Just ask. Want to extend the story? Keep going. If something feels off, skip the timeline. Circle what you want changed and leave a comment — like Google Docs, but for video. You can call it editing without editing.&quot;</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_s1</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>A man in his late 20s with short wavy brown hair, light stubble, wearing a dark green knit polo shirt, seated at a light wood table in a bright modern open-plan office. He speaks directly to camera with natural lip sync matching the audio exactly. The audio in audio 1 is the speech he is speaking — sync his mouth movements to it precisely. Soft natural light from large windows. Medium close-up, shallow depth of field, background softly blurred. Calm, confident delivery. No other speakers. &quot;Now you can create videos the way you vibe-code. Meet Pexo.&quot;</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_s2</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>A man in his late 20s with short wavy brown hair, light stubble, wearing a dark green knit polo shirt, seated at a light wood table in a bright modern open-plan office. He speaks directly to camera with natural lip sync matching the audio exactly. The audio in audio 1 is the speech he is speaking — sync his mouth movements to it precisely. Soft natural light from large windows. Medium close-up, shallow depth of field. Calm confident delivery. &quot;The AI video agent that works like a creative partner. Tell it what you want. Pexo handles the production.&quot;</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_s3</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>A man in his late 20s with short wavy brown hair, light stubble, wearing a dark green knit polo shirt, seated at a light wood table in a bright modern open-plan office. He speaks directly to camera with natural lip sync matching the audio exactly. The audio in audio 1 is the speech he is speaking — sync his mouth movements to it precisely. Soft natural light from large windows. Medium close-up, shallow depth of field. Calm confident delivery. &quot;Start with your website, your assets, or even a half-formed idea. Pexo understands what you do, shapes the creative direction, and turns it into a plan. It remembers your brand voice, preferences, and decisions — so you never have to start over.&quot;</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_s5</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>A man in his late 20s with short wavy brown hair, light stubble, wearing a dark green knit polo shirt, seated at a light wood table in a bright modern open-plan office. He speaks directly to camera with natural lip sync matching the audio exactly. The audio in audio 1 is the speech he is speaking — sync his mouth movements to it precisely. Soft natural light from large windows. Medium close-up, shallow depth of field. Calm confident delivery. &quot;Pexo doesn&#x27;t just generate clips. It builds the complete video — the edit, voiceover, motion graphics, captions, music, pacing, and final delivery. Whether you&#x27;re launching a product, selling something, explaining an idea, or telling a story, you stay focused on what you want to say. Pexo handles how it gets made.&quot;</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_s6</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>A man in his late 20s with short wavy brown hair, light stubble, wearing a dark green knit polo shirt, seated at a light wood table in a bright modern open-plan office. He speaks directly to camera with natural lip sync matching the audio exactly. The audio in audio 1 is the speech he is speaking — sync his mouth movements to it precisely. Soft natural light from large windows. Medium close-up, shallow depth of field. Calm confident delivery. &quot;And if you&#x27;re wondering what that looks like... You&#x27;re already watching it. Everything in this video: The visuals. The product demo. The voiceover. Every scene. Every edit. Even me. All made with Pexo.&quot;</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_s7</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>A man in his late 20s with short wavy brown hair, light stubble, wearing a dark green knit polo shirt, seated at a light wood table in a bright modern open-plan office. He speaks directly to camera with natural lip sync matching the audio exactly. The audio in audio 1 is the speech he is speaking — sync his mouth movements to it precisely. Soft natural light from large windows. Medium close-up, shallow depth of field. Calm confident delivery. &quot;Pexo is now available to everyone. You vibe-coded what you built. Now vibe-create how the world sees it.&quot;</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_s3a</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>A man in his late 20s with short wavy brown hair, light stubble, wearing a dark green knit polo shirt, seated at a light wood table in a bright modern open-plan office. He speaks directly to camera with natural lip sync matching the audio exactly. The audio in audio 1 is the speech he is speaking — sync his mouth movements to it precisely. Soft natural light from large windows. Medium close-up, shallow depth of field. Calm confident delivery. &quot;Start with your website, your assets, or even a half-formed idea. Pexo understands what you do, shapes the creative direction, and turns it into a plan.&quot;</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_s3b</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>A man in his late 20s with short wavy brown hair, light stubble, wearing a dark green knit polo shirt, seated at a light wood table in a bright modern open-plan office. He speaks directly to camera with natural lip sync matching the audio exactly. The audio in audio 1 is the speech he is speaking — sync his mouth movements to it precisely. Soft natural light from large windows. Medium close-up, shallow depth of field. Calm confident delivery. &quot;It remembers your brand voice, preferences, and decisions — so you never have to start over.&quot;</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">final</span>
+            <span class="badge muted-badge">show_final_video</span>
+            <span class="badge muted-badge">local</span>
+          </div>
+          <h3>final_video</h3>
+          <p class="mono">/projects/95421627250/workspace/assets/pexo_lipsync_full_82s.mp4</p>
+          <p></p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">audio</span>
+            <span class="badge muted-badge">audio_produce</span>
+            <span class="badge muted-badge">elevenlabs</span>
+          </div>
+          <h3>transcribe_v4_final</h3>
+          <p class="mono">scribe_v2</p>
+          <p></p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_v4_s5a</h3>
+          <p class="mono">doubao-seedance-2-0-fast-260128</p>
+          <p>A young man in his late 20s seated at a light wood table in a bright modern open-plan office, large windows with soft natural light behind him, medium close-up shot, speaking naturally to camera with natural mouth movement and lip sync driven by audio 1. Shallow depth of field, stable head position, professional and engaged expression. No background music, no extra sound.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_v4_s1</h3>
+          <p class="mono">doubao-seedance-2-0-fast-260128</p>
+          <p>A young man in his late 20s seated at a light wood table in a bright modern open-plan office, large windows with soft natural light behind him, medium close-up shot, speaking naturally to camera with natural mouth movement and lip sync driven by audio 1. Shallow depth of field, stable head position, professional and engaged expression. No background music, no extra sound.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_v4_s2</h3>
+          <p class="mono">doubao-seedance-2-0-fast-260128</p>
+          <p>A young man in his late 20s seated at a light wood table in a bright modern open-plan office, large windows with soft natural light behind him, medium close-up shot, speaking naturally to camera with natural mouth movement and lip sync driven by audio 1. Shallow depth of field, stable head position, professional and engaged expression. No background music, no extra sound.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_v4_s3a</h3>
+          <p class="mono">doubao-seedance-2-0-fast-260128</p>
+          <p>A young man in his late 20s seated at a light wood table in a bright modern open-plan office, large windows with soft natural light behind him, medium close-up shot, speaking naturally to camera with natural mouth movement and lip sync driven by audio 1. Shallow depth of field, stable head position, professional and engaged expression. No background music, no extra sound.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_v4_s3b</h3>
+          <p class="mono">doubao-seedance-2-0-fast-260128</p>
+          <p>A young man in his late 20s seated at a light wood table in a bright modern open-plan office, large windows with soft natural light behind him, medium close-up shot, speaking naturally to camera with natural mouth movement and lip sync driven by audio 1. Shallow depth of field, stable head position, professional and engaged expression. No background music, no extra sound.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_v4_s4</h3>
+          <p class="mono">doubao-seedance-2-0-fast-260128</p>
+          <p>A young man in his late 20s seated at a light wood table in a bright modern open-plan office, large windows with soft natural light behind him, medium close-up shot, speaking naturally to camera with natural mouth movement and lip sync driven by audio 1. Shallow depth of field, stable head position, professional and engaged expression. No background music, no extra sound.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_v4_s5b</h3>
+          <p class="mono">doubao-seedance-2-0-fast-260128</p>
+          <p>A young man in his late 20s seated at a light wood table in a bright modern open-plan office, large windows with soft natural light behind him, medium close-up shot, speaking naturally to camera with natural mouth movement and lip sync driven by audio 1. Shallow depth of field, stable head position, professional and engaged expression. No background music, no extra sound.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_v4_s6</h3>
+          <p class="mono">doubao-seedance-2-0-fast-260128</p>
+          <p>A young man in his late 20s seated at a light wood table in a bright modern open-plan office, large windows with soft natural light behind him, medium close-up shot, speaking naturally to camera with natural mouth movement and lip sync driven by audio 1. Shallow depth of field, stable head position, professional and engaged expression. No background music, no extra sound.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_v4_s7</h3>
+          <p class="mono">doubao-seedance-2-0-fast-260128</p>
+          <p>A young man in his late 20s seated at a light wood table in a bright modern open-plan office, large windows with soft natural light behind him, medium close-up shot, speaking naturally to camera with natural mouth movement and lip sync driven by audio 1. Shallow depth of field, stable head position, professional and engaged expression. No background music, no extra sound.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_v4_s2_yellow</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>A young man in his late 20s with short wavy brown hair and light stubble, wearing a bright YELLOW short-sleeve knit polo shirt, seated at a light wood table in a bright modern industrial open-plan office. Large windows with soft natural light, shallow depth of field, medium close-up. No other people visible in the background. His mouth moves naturally and precisely in sync with the speech from the audio. Image 1 is the character reference. Audio 1 drives the speech and lip movements.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_v4_s3b_nobg</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>A young man in his late 20s with short wavy brown hair and light stubble, wearing a dark forest green short-sleeve knit polo shirt, seated at a light wood table in a bright modern industrial open-plan office. Large windows with soft natural light, shallow depth of field, medium close-up. The background office space is empty — no other people are visible anywhere in the background. His mouth moves naturally and precisely in sync with the speech from the audio. Image 1 is the character reference. Audio 1 drives the speech and lip movements.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_v4r_s1_yellow</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>A young man in his late 20s with short wavy brown hair and light stubble, wearing a bright YELLOW short-sleeve knit polo shirt, seated at a light wood table in a bright modern industrial open-plan office. Large windows with soft natural light, shallow depth of field, medium close-up. His mouth moves naturally and precisely in sync with the speech from the audio. Image 1 is the character reference. Audio 1 drives the speech and lip movements.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>lipsync_v4r_s3a_nobg</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>A young man in his late 20s with short wavy brown hair and light stubble, wearing a dark forest green short-sleeve knit polo shirt, seated at a light wood table in a bright modern industrial open-plan office. Large windows with soft natural light, shallow depth of field, medium close-up. The background office is completely empty — no other people visible anywhere behind the speaker. His mouth moves naturally and precisely in sync with the speech from the audio. Image 1 is the character reference. Audio 1 drives the speech and lip movements.</p>
+        </article>
+        </div>
+      </section>
+
+      <section>
+        <h2>生成/渲染主链路</h2>
+        
+        <div class="step good">
+          <div><strong>audio_produce</strong> <span>11:35:21</span></div>
+          <p>{&#x27;mode&#x27;: &#x27;speech2text&#x27;, &#x27;name&#x27;: &#x27;transcribe_chris_v3&#x27;, &#x27;model&#x27;: &#x27;scribe_v2&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_speech2text&#x27;: {&#x27;file&#x27;: &#x27;/projects/95421627250...</p>
+          <p class="muted">{&quot;trace_id&quot;: &quot;fbe1cb41-8f41-4ff6-9de5-b7b7afa58772&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;4aa01ac0-104e-4413-9f9e-ff15d95c750d&quot;, &quot;transcript_fi...</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>audio_produce</strong> <span>11:35:53</span></div>
+          <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;pexo_vo_chris_final_v4&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &quot;Now you can create...</p>
+          <p class="muted">{&quot;trace_id&quot;: &quot;f1509922-2f14-4385-b2d3-f91f3a29529c&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;401d0817-3ca4-423e-b465-e313dc011aa7&quot;, &quot;file&quot;: &quot;/proj...</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>11:47:34</span></div>
+          <p>name=lipsync_s4; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=15; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s4_20260816T035153_0a501486.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>11:47:34</span></div>
+          <p>name=lipsync_s1; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=8; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s1_20260816T035138_4164df4e.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>11:47:34</span></div>
+          <p>name=lipsync_s2; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=14; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s2_20260816T035208_2bc39389.mp4</p>
+        </div>
+        
+
+        <div class="step bad">
+          <div><strong>video_generate</strong> <span>11:47:34</span></div>
+          <p>name=lipsync_s3; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=15; sound=on; aspect=16:9</p>
+          <p class="muted">ok=False error=media_orchestrator.execution_failed file=None</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>11:47:34</span></div>
+          <p>name=lipsync_s5; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=12; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s5_20260816T035134_2443f6ba.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>11:47:34</span></div>
+          <p>name=lipsync_s6; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=10; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s6_20260816T035148_13202bfe.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>11:47:34</span></div>
+          <p>name=lipsync_s7; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=6; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s7_20260816T035038_473b8b24.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>11:52:29</span></div>
+          <p>name=lipsync_s3a; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=12; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s3a_20260816T035547_6f003173.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>11:52:29</span></div>
+          <p>name=lipsync_s3b; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=8; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s3b_20260816T035552_7e9eb4ff.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>audio_produce</strong> <span>12:08:26</span></div>
+          <p>{&#x27;mode&#x27;: &#x27;speech2text&#x27;, &#x27;name&#x27;: &#x27;transcribe_v4_final&#x27;, &#x27;model&#x27;: &#x27;scribe_v2&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_speech2text&#x27;: {&#x27;file&#x27;: &#x27;/projects/95421627250...</p>
+          <p class="muted">{&quot;trace_id&quot;: &quot;68f2d389-bf9a-49ff-a24d-e1e66b9b4a37&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;7a7daf29-6e9e-411e-b73c-2004e86b5fe0&quot;, &quot;transcript_fi...</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>12:09:44</span></div>
+          <p>name=lipsync_v4_s5a; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=11; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s5a_20260816T041238_b93cc887.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>12:09:44</span></div>
+          <p>name=lipsync_v4_s1; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=8; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s1_20260816T041230_8b47991a.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>12:09:44</span></div>
+          <p>name=lipsync_v4_s2; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=7; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s2_20260816T041305_b2bc0205.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>12:09:44</span></div>
+          <p>name=lipsync_v4_s3a; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=7; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s3a_20260816T041343_f9a0863e.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>12:09:44</span></div>
+          <p>name=lipsync_v4_s3b; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=6; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s3b_20260816T041338_5fbb2230.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>12:09:44</span></div>
+          <p>name=lipsync_v4_s4; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=15; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s4_20260816T041230_4735233e.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>12:09:44</span></div>
+          <p>name=lipsync_v4_s5b; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=11; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s5b_20260816T041307_289d41a4.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>12:09:44</span></div>
+          <p>name=lipsync_v4_s6; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=13; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s6_20260816T041305_e87a6176.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>12:09:44</span></div>
+          <p>name=lipsync_v4_s7; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=8; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s7_20260816T041241_17ffa7c0.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>13:08:17</span></div>
+          <p>name=lipsync_v4_s2_yellow; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=8; sound=on; aspect=16:9</p>
+          <p class="muted"></p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>13:08:17</span></div>
+          <p>name=lipsync_v4_s3b_nobg; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=7; sound=on; aspect=16:9</p>
+          <p class="muted"></p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>13:11:15</span></div>
+          <p>name=lipsync_v4r_s1_yellow; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=8; sound=on; aspect=16:9</p>
+          <p class="muted"></p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span>13:11:15</span></div>
+          <p>name=lipsync_v4r_s3a_nobg; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=7; sound=on; aspect=16:9</p>
+          <p class="muted"></p>
+        </div>
+        
+      </section>
+
+      <section id="chain">
+        <h2>技术明细</h2>
+        <details id="chainDetails" class="technical-details">
+          <summary>展开完整调用表（136 行）</summary>
+          <div class="controls">
+            <select id="toolFilter">
+              <option value="">All tools (136)</option>
+              <option value="__problem">Only flagged (1)</option>
+              <option value="add_attachments">add_attachments (3)</option>
+<option value="analyze_file_content">analyze_file_content (24)</option>
+<option value="audio_produce">audio_produce (3)</option>
+<option value="ls">ls (1)</option>
+<option value="media_probe">media_probe (23)</option>
+<option value="media_process">media_process (21)</option>
+<option value="read_file">read_file (14)</option>
+<option value="show_final_video">show_final_video (2)</option>
+<option value="video_generate">video_generate (22)</option>
+<option value="write_todos">write_todos (23)</option>
+            </select>
+            <input id="searchBox" placeholder="搜索工具、参数、结果、问题">
+          </div>
+          <div class="table-wrap">
+            <table id="chainTable">
+              <thead><tr><th>#</th><th>UTC</th><th>Trace</th><th>Tool</th><th>Key params</th><th>Result</th><th>Problem</th></tr></thead>
+              <tbody>
+        <tr id="call-1" class="" data-index="1" data-tool="write_todos" data-problem="0">
+          <td>1</td>
+          <td>11:23:53</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>读取制作技能文件，了解生产流程=in_progress; 分析已有素材（图片和音频）=pending; 生成完整视频（口型对齐）=pending; 合成并交付最终视频=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;读取制作技能文件，了解生产流程&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;分析已有素材（图片和音频）&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}, {&#x27;content&#x27;: &#x27;生成完整视频（口型对齐）&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;},...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-2" class="" data-index="2" data-tool="read_file" data-problem="0">
+          <td>2</td>
+          <td>11:23:56</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/generation-skill/SKILL.md offset= limit=80</td>
+          <td>1 --- 2 name: generation-skill 3 description: Execute production generation for video projects from Script Handoff and any required Subject Manifest. Own generation units, model/p...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-3" class="" data-index="3" data-tool="read_file" data-problem="0">
+          <td>3</td>
+          <td>11:23:56</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/modification-skill/SKILL.md offset= limit=80</td>
+          <td>1 --- 2 name: modification-skill 3 description: Use whenever a user wants an already-delivered video changed, including Comments.texts / Mark what to fix, timestamped or circled f...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-4" class="" data-index="4" data-tool="read_file" data-problem="0">
+          <td>4</td>
+          <td>11:24:00</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/generation-skill/references/voice-production-and-resolution.md offset= limit=80</td>
+          <td>1 --- 2 id: voice-production-and-resolution 3 description: &quot;Shared rules for voice resolution, public search, preview, clone authorization, TTS production, measured fit, and spoke...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-5" class="" data-index="5" data-tool="media_probe" data-problem="0">
+          <td>5</td>
+          <td>11:24:00</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/a_K92RFuN_Product-Lead-opening-line.mp3</td>
+          <td>duration=7.224000 codec=mp3 NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-6" class="" data-index="6" data-tool="ls" data-problem="0">
+          <td>6</td>
+          <td>11:24:06</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">ls</span></td>
+          <td>{&#x27;path&#x27;: &#x27;/projects/95421627250/workspace/assets&#x27;}</td>
+          <td>[&#x27;/projects/95421627250/workspace/assets/a_K92RFuN_Product-Lead-opening-line.mp3&#x27;, &#x27;/projects/95421627250/workspace/assets/a_t9g4CmC_20260816-103332.jpeg&#x27;]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-7" class="" data-index="7" data-tool="analyze_file_content" data-problem="0">
+          <td>7</td>
+          <td>11:24:06</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=What is said in this audio? Transcribe word by word.</td>
+          <td>The transcribed speech from the audio is: Today you can vibe code a product, launch a storefront, or turn an idea into a working demo, in a weekend. But showing people what you bu...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-8" class="" data-index="8" data-tool="analyze_file_content" data-problem="0">
+          <td>8</td>
+          <td>11:24:13</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Describe this image in detail - person, appearance, background, lighting, framing</td>
+          <td>### Conclusion This is a professional medium close-up portrait of a young adult man set in a bright, modern industrial-style open-plan office, with a shallow depth of field that k...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-9" class="" data-index="9" data-tool="write_todos" data-problem="0">
+          <td>9</td>
+          <td>11:24:31</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>读取制作技能文件，了解生产流程=completed; 分析已有素材（图片和音频）=completed; 理解完整口播文本，规划视频生成策略=in_progress; 生成完整视频（口型对齐）=pending; 合成并交付最终视频=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;读取制作技能文件，了解生产流程&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;分析已有素材（图片和音频）&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;理解完整口播文本，规划视频生成策略&#x27;, &#x27;status&#x27;: &#x27;in_pr...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-10" class="" data-index="10" data-tool="media_probe" data-problem="0">
+          <td>10</td>
+          <td>11:35:21</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/a_xJwhr8u_a_cDbf2jS-pexo_voiceover_chris_v3_90s.mp3</td>
+          <td>duration=89.712000 codec=mp3 NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-11" class="" data-index="11" data-tool="audio_produce" data-problem="0">
+          <td>11</td>
+          <td>11:35:21</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">audio_produce</span></td>
+          <td>{&#x27;mode&#x27;: &#x27;speech2text&#x27;, &#x27;name&#x27;: &#x27;transcribe_chris_v3&#x27;, &#x27;model&#x27;: &#x27;scribe_v2&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_speech2text&#x27;: {&#x27;file&#x27;: &#x27;/projects/95421627250...</td>
+          <td>{&quot;trace_id&quot;: &quot;fbe1cb41-8f41-4ff6-9de5-b7b7afa58772&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;4aa01ac0-104e-4413-9f9e-ff15d95c750d&quot;, &quot;transcript_fi...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-12" class="" data-index="12" data-tool="read_file" data-problem="0">
+          <td>12</td>
+          <td>11:35:26</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/projects/95421627250/workspace/assets/transcribe_chris_v3_20260816T033524_e93485c3.json</td>
+          <td>1 {&quot;language_code&quot;:&quot;eng&quot;,&quot;language_probability&quot;:0.9343974590301514,&quot;text&quot;:&quot;Today you can vibe code a product, launch a storefront, or turn an idea into a working demo in a weekend...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-13" class="" data-index="13" data-tool="write_todos" data-problem="0">
+          <td>13</td>
+          <td>11:35:38</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>读取制作技能文件，了解生产流程=completed; 分析已有素材（图片和音频）=completed; 用 Chris 音色重新生成完整口播音频=in_progress; 交付新音频并确认效果=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;读取制作技能文件，了解生产流程&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;分析已有素材（图片和音频）&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;用 Chris 音色重新生成完整口播音频&#x27;, &#x27;status&#x27;: &#x27;in...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-14" class="" data-index="14" data-tool="audio_produce" data-problem="0">
+          <td>14</td>
+          <td>11:35:53</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">audio_produce</span></td>
+          <td>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;pexo_vo_chris_final_v4&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &quot;Now you can create...</td>
+          <td>{&quot;trace_id&quot;: &quot;f1509922-2f14-4385-b2d3-f91f3a29529c&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;401d0817-3ca4-423e-b465-e313dc011aa7&quot;, &quot;file&quot;: &quot;/proj...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-15" class="" data-index="15" data-tool="media_probe" data-problem="0">
+          <td>15</td>
+          <td>11:36:36</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-16" class="" data-index="16" data-tool="write_todos" data-problem="0">
+          <td>16</td>
+          <td>11:36:41</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>读取制作技能文件，了解生产流程=completed; 分析已有素材（图片和音频）=completed; 用 Chris 音色重新生成完整口播音频=completed; 交付新音频并确认效果=in_progress</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;读取制作技能文件，了解生产流程&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;分析已有素材（图片和音频）&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;用 Chris 音色重新生成完整口播音频&#x27;, &#x27;status&#x27;: &#x27;co...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-17" class="" data-index="17" data-tool="add_attachments" data-problem="0">
+          <td>17</td>
+          <td>11:36:44</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">add_attachments</span></td>
+          <td>pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3</td>
+          <td>[{&quot;asset_id&quot;: &quot;a_4fw6hsw&quot;, &quot;mime_type&quot;: &quot;audio/mpeg&quot;, &quot;name&quot;: &quot;pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3&quot;}]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-18" class="" data-index="18" data-tool="write_todos" data-problem="0">
+          <td>18</td>
+          <td>11:36:48</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>读取制作技能文件，了解生产流程=completed; 分析已有素材（图片和音频）=completed; 用 Chris 音色重新生成完整口播音频=completed; 交付新音频并确认效果=completed</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;读取制作技能文件，了解生产流程&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;分析已有素材（图片和音频）&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;用 Chris 音色重新生成完整口播音频&#x27;, &#x27;status&#x27;: &#x27;co...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-19" class="" data-index="19" data-tool="add_attachments" data-problem="0">
+          <td>19</td>
+          <td>11:38:41</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">add_attachments</span></td>
+          <td>pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3</td>
+          <td>[{&quot;asset_id&quot;: &quot;a_4fw6hsw&quot;, &quot;mime_type&quot;: &quot;audio/mpeg&quot;, &quot;name&quot;: &quot;pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3&quot;}]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-20" class="" data-index="20" data-tool="read_file" data-problem="0">
+          <td>20</td>
+          <td>11:45:20</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/generation-skill/references/video-models-routing.md offset= limit=100</td>
+          <td>1 --- 2 id: video-models-routing 3 description: &quot;Executable video model routing contract for HappyHorse, Seedance Fast, Seedance, and Kling. Uses Strategy Genes for hard routing r...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-21" class="" data-index="21" data-tool="read_file" data-problem="0">
+          <td>21</td>
+          <td>11:45:23</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/generation-skill/references/generation-voice-strategy-execution.md offset= limit=100</td>
+          <td>1 --- 2 id: voice-strategy-execution 3 description: &quot;Generation-stage execution rules for Script Handoff v2 speech: exact-source exclusivity, visible-speech payload proof, VO-safe...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-22" class="" data-index="22" data-tool="write_todos" data-problem="0">
+          <td>22</td>
+          <td>11:45:29</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>规划分段策略：82秒口播分成多段口型视频生成=in_progress; 并行生成所有分段视频=pending; 交付各段视频供确认=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;规划分段策略：82秒口播分成多段口型视频生成&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;并行生成所有分段视频&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}, {&#x27;content&#x27;: &#x27;交付各段视频供确认&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-23" class="" data-index="23" data-tool="write_todos" data-problem="0">
+          <td>23</td>
+          <td>11:46:51</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>裁剪7段音频片段=in_progress; 并行生成7段口型视频=pending; 交付各段视频供确认=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;裁剪7段音频片段&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;并行生成7段口型视频&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}, {&#x27;content&#x27;: &#x27;交付各段视频供确认&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-24" class="" data-index="24" data-tool="media_process" data-problem="0">
+          <td>24</td>
+          <td>11:47:00</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_s1; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_s1.mp3 render_ms=632</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-25" class="" data-index="25" data-tool="media_process" data-problem="0">
+          <td>25</td>
+          <td>11:47:00</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_s2; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_s2.mp3 render_ms=632</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-26" class="" data-index="26" data-tool="media_process" data-problem="0">
+          <td>26</td>
+          <td>11:47:00</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_s3; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_s3.mp3 render_ms=540</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-27" class="" data-index="27" data-tool="media_process" data-problem="0">
+          <td>27</td>
+          <td>11:47:00</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_s4; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_s4.mp3 render_ms=661</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-28" class="" data-index="28" data-tool="media_process" data-problem="0">
+          <td>28</td>
+          <td>11:47:00</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_s5; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_s5.mp3 render_ms=530</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-29" class="" data-index="29" data-tool="media_process" data-problem="0">
+          <td>29</td>
+          <td>11:47:00</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_s6; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_s6.mp3 render_ms=521</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-30" class="" data-index="30" data-tool="media_process" data-problem="0">
+          <td>30</td>
+          <td>11:47:00</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_s7; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_s7.mp3 render_ms=505</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-31" class="" data-index="31" data-tool="write_todos" data-problem="0">
+          <td>31</td>
+          <td>11:47:05</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>裁剪7段音频片段=completed; 并行生成7段口型视频=in_progress; 交付各段视频供确认=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;裁剪7段音频片段&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;并行生成7段口型视频&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;交付各段视频供确认&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-32" class="" data-index="32" data-tool="video_generate" data-problem="0">
+          <td>32</td>
+          <td>11:47:34</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_s4; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=15; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s4_20260816T035153_0a501486.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-33" class="" data-index="33" data-tool="video_generate" data-problem="0">
+          <td>33</td>
+          <td>11:47:34</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_s1; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=8; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s1_20260816T035138_4164df4e.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-34" class="" data-index="34" data-tool="video_generate" data-problem="0">
+          <td>34</td>
+          <td>11:47:34</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_s2; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=14; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s2_20260816T035208_2bc39389.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-35" class="has-problem" data-index="35" data-tool="video_generate" data-problem="1">
+          <td>35</td>
+          <td>11:47:34</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_s3; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=15; sound=on; aspect=16:9</td>
+          <td>ok=False error=media_orchestrator.execution_failed file=None</td>
+          <td>Generation failed: The parameter `content[2]` specified in the request is not valid: the parameter audio duration (seconds) specified in t...</td>
+        </tr>
+        
+
+        <tr id="call-36" class="" data-index="36" data-tool="video_generate" data-problem="0">
+          <td>36</td>
+          <td>11:47:34</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_s5; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=12; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s5_20260816T035134_2443f6ba.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-37" class="" data-index="37" data-tool="video_generate" data-problem="0">
+          <td>37</td>
+          <td>11:47:34</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_s6; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=10; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s6_20260816T035148_13202bfe.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-38" class="" data-index="38" data-tool="video_generate" data-problem="0">
+          <td>38</td>
+          <td>11:47:34</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_s7; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=6; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s7_20260816T035038_473b8b24.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-39" class="" data-index="39" data-tool="media_process" data-problem="0">
+          <td>39</td>
+          <td>11:52:21</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_s3a; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_s3a.mp3 render_ms=194</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-40" class="" data-index="40" data-tool="media_process" data-problem="0">
+          <td>40</td>
+          <td>11:52:21</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_s3b; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_s3b.mp3 render_ms=194</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-41" class="" data-index="41" data-tool="video_generate" data-problem="0">
+          <td>41</td>
+          <td>11:52:29</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_s3a; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=12; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s3a_20260816T035547_6f003173.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-42" class="" data-index="42" data-tool="video_generate" data-problem="0">
+          <td>42</td>
+          <td>11:52:29</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_s3b; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=8; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_s3b_20260816T035552_7e9eb4ff.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-43" class="" data-index="43" data-tool="analyze_file_content" data-problem="0">
+          <td>43</td>
+          <td>11:56:14</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Is the man&#x27;s lip movement synchronized with the speech audio? Does the person match the reference photo (shor...</td>
+          <td>[Visual Analysis] ### Conclusion 1. Lip movement and speech audio synchronization cannot be determined from visual content alone, as audio analysis is outside the scope of this vi...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-44" class="" data-index="44" data-tool="analyze_file_content" data-problem="0">
+          <td>44</td>
+          <td>11:56:14</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Is the man&#x27;s lip movement synchronized with the speech audio? Does the person match the reference photo (shor...</td>
+          <td>[Visual Analysis] ### Conclusion 1. Lip movement and speech audio synchronization cannot be determined from the visual content alone, as audio analysis is outside the scope of thi...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-45" class="" data-index="45" data-tool="analyze_file_content" data-problem="0">
+          <td>45</td>
+          <td>11:56:14</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Is the man&#x27;s lip movement synchronized with the speech audio? Does the person match the reference photo (shor...</td>
+          <td>[Visual Analysis] ### Conclusion 1. Lip movement and speech audio synchronization cannot be determined from the visual content alone, as audio analysis is outside the scope of thi...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-46" class="" data-index="46" data-tool="analyze_file_content" data-problem="0">
+          <td>46</td>
+          <td>11:56:14</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Is the man&#x27;s lip movement synchronized with the speech audio? Does the person match the reference photo (shor...</td>
+          <td>[Visual Analysis] ### Conclusion 1. Lip movement and speech audio synchronization cannot be determined from the visual portion of this task, as audio checks are handled by a paral...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-47" class="" data-index="47" data-tool="analyze_file_content" data-problem="0">
+          <td>47</td>
+          <td>11:56:14</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Is the man&#x27;s lip movement synchronized with the speech audio? Does the person match the reference photo (shor...</td>
+          <td>[Visual Analysis] ### Conclusion 1. Lip movement and speech audio synchronization cannot be determined from visual analysis only. 2. The person matches the reference photo descrip...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-48" class="" data-index="48" data-tool="analyze_file_content" data-problem="0">
+          <td>48</td>
+          <td>11:56:14</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Is the man&#x27;s lip movement synchronized with the speech audio? Does the person match the reference photo (shor...</td>
+          <td>[Visual Analysis] ### Conclusion 1. Lip movement and speech audio synchronization cannot be determined from visual content alone, as audio analysis is outside the scope of this vi...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-49" class="" data-index="49" data-tool="analyze_file_content" data-problem="0">
+          <td>49</td>
+          <td>11:56:14</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Is the man&#x27;s lip movement synchronized with the speech audio? Does the person match the reference photo (shor...</td>
+          <td>[Visual Analysis] ### Conclusion 1. Lip movement and speech audio synchronization cannot be determined from the visual portion of this task, as audio checks are handled by a paral...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-50" class="" data-index="50" data-tool="analyze_file_content" data-problem="0">
+          <td>50</td>
+          <td>11:56:14</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Is the man&#x27;s lip movement synchronized with the speech audio? Does the person match the reference photo (shor...</td>
+          <td>[Visual Analysis] ### Conclusion 1. Lip movement and speech audio synchronization cannot be determined from the visual portion of this task, as audio checks are handled by a paral...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-51" class="" data-index="51" data-tool="write_todos" data-problem="0">
+          <td>51</td>
+          <td>11:56:37</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>裁剪7段音频片段=completed; 并行生成8段口型视频=completed; 交付全部8段视频供确认=in_progress</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;裁剪7段音频片段&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;并行生成8段口型视频&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;交付全部8段视频供确认&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-52" class="" data-index="52" data-tool="add_attachments" data-problem="0">
+          <td>52</td>
+          <td>11:56:44</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">add_attachments</span></td>
+          <td>lipsync_s1_20260816T035138_4164df4e.mp4, lipsync_s2_20260816T035208_2bc39389.mp4, lipsync_s3a_20260816T035547_6f003173.mp4, lipsync_s3b_20260816T035552_7e9eb4ff.mp4, lipsync_s4_20260816T035153_0a501486.mp4, lipsync_s5_20260816T035134_2443f6ba.mp4, lipsync_s6_20260816T035148_1320...</td>
+          <td>[{&quot;asset_id&quot;: &quot;a_AZv75on&quot;, &quot;mime_type&quot;: &quot;video/mp4&quot;, &quot;name&quot;: &quot;lipsync_s1_20260816T035138_4164df4e.mp4&quot;}, {&quot;asset_id&quot;: &quot;a_gwVybxN&quot;, &quot;mime_type&quot;: &quot;video/mp4&quot;, &quot;name&quot;: &quot;lipsync_s2_20...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-53" class="" data-index="53" data-tool="write_todos" data-problem="0">
+          <td>53</td>
+          <td>11:56:48</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>裁剪7段音频片段=completed; 并行生成8段口型视频=completed; 交付全部8段视频供确认=completed</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;裁剪7段音频片段&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;并行生成8段口型视频&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;交付全部8段视频供确认&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-54" class="" data-index="54" data-tool="read_file" data-problem="0">
+          <td>54</td>
+          <td>11:58:46</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/assembly-skill/SKILL.md offset= limit=80</td>
+          <td>1 --- 2 name: assembly-skill 3 description: Prepare and lock actual video/audio materials for video projects, including probes, sequence coverage, rough-cut windows, measured post...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-55" class="" data-index="55" data-tool="write_todos" data-problem="0">
+          <td>55</td>
+          <td>11:58:52</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>探查8段视频岁数确认可用性=in_progress; 拼接8段视频为完整视频=pending; 交付最终视频=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;探查8段视频岁数确认可用性&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;拼接8段视频为完整视频&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}, {&#x27;content&#x27;: &#x27;交付最终视频&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-56" class="" data-index="56" data-tool="media_probe" data-problem="0">
+          <td>56</td>
+          <td>11:58:59</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/lipsync_s1_20260816T035138_4164df4e.mp4</td>
+          <td>duration=8.058000 codec=h264 1280x720 pix_fmt=yuv420p</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-57" class="" data-index="57" data-tool="media_probe" data-problem="0">
+          <td>57</td>
+          <td>11:58:59</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/lipsync_s2_20260816T035208_2bc39389.mp4</td>
+          <td>duration=14.095000 codec=h264 1280x720 pix_fmt=yuv420p</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-58" class="" data-index="58" data-tool="media_probe" data-problem="0">
+          <td>58</td>
+          <td>11:58:59</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/lipsync_s3a_20260816T035547_6f003173.mp4</td>
+          <td>duration=12.098000 codec=h264 1280x720 pix_fmt=yuv420p</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-59" class="" data-index="59" data-tool="media_probe" data-problem="0">
+          <td>59</td>
+          <td>11:58:59</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/lipsync_s3b_20260816T035552_7e9eb4ff.mp4</td>
+          <td>duration=8.081000 codec=h264 1280x720 pix_fmt=yuv420p</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-60" class="" data-index="60" data-tool="media_probe" data-problem="0">
+          <td>60</td>
+          <td>11:58:59</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/lipsync_s4_20260816T035153_0a501486.mp4</td>
+          <td>duration=15.093000 codec=h264 1280x720 pix_fmt=yuv420p</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-61" class="" data-index="61" data-tool="media_probe" data-problem="0">
+          <td>61</td>
+          <td>11:58:59</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/lipsync_s5_20260816T035134_2443f6ba.mp4</td>
+          <td>duration=12.052000 codec=h264 1280x720 pix_fmt=yuv420p</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-62" class="" data-index="62" data-tool="media_probe" data-problem="0">
+          <td>62</td>
+          <td>11:58:59</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/lipsync_s6_20260816T035148_13202bfe.mp4</td>
+          <td>duration=10.101000 codec=h264 1280x720 pix_fmt=yuv420p</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-63" class="" data-index="63" data-tool="media_probe" data-problem="0">
+          <td>63</td>
+          <td>11:58:59</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/lipsync_s7_20260816T035038_473b8b24.mp4</td>
+          <td>duration=6.084000 codec=h264 1280x720 pix_fmt=yuv420p</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-64" class="" data-index="64" data-tool="write_todos" data-problem="0">
+          <td>64</td>
+          <td>11:59:47</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>探查8段视频确认可用性=completed; 拼接8段视频为完整视频=in_progress; 交付最终视频=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;探查8段视频确认可用性&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;拼接8段视频为完整视频&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;交付最终视频&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-65" class="" data-index="65" data-tool="media_process" data-problem="0">
+          <td>65</td>
+          <td>11:59:54</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=None; output=pexo_lipsync_full_82s.mp4; steps=concat(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/pexo_lipsync_full_82s.mp4 render_ms=1315</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-66" class="" data-index="66" data-tool="media_probe" data-problem="0">
+          <td>66</td>
+          <td>11:59:58</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/pexo_lipsync_full_82s.mp4</td>
+          <td>duration=85.685000 codec=h264 1280x720 pix_fmt=yuv420p</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-67" class="" data-index="67" data-tool="write_todos" data-problem="0">
+          <td>67</td>
+          <td>12:00:02</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>探查8段视频确认可用性=completed; 拼接8段视频为完整视频=completed; 交付最终视频=in_progress</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;探查8段视频确认可用性&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;拼接8段视频为完整视频&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;交付最终视频&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-68" class="" data-index="68" data-tool="show_final_video" data-problem="0">
+          <td>68</td>
+          <td>12:00:05</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">show_final_video</span></td>
+          <td>file_path=/projects/95421627250/workspace/assets/pexo_lipsync_full_82s.mp4</td>
+          <td>a_W6Hon4R</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-69" class="" data-index="69" data-tool="write_todos" data-problem="0">
+          <td>69</td>
+          <td>12:00:10</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>探查8段视频确认可用性=completed; 拼接8段视频为完整视频=completed; 交付最终视频=completed</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;探查8段视频确认可用性&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;拼接8段视频为完整视频&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;交付最终视频&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-70" class="" data-index="70" data-tool="media_probe" data-problem="0">
+          <td>70</td>
+          <td>12:06:24</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/pexo_lipsync_full_82s.mp4</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-71" class="" data-index="71" data-tool="media_probe" data-problem="0">
+          <td>71</td>
+          <td>12:06:24</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-72" class="" data-index="72" data-tool="read_file" data-problem="0">
+          <td>72</td>
+          <td>12:08:01</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/generation-skill/SKILL.md offset= limit=100</td>
+          <td>1 --- 2 name: generation-skill 3 description: Execute production generation for video projects from Script Handoff and any required Subject Manifest. Own generation units, model/p...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-73" class="" data-index="73" data-tool="read_file" data-problem="0">
+          <td>73</td>
+          <td>12:08:04</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/generation-skill/SKILL.md offset=100 limit=50</td>
+          <td>1 --- 2 name: generation-skill 3 description: Execute production generation for video projects from Script Handoff and any required Subject Manifest. Own generation units, model/p...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-74" class="" data-index="74" data-tool="read_file" data-problem="0">
+          <td>74</td>
+          <td>12:08:07</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/generation-skill/references/video-generation-execution.md offset= limit=120</td>
+          <td>1 --- 2 id: video-generation-execution 3 description: &quot;Executable video generation execution contract for audio strategy, sequence planning, prompt payload discipline, voice-sourc...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-75" class="" data-index="75" data-tool="write_todos" data-problem="0">
+          <td>75</td>
+          <td>12:08:17</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>원본 82.1s TTS를 세그먼트별로 정확히 재절단=in_progress; 8세그먼트 립싱크 영상 재생성=pending; 8세그먼트 QA 후 82.1초로 합치여 최종 무비디오 완성=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;원본 82.1s TTS를 세그먼트별로 정확히 재절단&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;8세그먼트 립싱크 영상 재생성&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}, {&#x27;content&#x27;: &#x27;8세그먼트 QA 후 82.1초로 합치...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-76" class="" data-index="76" data-tool="audio_produce" data-problem="0">
+          <td>76</td>
+          <td>12:08:26</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">audio_produce</span></td>
+          <td>{&#x27;mode&#x27;: &#x27;speech2text&#x27;, &#x27;name&#x27;: &#x27;transcribe_v4_final&#x27;, &#x27;model&#x27;: &#x27;scribe_v2&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_speech2text&#x27;: {&#x27;file&#x27;: &#x27;/projects/95421627250...</td>
+          <td>{&quot;trace_id&quot;: &quot;68f2d389-bf9a-49ff-a24d-e1e66b9b4a37&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;7a7daf29-6e9e-411e-b73c-2004e86b5fe0&quot;, &quot;transcript_fi...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-77" class="" data-index="77" data-tool="read_file" data-problem="0">
+          <td>77</td>
+          <td>12:08:32</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/projects/95421627250/workspace/assets/transcribe_v4_final_20260816T040829_664a7c43.json</td>
+          <td>1 {&quot;language_code&quot;:&quot;eng&quot;,&quot;language_probability&quot;:0.9216505289077759,&quot;text&quot;:&quot;Now you can create videos the way you vibe code. Meet Pexo, the AI video agent that works like a creativ...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-78" class="" data-index="78" data-tool="write_todos" data-problem="0">
+          <td>78</td>
+          <td>12:08:45</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>用原始 TTS 重新精准裁劈8段音频=in_progress; 并行重生成8段口型视频=pending; QA 并拼接为完整 82.1s 视频=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;用原始 TTS 重新精准裁劈8段音频&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;并行重生成8段口型视频&#x27;, &#x27;status&#x27;: &#x27;pending&#x27;}, {&#x27;content&#x27;: &#x27;QA 并拼接为完整 82.1s 视频&#x27;, &#x27;status&#x27;: &#x27;pen...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-79" class="" data-index="79" data-tool="media_process" data-problem="0">
+          <td>79</td>
+          <td>12:08:56</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_v4_s5.mp3; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_v4_s5.mp3 render_ms=709</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-80" class="" data-index="80" data-tool="media_process" data-problem="0">
+          <td>80</td>
+          <td>12:08:56</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_v4_s1.mp3; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_v4_s1.mp3 render_ms=783</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-81" class="" data-index="81" data-tool="media_process" data-problem="0">
+          <td>81</td>
+          <td>12:08:56</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_v4_s2.mp3; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_v4_s2.mp3 render_ms=719</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-82" class="" data-index="82" data-tool="media_process" data-problem="0">
+          <td>82</td>
+          <td>12:08:56</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_v4_s3a.mp3; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_v4_s3a.mp3 render_ms=515</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-83" class="" data-index="83" data-tool="media_process" data-problem="0">
+          <td>83</td>
+          <td>12:08:56</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_v4_s3b.mp3; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_v4_s3b.mp3 render_ms=538</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-84" class="" data-index="84" data-tool="media_process" data-problem="0">
+          <td>84</td>
+          <td>12:08:56</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_v4_s4.mp3; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_v4_s4.mp3 render_ms=573</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-85" class="" data-index="85" data-tool="media_process" data-problem="0">
+          <td>85</td>
+          <td>12:08:56</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_v4_s6.mp3; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_v4_s6.mp3 render_ms=673</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-86" class="" data-index="86" data-tool="media_process" data-problem="0">
+          <td>86</td>
+          <td>12:08:56</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_v4_s7.mp3; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_v4_s7.mp3 render_ms=530</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-87" class="" data-index="87" data-tool="media_probe" data-problem="0">
+          <td>87</td>
+          <td>12:09:04</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/vo_v4_s1.mp3</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-88" class="" data-index="88" data-tool="media_probe" data-problem="0">
+          <td>88</td>
+          <td>12:09:04</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/vo_v4_s2.mp3</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-89" class="" data-index="89" data-tool="media_probe" data-problem="0">
+          <td>89</td>
+          <td>12:09:04</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/vo_v4_s3a.mp3</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-90" class="" data-index="90" data-tool="media_probe" data-problem="0">
+          <td>90</td>
+          <td>12:09:04</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/vo_v4_s3b.mp3</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-91" class="" data-index="91" data-tool="media_probe" data-problem="0">
+          <td>91</td>
+          <td>12:09:04</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/vo_v4_s4.mp3</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-92" class="" data-index="92" data-tool="media_probe" data-problem="0">
+          <td>92</td>
+          <td>12:09:04</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/vo_v4_s5.mp3</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-93" class="" data-index="93" data-tool="media_probe" data-problem="0">
+          <td>93</td>
+          <td>12:09:04</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/vo_v4_s6.mp3</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-94" class="" data-index="94" data-tool="media_probe" data-problem="0">
+          <td>94</td>
+          <td>12:09:04</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/vo_v4_s7.mp3</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-95" class="" data-index="95" data-tool="media_process" data-problem="0">
+          <td>95</td>
+          <td>12:09:13</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_v4_s5a.mp3; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_v4_s5a.mp3 render_ms=196</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-96" class="" data-index="96" data-tool="media_process" data-problem="0">
+          <td>96</td>
+          <td>12:09:13</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=/projects/95421627250/workspace/assets/pexo_vo_chris_final_v4_20260816T033633_2c796c99.mp3; output=vo_v4_s5b.mp3; steps=trim(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/vo_v4_s5b.mp3 render_ms=192</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-97" class="" data-index="97" data-tool="write_todos" data-problem="0">
+          <td>97</td>
+          <td>12:09:20</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>用原始 TTS 重新精准裁劈9段音频=completed; 并行重生成9段口型视频=in_progress; QA 并拼接为完整 82.1s 视频=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;用原始 TTS 重新精准裁劈9段音频&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;并行重生成9段口型视频&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;QA 并拼接为完整 82.1s 视频&#x27;, &#x27;status&#x27;: &#x27;p...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-98" class="" data-index="98" data-tool="video_generate" data-problem="0">
+          <td>98</td>
+          <td>12:09:44</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_v4_s5a; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=11; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s5a_20260816T041238_b93cc887.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-99" class="" data-index="99" data-tool="video_generate" data-problem="0">
+          <td>99</td>
+          <td>12:09:44</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_v4_s1; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=8; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s1_20260816T041230_8b47991a.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-100" class="" data-index="100" data-tool="video_generate" data-problem="0">
+          <td>100</td>
+          <td>12:09:44</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_v4_s2; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=7; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s2_20260816T041305_b2bc0205.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-101" class="" data-index="101" data-tool="video_generate" data-problem="0">
+          <td>101</td>
+          <td>12:09:44</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_v4_s3a; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=7; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s3a_20260816T041343_f9a0863e.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-102" class="" data-index="102" data-tool="video_generate" data-problem="0">
+          <td>102</td>
+          <td>12:09:44</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_v4_s3b; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=6; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s3b_20260816T041338_5fbb2230.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-103" class="" data-index="103" data-tool="video_generate" data-problem="0">
+          <td>103</td>
+          <td>12:09:44</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_v4_s4; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=15; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s4_20260816T041230_4735233e.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-104" class="" data-index="104" data-tool="video_generate" data-problem="0">
+          <td>104</td>
+          <td>12:09:44</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_v4_s5b; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=11; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s5b_20260816T041307_289d41a4.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-105" class="" data-index="105" data-tool="video_generate" data-problem="0">
+          <td>105</td>
+          <td>12:09:44</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_v4_s6; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=13; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s6_20260816T041305_e87a6176.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-106" class="" data-index="106" data-tool="video_generate" data-problem="0">
+          <td>106</td>
+          <td>12:09:44</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_v4_s7; seedance/doubao-seedance-2-0-fast-260128; mode=reference2video; duration=8; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/95421627250/workspace/assets/lipsync_v4_s7_20260816T041241_17ffa7c0.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-107" class="" data-index="107" data-tool="analyze_file_content" data-problem="0">
+          <td>107</td>
+          <td>12:14:03</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Check: 1) Does the person match the reference - young man late 20s, short wavy brown hair, light stubble, dar...</td>
+          <td>[Visual Analysis] Conclusion: The person matches the provided reference, there are visible speech-synchronized lip movements, and no visual defects are present. Evidence: - [0.0-8...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-108" class="" data-index="108" data-tool="analyze_file_content" data-problem="0">
+          <td>108</td>
+          <td>12:14:03</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Check: 1) Does the person match the reference - young man late 20s, short wavy brown hair, light stubble, dar...</td>
+          <td>[Visual Analysis] Conclusion: The person matches the provided reference, there are visible speech-synchronized lip movements, and no visual defects are present. Evidence: - [0.0-7...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-109" class="" data-index="109" data-tool="analyze_file_content" data-problem="0">
+          <td>109</td>
+          <td>12:14:03</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Check: 1) Does the person match the reference - young man late 20s, short wavy brown hair, light stubble, dar...</td>
+          <td>[Visual Analysis] Conclusion: The person matches the provided reference, there are visible speech-synchronized lip movements, and no visual defects are present. Evidence: - [0.0-7...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-110" class="" data-index="110" data-tool="analyze_file_content" data-problem="0">
+          <td>110</td>
+          <td>12:14:03</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Check: 1) Does the person match the reference - young man late 20s, short wavy brown hair, light stubble, dar...</td>
+          <td>[Visual Analysis] Conclusion: The person matches the provided reference, there are visible lip movements synchronized with speech, and no obvious visual defects are present. Evide...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-111" class="" data-index="111" data-tool="analyze_file_content" data-problem="0">
+          <td>111</td>
+          <td>12:14:03</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Check: 1) Does the person match the reference - young man late 20s, short wavy brown hair, light stubble, dar...</td>
+          <td>[Visual Analysis] Conclusion: The person matches the provided reference, there are visible speech-synchronized lip movements, and no obvious visual defects are present. Evidence: ...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-112" class="" data-index="112" data-tool="analyze_file_content" data-problem="0">
+          <td>112</td>
+          <td>12:14:03</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Check: 1) Does the person match the reference - young man late 20s, short wavy brown hair, light stubble, dar...</td>
+          <td>[Visual Analysis] Conclusion: The person and background match the reference description, there are visible lip movements synchronized with speech, and no obvious visual defects ar...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-113" class="" data-index="113" data-tool="analyze_file_content" data-problem="0">
+          <td>113</td>
+          <td>12:14:03</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Check: 1) Does the person match the reference - young man late 20s, short wavy brown hair, light stubble, dar...</td>
+          <td>[Visual Analysis] Conclusion: The person and background match the provided reference, there are speech-synchronized lip movements, and no visible visual defects. Evidence: - [0.0s...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-114" class="" data-index="114" data-tool="analyze_file_content" data-problem="0">
+          <td>114</td>
+          <td>12:14:03</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Check: 1) Does the person match the reference - young man late 20s, short wavy brown hair, light stubble, dar...</td>
+          <td>[Visual Analysis] Conclusion: The person matches the provided reference, there are visible lip movements synchronized with speech, and no obvious visual defects are observed. Evid...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-115" class="" data-index="115" data-tool="analyze_file_content" data-problem="0">
+          <td>115</td>
+          <td>12:14:03</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Check: 1) Does the person match the reference - young man late 20s, short wavy brown hair, light stubble, dar...</td>
+          <td>[Visual Analysis] Conclusion: The person and background match the reference description, there are visible lip movements synchronized with speech, and no visual defects are observ...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-116" class="" data-index="116" data-tool="write_todos" data-problem="0">
+          <td>116</td>
+          <td>12:14:22</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>用原始 TTS 重新精准裁劈9段音频=completed; 并行重生成9段口型视频=completed; QA 并拼接为完整 82.1s 视频=in_progress</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;用原始 TTS 重新精准裁劈9段音频&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;并行重生成9段口型视频&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;QA 并拼接为完整 82.1s 视频&#x27;, &#x27;status&#x27;: &#x27;in_...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-117" class="" data-index="117" data-tool="media_process" data-problem="0">
+          <td>117</td>
+          <td>12:14:32</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_process</span></td>
+          <td>input=None; output=pexo_lipsync_v4_final_82s.mp4; steps=concat(,,x,), trim(,,x,), replace_audio(,,x,)</td>
+          <td>success=True asset=None file=/projects/95421627250/workspace/assets/pexo_lipsync_v4_final_82s.mp4 render_ms=4153</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-118" class="" data-index="118" data-tool="media_probe" data-problem="0">
+          <td>118</td>
+          <td>12:14:40</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/95421627250/workspace/assets/pexo_lipsync_v4_final_82s.mp4</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-119" class="" data-index="119" data-tool="show_final_video" data-problem="0">
+          <td>119</td>
+          <td>12:14:47</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">show_final_video</span></td>
+          <td>file_path=/projects/95421627250/workspace/assets/pexo_lipsync_v4_final_82s.mp4</td>
+          <td>a_t8zxyfY</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-120" class="" data-index="120" data-tool="write_todos" data-problem="0">
+          <td>120</td>
+          <td>12:14:52</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>用原始 TTS 重新精准裁劈9段音频=completed; 并行重生成9段口型视频=completed; QA 并拼接为完整 82.1s 视频=completed</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;用原始 TTS 重新精准裁劈9段音频&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;并行重生成9段口型视频&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;QA 并拼接为完整 82.1s 视频&#x27;, &#x27;status&#x27;: &#x27;com...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-121" class="" data-index="121" data-tool="read_file" data-problem="0">
+          <td>121</td>
+          <td>13:06:29</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/modification-skill/SKILL.md offset= limit=100</td>
+          <td>1 --- 2 name: modification-skill 3 description: Use whenever a user wants an already-delivered video changed, including Comments.texts / Mark what to fix, timestamped or circled f...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-122" class="" data-index="122" data-tool="read_file" data-problem="0">
+          <td>122</td>
+          <td>13:07:04</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/modification-skill/references/complaint-triage-and-reverification.md offset= limit=200</td>
+          <td>1 # Complaint Triage &amp; Targeted Re-verification 2 3 How to diagnose subtitle/caption/on-screen-text complaints with media evidence, handle subtitle artifacts correctly, and prove ...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-123" class="" data-index="123" data-tool="write_todos" data-problem="0">
+          <td>123</td>
+          <td>13:07:08</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Analyze both annotation frames to understand what to change=in_progress; Re-generate the two affected segments with the requested changes=pending; Assemble updated final video and verify both fixes=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Analyze both annotation frames to understand what to change&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;Re-generate the two affected segments with ...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-124" class="" data-index="124" data-tool="analyze_file_content" data-problem="0">
+          <td>124</td>
+          <td>13:07:14</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=What is shown in this annotated frame? Describe the scene, any people or elements visible, what is highlighte...</td>
+          <td>### Conclusion This is a frame set in a modern industrial-style open office, with a man speaking to the camera in the foreground, and a yellow rectangular annotation highlighting ...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-125" class="" data-index="125" data-tool="analyze_file_content" data-problem="0">
+          <td>125</td>
+          <td>13:07:14</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=What is shown in this annotated frame? Describe the scene, any people or elements visible, what is highlighte...</td>
+          <td>### Conclusion This is a frame set in a bright, modern industrial-style open office. A man is the foreground subject, seated at a table and appearing to speak, with a yellow recta...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-126" class="" data-index="126" data-tool="analyze_file_content" data-problem="0">
+          <td>126</td>
+          <td>13:07:34</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=At around timestamp 9.66 seconds: describe the man&#x27;s shirt color and details. At around timestamp 25.63 secon...</td>
+          <td>### Conclusion At around 9.66 seconds, the man is wearing a dark green short-sleeved polo shirt with a collared neckline and a small open placket at the top of the collar. At arou...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-127" class="" data-index="127" data-tool="read_file" data-problem="0">
+          <td>127</td>
+          <td>13:07:57</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/modification-skill/references/video-models-routing.md offset= limit=200</td>
+          <td>1 --- 2 id: video-models-routing 3 description: &quot;Executable video model routing contract for HappyHorse, Seedance Fast, Seedance, and Kling. Uses Strategy Genes for hard routing r...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-128" class="" data-index="128" data-tool="write_todos" data-problem="0">
+          <td>128</td>
+          <td>13:08:04</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Analyze both annotation frames to understand what to change=completed; Re-generate the two affected segments with the requested changes=in_progress; Assemble updated final video and verify both fixes=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Analyze both annotation frames to understand what to change&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;Re-generate the two affected segments with th...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-129" class="" data-index="129" data-tool="video_generate" data-problem="0">
+          <td>129</td>
+          <td>13:08:17</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_v4_s2_yellow; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=8; sound=on; aspect=16:9</td>
+          <td></td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-130" class="" data-index="130" data-tool="video_generate" data-problem="0">
+          <td>130</td>
+          <td>13:08:17</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_v4_s3b_nobg; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=7; sound=on; aspect=16:9</td>
+          <td></td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-131" class="" data-index="131" data-tool="write_todos" data-problem="0">
+          <td>131</td>
+          <td>13:10:39</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Analyze both annotation frames=in_progress; Re-generate the two affected segments with the requested changes=pending; Assemble updated final video and verify both fixes=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Analyze both annotation frames&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;Re-generate the two affected segments with the requested changes&#x27;, &#x27;stat...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-132" class="" data-index="132" data-tool="analyze_file_content" data-problem="0">
+          <td>132</td>
+          <td>13:10:44</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=What is shown in this annotated frame? Describe the scene, any people visible in the background, what is high...</td>
+          <td>### Conclusion This is an annotated frame of a modern open-plan office, with a man in the foreground as the main subject, and a yellow rectangular annotation highlighting two peop...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-133" class="" data-index="133" data-tool="analyze_file_content" data-problem="0">
+          <td>133</td>
+          <td>13:10:44</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=What is shown in this annotated frame? Describe the scene, what is highlighted or circled, the color of the m...</td>
+          <td>### Conclusion This is an annotated frame of a modern open-plan office scene, with a yellow rectangular annotation highlighting the torso of a man seated at a foreground desk; the...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-134" class="" data-index="134" data-tool="write_todos" data-problem="0">
+          <td>134</td>
+          <td>13:11:02</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Analyze both annotation frames=completed; Re-generate the two affected segments (S1: yellow shirt, S3a: no background people)=in_progress; Assemble updated final video and verify both fixes=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Analyze both annotation frames&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;Re-generate the two affected segments (S1: yellow shirt, S3a: no backgroun...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-135" class="" data-index="135" data-tool="video_generate" data-problem="0">
+          <td>135</td>
+          <td>13:11:15</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_v4r_s1_yellow; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=8; sound=on; aspect=16:9</td>
+          <td></td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-136" class="" data-index="136" data-tool="video_generate" data-problem="0">
+          <td>136</td>
+          <td>13:11:15</td>
+          <td><code>thread_58137355935_95421627250_01M049HN80JXQZS5CAV949K3ZR</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=lipsync_v4r_s3a_nobg; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=7; sound=on; aspect=16:9</td>
+          <td></td>
+          <td></td>
+        </tr>
+        </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section id="skills">
+        <h2>Skills / Reference 读取逻辑</h2>
+        <div class="callout">这是自动生成的通用 skill/reference 读取摘要。它只展示 trace 里实际 read_file 的覆盖情况和静态期望；case 级根因请以 markdown 分析报告为准。</div>
+        <h3>实际 read_file</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>File</th><th>Lines</th><th>Complete</th><th>Notes</th></tr></thead>
+            <tbody>
+        <tr>
+          <td>2</td>
+          <td><code>/.skills/0/generation-skill/SKILL.md</code></td>
+          <td>1-98</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>3</td>
+          <td><code>/.skills/0/modification-skill/SKILL.md</code></td>
+          <td>1-197</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>4</td>
+          <td><code>/.skills/0/generation-skill/references/voice-production-and-resolution.md</code></td>
+          <td>1-172</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>12</td>
+          <td><code>/projects/95421627250/workspace/assets/transcribe_chris_v3_20260816T033524_e93485c3.json</code></td>
+          <td>1-1</td>
+          <td>No</td>
+          <td>truncated and not fully continued</td>
+        </tr>
+        
+
+        <tr>
+          <td>20</td>
+          <td><code>/.skills/0/generation-skill/references/video-models-routing.md</code></td>
+          <td>1-197</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>21</td>
+          <td><code>/.skills/0/generation-skill/references/generation-voice-strategy-execution.md</code></td>
+          <td>1-137</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>54</td>
+          <td><code>/.skills/0/assembly-skill/SKILL.md</code></td>
+          <td>1-96</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>72</td>
+          <td><code>/.skills/0/generation-skill/SKILL.md</code></td>
+          <td>1-98</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>73</td>
+          <td><code>/.skills/0/generation-skill/SKILL.md</code></td>
+          <td>1-98</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>74</td>
+          <td><code>/.skills/0/generation-skill/references/video-generation-execution.md</code></td>
+          <td>1-358</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>77</td>
+          <td><code>/projects/95421627250/workspace/assets/transcribe_v4_final_20260816T040829_664a7c43.json</code></td>
+          <td>1-1</td>
+          <td>No</td>
+          <td>truncated and not fully continued</td>
+        </tr>
+        
+
+        <tr>
+          <td>121</td>
+          <td><code>/.skills/0/modification-skill/SKILL.md</code></td>
+          <td>1-197</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>122</td>
+          <td><code>/.skills/0/modification-skill/references/complaint-triage-and-reverification.md</code></td>
+          <td>1-176</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>127</td>
+          <td><code>/.skills/0/modification-skill/references/video-models-routing.md</code></td>
+          <td>1-197</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        </tbody>
+          </table>
+        </div>
+        <h3 style="margin-top:18px">应读 reference 覆盖</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Expected Reference</th><th>Why Relevant</th><th>Status</th><th>Notes</th></tr></thead>
+            <tbody>
+        <tr class="">
+          <td><code>/.skills/0/assembly-skill/SKILL.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/generation-skill/SKILL.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/generation-skill/references/generation-voice-strategy-execution.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/generation-skill/references/video-generation-execution.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/generation-skill/references/video-models-routing.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/generation-skill/references/voice-production-and-resolution.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/modification-skill/SKILL.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/modification-skill/references/complaint-triage-and-reverification.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/modification-skill/references/video-models-routing.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <aside class="side">
+      <section>
+        <h2>风险点</h2>
+        <ul class="issue-list">
+        <li>
+          <strong>#35 · video_generate</strong>
+          <span>Generation failed: The parameter `content[2]` specified in the request is not valid: the parameter audio duration (seconds) specified in t...</span>
+          <code>name=lipsync_s3; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=15; sound=on; aspect=16:9</code>
+        </li>
+        </ul>
+      </section>
+      <section>
+        <h2>Tool Mix</h2>
+        <div class="mini-grid"><div class="mini-stat"><span>analyze_file_content</span><strong>24</strong></div>
+<div class="mini-stat"><span>media_probe</span><strong>23</strong></div>
+<div class="mini-stat"><span>write_todos</span><strong>23</strong></div>
+<div class="mini-stat"><span>video_generate</span><strong>22</strong></div>
+<div class="mini-stat"><span>media_process</span><strong>21</strong></div>
+<div class="mini-stat"><span>read_file</span><strong>14</strong></div>
+<div class="mini-stat"><span>add_attachments</span><strong>3</strong></div>
+<div class="mini-stat"><span>audio_produce</span><strong>3</strong></div>
+<div class="mini-stat"><span>show_final_video</span><strong>2</strong></div>
+<div class="mini-stat"><span>ls</span><strong>1</strong></div></div>
+      </section>
+      <section>
+        <h2>结论</h2>
+        <p class="muted">本看板的业务链路已从当前 case 的 trace、assets 和本地媒体动态生成；它用于快速定位调用链证据，不再携带固定 sticker 案例结论。</p>
+        <p class="muted">显式 lint 调用次数：<strong>0</strong>。</p>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+const toolFilter = document.getElementById('toolFilter');
+const searchBox = document.getElementById('searchBox');
+const rows = Array.from(document.querySelectorAll('#chainTable tbody tr'));
+function applyFilters() {
+  const tool = toolFilter.value;
+  const q = searchBox.value.trim().toLowerCase();
+  rows.forEach(row => {
+    const toolOk = !tool || (tool === '__problem' ? row.dataset.problem === '1' : row.dataset.tool === tool);
+    const textOk = !q || row.innerText.toLowerCase().includes(q);
+    row.classList.toggle('hidden', !(toolOk && textOk));
+  });
+}
+toolFilter.addEventListener('change', applyFilters);
+searchBox.addEventListener('input', applyFilters);
+document.querySelectorAll('[data-filter]').forEach(link => {
+  link.addEventListener('click', () => {
+    toolFilter.value = link.dataset.filter;
+    applyFilters();
+  });
+});
+document.querySelectorAll('[data-call]').forEach(link => {
+  link.addEventListener('click', () => {
+    const details = document.getElementById('chainDetails');
+    if (details) details.open = true;
+    const target = document.getElementById(`call-${link.dataset.call}`);
+    if (!target) return;
+    toolFilter.value = '';
+    searchBox.value = '';
+    applyFilters();
+    document.querySelectorAll('.call-highlight').forEach(row => row.classList.remove('call-highlight'));
+    target.classList.add('call-highlight');
+    setTimeout(() => target.classList.remove('call-highlight'), 2600);
+  });
+});
+const roundTabs = Array.from(document.querySelectorAll('[data-round]'));
+const roundPanels = Array.from(document.querySelectorAll('[data-round-panel]'));
+roundTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    const selected = tab.dataset.round;
+    roundTabs.forEach(item => {
+      const active = item.dataset.round === selected;
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    roundPanels.forEach(panel => {
+      panel.hidden = panel.dataset.roundPanel !== selected;
+    });
+  });
+});
+</script>
+</body>
+</html>
