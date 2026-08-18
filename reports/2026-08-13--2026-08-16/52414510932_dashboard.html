@@ -1,0 +1,2911 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case 52414510932 Dashboard</title>
+<style>
+:root {
+  --bg: #f5f7fb;
+  --panel: #ffffff;
+  --panel-2: #f0f4f8;
+  --ink: #18202f;
+  --muted: #647084;
+  --line: #d9e0ea;
+  --blue: #2563eb;
+  --cyan: #0f766e;
+  --green: #16803c;
+  --amber: #a15c05;
+  --red: #b42318;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: linear-gradient(180deg, #eef3f8 0, var(--bg) 260px, var(--bg) 100%);
+}
+a { color: var(--blue); }
+.shell { max-width: 1440px; margin: 0 auto; padding: 28px 28px 64px; }
+.hero-panel { background: #111827; color: #f8fafc; border-radius: 10px; padding: 22px; margin-bottom: 18px; display: grid; grid-template-columns: 1.35fr .65fr; gap: 20px; align-items: stretch; }
+.hero-panel h1 { margin: 0 0 10px; font-size: 34px; letter-spacing: 0; }
+.hero-panel p { margin: 0; color: #cbd5e1; line-height: 1.6; }
+.verdict { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-radius: 8px; padding: 16px; }
+.verdict h2 { margin: 0 0 12px; color: #fff; font-size: 17px; }
+.verdict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.verdict-item { border-radius: 8px; padding: 10px; background: rgba(255,255,255,.08); }
+.verdict-item span { display: block; color: #cbd5e1; font-size: 12px; }
+.verdict-item strong { display: block; margin-top: 4px; font-size: 18px; }
+.verdict-item.bad strong { color: #fca5a5; }
+.verdict-item.warn strong { color: #fcd34d; }
+.verdict-item.good strong { color: #86efac; }
+.topbar { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; margin-bottom: 20px; }
+.title h1 { margin: 0 0 8px; font-size: 30px; letter-spacing: 0; }
+.title p { margin: 0; color: var(--muted); }
+.nav { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.nav a { text-decoration: none; color: var(--ink); border: 1px solid var(--line); background: var(--panel); padding: 8px 10px; border-radius: 8px; font-size: 13px; }
+.stats { display: grid; grid-template-columns: repeat(6, minmax(130px, 1fr)); gap: 12px; margin: 18px 0 22px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+.stat span { display: block; color: var(--muted); font-size: 12px; }
+.stat strong { display: block; margin-top: 6px; font-size: 28px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.layout > main { min-width: 0; }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px; margin-bottom: 18px; min-width: 0; }
+h2 { margin: 0 0 14px; font-size: 20px; }
+h3 { margin: 0 0 8px; font-size: 15px; }
+.muted { color: var(--muted); }
+.mono, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+.linear-rail { position: relative; display: grid; gap: 14px; padding-left: 18px; min-width: 0; }
+.linear-rail::before { content: ""; position: absolute; left: 33px; top: 18px; bottom: 18px; width: 3px; background: #d5dde8; border-radius: 999px; }
+.kpop-visual { padding: 0; background: transparent; box-shadow: none; }
+.kpop-route { display: grid; grid-template-columns: minmax(150px, 1.2fr) 28px minmax(130px, 1fr) 28px minmax(130px, 1fr) 28px minmax(130px, 1fr) 28px minmax(150px, 1.1fr); align-items: stretch; margin: 4px 0 18px; }
+.route-node { min-height: 82px; border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: center; background: #f8fafc; }
+.route-node span { color: var(--muted); font-size: 12px; margin-bottom: 5px; }
+.route-node strong { font-size: 15px; line-height: 1.35; }
+.route-node.source { border-top: 4px solid var(--blue); }
+.route-node.active { border-top: 4px solid var(--green); background: #f0fdf4; }
+.route-node.warn { border-top: 4px solid var(--amber); background: #fffbeb; }
+.route-node.blocked { border-top: 4px solid var(--red); background: #fff7ed; }
+.route-arrow { display: grid; place-items: center; color: #94a3b8; font-size: 22px; }
+.kpop-visual-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; margin-top: 18px; }
+.kpop-visual-grid.generation-grid { grid-template-columns: 1fr 1fr; }
+.kpop-block { border-top: 1px solid var(--line); padding-top: 14px; min-width: 0; }
+.visual-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.visual-head h3 { margin: 0; font-size: 16px; }
+.visual-head span { color: var(--muted); font-size: 12px; text-align: right; }
+.version-lanes { display: grid; gap: 9px; }
+.version-lane { display: grid; grid-template-columns: 92px 1fr; align-items: center; gap: 10px; }
+.version-tag { color: #334155; font-weight: 800; font-size: 12px; }
+.lane-flow { min-height: 38px; display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: #f8fafc; border-left: 4px solid var(--blue); border-radius: 0 6px 6px 0; overflow: hidden; }
+.lane-flow b { white-space: nowrap; font-size: 12px; }
+.lane-flow i { font-style: normal; color: #94a3b8; }
+.lane-flow em { margin-left: auto; color: #92400e; font-style: normal; font-weight: 800; font-size: 12px; white-space: nowrap; }
+.version-lane.critical .lane-flow { border-left-color: var(--red); background: #fff7ed; }
+.duration-axis { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; margin-bottom: 5px; }
+.duration-track { display: flex; height: 46px; overflow: hidden; border-radius: 7px; background: #fee2e2; }
+.duration-track > div { display: flex; align-items: center; justify-content: center; min-width: 0; }
+.duration-track span { font-size: 12px; font-weight: 800; white-space: nowrap; }
+.duration-used { background: #bfdbfe; color: #1e3a8a; }
+.duration-missing { background: #ef4444; color: #fff; }
+.duration-note { display: flex; justify-content: space-between; gap: 12px; margin-top: 6px; font-size: 11px; }
+.duration-note span { color: var(--muted); }
+.duration-note strong { color: #991b1b; }
+.clock-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.clock-compare div { padding: 9px 10px; background: #f8fafc; border-left: 4px solid var(--blue); }
+.clock-compare .bad { background: #fff7ed; border-left-color: var(--red); }
+.clock-compare span, .clock-compare strong { display: block; }
+.clock-compare span { color: var(--muted); font-size: 11px; margin-bottom: 3px; }
+.clock-compare strong { font-size: 12px; }
+.attempt-chart { display: grid; gap: 7px; }
+.attempt-row { display: grid; grid-template-columns: 82px 1fr 48px; gap: 8px; align-items: center; }
+.attempt-row > span, .attempt-row > b { font-size: 11px; }
+.attempt-row > b { text-align: right; }
+.attempt-track { height: 16px; display: flex; overflow: hidden; border-radius: 4px; background: #e2e8f0; }
+.attempt-track i { display: block; height: 100%; }
+.attempt-track .ok { background: #22c55e; }
+.attempt-track .fail { background: #ef4444; }
+.route-compare { display: grid; align-content: start; }
+.route-lane { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.route-lane span { width: 40px; color: var(--muted); font-size: 11px; }
+.route-lane b { padding: 5px 7px; border-radius: 4px; background: #dcfce7; font-size: 11px; }
+.route-lane.actual b { background: #fee2e2; }
+.route-lane i { color: #94a3b8; font-style: normal; }
+.skip-count { display: flex; align-items: baseline; gap: 9px; padding-top: 14px; }
+.skip-count strong { font-size: 28px; color: #991b1b; }
+.skip-count span { color: var(--muted); font-size: 12px; }
+.evidence-head { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+.kpop-evidence-strip { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+.kpop-frame { margin: 0; min-width: 0; position: relative; }
+.kpop-frame img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; border-radius: 6px; }
+.kpop-frame figcaption { display: flex; align-items: baseline; gap: 7px; margin-top: 6px; }
+.kpop-frame figcaption strong { font-size: 24px; color: #991b1b; }
+.kpop-frame:first-child figcaption strong { color: #166534; }
+.kpop-frame figcaption span { color: var(--muted); font-size: 11px; }
+.kpop-unverified { min-height: 120px; border: 2px dashed #f59e0b; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fffbeb; text-align: center; padding: 12px; }
+.kpop-unverified strong { font-size: 34px; color: #92400e; }
+.kpop-unverified span, .kpop-unverified b { font-size: 11px; }
+.kpop-unverified b { margin-top: 5px; color: #991b1b; }
+.round-execution-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+.round-execution-head h2 { margin-bottom: 5px; }
+.round-execution-head p { margin: 0; color: var(--muted); font-size: 13px; }
+.round-tabs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.round-tab { appearance: none; border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 7px; padding: 8px 11px; font: inherit; font-size: 12px; cursor: pointer; }
+.round-tab:hover { background: #eff6ff; }
+.round-tab.is-active { background: #18202f; color: #fff; border-color: #18202f; }
+.round-panel[hidden] { display: none; }
+.round-summary { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)) minmax(220px, 1.35fr); gap: 8px; margin-bottom: 16px; }
+.round-summary > div { border-top: 3px solid #94a3b8; background: #f8fafc; padding: 10px; min-width: 0; }
+.round-summary > div:nth-child(3) { border-top-color: var(--green); }
+.round-summary > div:nth-child(4) { border-top-color: var(--amber); }
+.round-summary .round-output { border-top-color: var(--blue); }
+.round-summary span, .round-summary strong, .round-summary code { display: block; }
+.round-summary span { color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+.round-summary strong { font-size: 12px; overflow-wrap: anywhere; }
+.round-summary code { color: #1d4ed8; margin-top: 4px; overflow-wrap: anywhere; }
+.round-trace-band { display: grid; grid-template-columns: minmax(180px, 1fr) auto minmax(220px, 1.2fr); gap: 12px; align-items: center; background: #eff6ff; border-left: 4px solid var(--blue); padding: 9px 11px; margin-top: 14px; }
+.round-trace-band.recovery { background: #f0fdf4; border-left-color: var(--green); }
+.round-trace-band span { font-weight: 800; font-size: 12px; }
+.round-trace-band b { font-size: 11px; color: var(--muted); }
+.round-trace-band em { font-size: 11px; font-style: normal; text-align: right; }
+.round-step-list { position: relative; display: grid; gap: 0; padding: 8px 0 2px; }
+.round-step-list::before { content: ""; position: absolute; left: 16px; top: 8px; bottom: 2px; width: 2px; background: #d9e0ea; }
+.round-step { position: relative; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; padding: 8px 0; min-width: 0; }
+.round-step-marker { position: relative; z-index: 1; width: 34px; height: 34px; border-radius: 999px; display: grid; place-items: center; background: #e2e8f0; color: #475569; border: 4px solid #fff; font-size: 12px; font-weight: 800; }
+.round-step.ok .round-step-marker { background: #dcfce7; color: #166534; }
+.round-step.warn .round-step-marker { background: #fef3c7; color: #92400e; }
+.round-step.fail .round-step-marker { background: #fee2e2; color: #991b1b; }
+.round-step-body { border-left: 4px solid #94a3b8; background: #f8fafc; padding: 11px 12px; min-width: 0; }
+.round-step.ok .round-step-body { border-left-color: var(--green); }
+.round-step.warn .round-step-body { border-left-color: var(--amber); background: #fffbeb; }
+.round-step.fail .round-step-body { border-left-color: var(--red); background: #fff7ed; }
+.round-step-phase { color: var(--muted); font-size: 11px; margin-bottom: 3px; }
+.round-step-body h4 { margin: 0 0 5px; font-size: 14px; }
+.round-step-body p { margin: 0 0 7px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.round-step-result { font-size: 12px; font-weight: 800; margin-bottom: 8px; }
+.round-step-body .related-calls { background: rgba(255,255,255,.72); }
+.round-lineage { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 0 0; margin-top: 10px; border-top: 1px solid var(--line); }
+.round-lineage span, .round-lineage strong { padding: 6px 8px; background: #eff6ff; border-radius: 4px; font-size: 11px; }
+.round-lineage strong { background: #dcfce7; color: #166534; }
+.round-lineage i { color: #94a3b8; font-style: normal; }
+.round-media-row { display: grid; grid-template-columns: minmax(180px, 280px) minmax(180px, 280px) minmax(220px, 1fr); gap: 12px; align-items: stretch; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.round-media-row .kpop-frame img { aspect-ratio: 16 / 9; }
+.round-media-row .kpop-unverified { min-height: 150px; }
+.round-media-note { border-left: 4px solid var(--blue); background: #eff6ff; padding: 12px; display: flex; flex-direction: column; justify-content: center; }
+.round-media-note.fail { border-left-color: var(--red); background: #fff7ed; }
+.round-media-note strong, .round-media-note span { display: block; }
+.round-media-note strong { margin-bottom: 5px; font-size: 13px; }
+.round-media-note span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.biz-node { position: relative; display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 14px; align-items: start; min-width: 0; }
+.biz-marker { position: relative; z-index: 1; width: 34px; height: 34px; margin-top: 18px; display: grid; place-items: center; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-weight: 900; border: 4px solid var(--panel); box-shadow: 0 0 0 1px #bfdbfe; }
+.biz-marker.good { background: #dcfce7; color: var(--green); box-shadow: 0 0 0 1px #86efac; }
+.biz-marker.warn { background: #fef3c7; color: var(--amber); box-shadow: 0 0 0 1px #fcd34d; }
+.biz-marker.bad { background: #fee2e2; color: var(--red); box-shadow: 0 0 0 1px #fca5a5; }
+.biz-card { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 16px; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(260px, .8fr); gap: 16px; align-items: start; min-width: 0; }
+.biz-card.bad-card { border-color: #fecaca; background: linear-gradient(90deg, #fff7ed 0, #fff 52%); }
+.biz-card.warn-card { border-color: #fde68a; background: linear-gradient(90deg, #fffbeb 0, #fff 52%); }
+.biz-kicker { color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+.biz-main h3 { font-size: 20px; margin: 0 0 8px; }
+.biz-main p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.biz-main, .biz-proof { min-width: 0; }
+.biz-main h3, .biz-main p, .call-mini p { overflow-wrap: anywhere; }
+.biz-proof { border-left: 1px solid var(--line); padding-left: 16px; }
+.biz-label { display: block; color: var(--muted); font-size: 12px; font-weight: 800; margin-bottom: 6px; }
+.biz-proof > strong { display: block; font-size: 15px; margin-bottom: 10px; }
+.biz-media { display: grid; grid-template-columns: repeat(2, minmax(120px, 170px)); gap: 10px; margin-top: 12px; }
+.biz-media.wide { grid-template-columns: minmax(170px, 260px) minmax(140px, 220px); }
+.timeline-table { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 8px; margin-top: 12px; }
+.timeline-table div { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 9px; }
+.timeline-table span { display: block; color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+.timeline-table strong { display: block; font-size: 13px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.call-chip { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; padding: 4px 7px; border-radius: 999px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; text-decoration: none; font-size: 12px; font-weight: 800; }
+.call-chip:hover { background: #dbeafe; }
+.related-calls { border: 1px solid var(--line); border-radius: 8px; background: #fff; overflow: hidden; min-width: 0; }
+.related-calls summary { cursor: pointer; list-style: none; padding: 8px 9px; font-size: 12px; font-weight: 800; color: #334155; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.related-calls summary::-webkit-details-marker { display: none; }
+.related-calls summary::before { content: "▸"; color: var(--blue); margin-right: 4px; }
+.related-calls[open] summary::before { content: "▾"; }
+.related-calls summary span { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; text-transform: none; letter-spacing: 0; }
+.related-call-list { display: grid; gap: 7px; padding: 8px; border-top: 1px solid var(--line); max-height: 380px; overflow: auto; }
+.call-mini { border: 1px solid var(--line); background: #f8fafc; border-radius: 7px; padding: 8px; }
+.call-mini.bad { border-color: #fecaca; background: #fff7ed; }
+.call-mini-top { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.call-mini-top strong { font-size: 12px; }
+.call-mini-top span { margin-left: auto; color: var(--muted); font-size: 11px; text-transform: none; letter-spacing: 0; }
+.call-mini p { margin: 5px 0 0; font-size: 12px; line-height: 1.35; }
+.call-mini-problem { margin-top: 6px; border-left: 3px solid var(--red); padding-left: 7px; color: var(--red); font-size: 12px; font-weight: 700; }
+.bad-card { border-color: #fecaca; background: #fff7ed; }
+.warn-card { border-color: #fde68a; background: #fffbeb; }
+.evidence-media { margin: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #e2e8f0; }
+.evidence-media img, .evidence-media video { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; display: block; }
+.evidence-media figcaption { padding: 6px; font-size: 11px; color: var(--muted); background: white; }
+.evidence-grid { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 12px; min-width: 0; }
+.evidence-card { border: 1px solid var(--line); border-radius: 8px; padding: 14px; min-width: 0; overflow-wrap: anywhere; }
+.evidence-title { font-weight: 800; margin-bottom: 8px; }
+.evidence-card p { margin: 0 0 10px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.evidence-card a { font-size: 12px; font-weight: 700; text-decoration: none; }
+.evidence-card code { white-space: normal; overflow-wrap: anywhere; }
+.grid-assets { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.asset-card, .prompt-card { border: 1px solid var(--line); background: #fbfcfe; border-radius: 8px; overflow: hidden; }
+.asset-preview { background: #dfe7f1; min-height: 180px; display: grid; place-items: center; }
+.asset-preview img, .asset-preview video { max-width: 100%; width: 100%; max-height: 260px; object-fit: contain; display: block; }
+.asset-body, .prompt-card { padding: 12px; }
+.prompt-card p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+.row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.badge, .tool-pill { display: inline-flex; align-items: center; border: 1px solid #bfdbfe; background: #eff6ff; color: #1d4ed8; border-radius: 999px; padding: 3px 8px; font-size: 12px; white-space: nowrap; }
+.muted-badge { border-color: var(--line); background: var(--panel-2); color: var(--muted); }
+.controls { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+select, input { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: white; color: var(--ink); }
+input { min-width: 280px; flex: 1; }
+.technical-details { border: 1px solid var(--line); border-radius: 8px; background: #fbfcfe; overflow: hidden; min-width: 0; max-width: 100%; }
+.technical-details > summary { cursor: pointer; padding: 12px 14px; font-weight: 800; color: #334155; }
+.technical-details[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+.technical-details .controls, .technical-details .table-wrap { margin-left: 12px; margin-right: 12px; }
+.technical-details .table-wrap { margin-bottom: 12px; width: calc(100% - 24px); max-width: calc(100% - 24px); }
+.table-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--line); border-radius: 8px; min-width: 0; max-width: 100%; }
+table { width: 100%; border-collapse: collapse; min-width: 980px; }
+th, td { border-bottom: 1px solid var(--line); padding: 9px 10px; text-align: left; vertical-align: top; font-size: 13px; }
+th { position: sticky; top: 0; background: #f8fafc; color: #334155; z-index: 1; }
+tr.has-problem td { background: #fff7ed; }
+tr.call-highlight td { background: #dbeafe !important; box-shadow: inset 0 0 0 1px #93c5fd; }
+tr.hidden { display: none; }
+.side { display: grid; grid-template-columns: 1.2fr .8fr .8fr; gap: 18px; }
+.side section { position: static; }
+.issue-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; min-width: 0; }
+.issue-list li { border-left: 4px solid var(--red); background: #fff7ed; padding: 10px; border-radius: 6px; min-width: 0; overflow-wrap: anywhere; }
+.issue-list span, .issue-list code { display: block; margin-top: 4px; }
+.issue-list code { white-space: normal; overflow-wrap: anywhere; }
+.mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mini-stat { display: flex; justify-content: space-between; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 8px; background: #fbfcfe; font-size: 12px; }
+.step { border-left: 4px solid var(--green); background: #f7fee7; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+.step.bad { border-left-color: var(--red); background: #fff7ed; }
+.step p { margin: 6px 0 0; font-size: 13px; }
+.callout { border-left: 4px solid var(--amber); background: #fffbeb; padding: 12px; border-radius: 6px; color: #573a05; }
+@media (max-width: 1080px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .hero-panel { grid-template-columns: 1fr; }
+  .biz-card { grid-template-columns: 1fr; }
+  .biz-proof { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; padding-top: 14px; }
+  .timeline-table { grid-template-columns: 1fr; }
+  .evidence-grid { grid-template-columns: 1fr; }
+  .side { grid-template-columns: 1fr; }
+  .topbar { flex-direction: column; }
+  .nav { justify-content: flex-start; }
+  .kpop-route { grid-template-columns: 1fr; gap: 7px; }
+  .route-arrow { transform: rotate(90deg); min-height: 20px; }
+  .kpop-visual-grid, .kpop-visual-grid.generation-grid { grid-template-columns: 1fr; }
+  .kpop-evidence-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .round-execution-head { flex-direction: column; }
+  .round-tabs { justify-content: flex-start; }
+  .round-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .round-summary .round-output { grid-column: 1 / -1; }
+  .round-media-row { grid-template-columns: 1fr 1fr; }
+  .round-media-note { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  html, body { max-width: 100%; overflow-x: hidden; }
+  .shell { padding: 12px 8px 40px; }
+  .shell, .hero-panel, section, main, .layout { width: 100%; min-width: 0; }
+  .hero-panel, section { padding: 12px; }
+  .hero-panel h1, .title h1, .hero-panel p, .title p { max-width: 100%; overflow-wrap: anywhere; word-break: break-word; }
+  .hero-panel h1 { font-size: 24px; line-height: 1.3; }
+  .title h1 { font-size: 24px; line-height: 1.3; }
+  .verdict-grid { grid-template-columns: 1fr; }
+  .nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; gap: 6px; }
+  .nav a { min-width: 0; padding: 7px 4px; text-align: center; overflow-wrap: anywhere; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .biz-node { grid-template-columns: 32px minmax(0, 1fr); gap: 6px; }
+  .linear-rail { padding-left: 0; }
+  .biz-card { padding: 12px; }
+  .biz-media, .biz-media.wide { grid-template-columns: 1fr; }
+  .related-calls summary { flex-wrap: wrap; }
+  input { min-width: 0; width: 100%; }
+  .version-lane { grid-template-columns: 1fr; gap: 4px; }
+  .lane-flow { flex-wrap: wrap; }
+  .lane-flow em { margin-left: 0; width: 100%; }
+  .clock-compare { grid-template-columns: 1fr; }
+  .attempt-row { grid-template-columns: 72px 1fr 42px; }
+  .kpop-evidence-strip { grid-template-columns: 1fr; }
+  .round-tabs { display: grid; grid-template-columns: 1fr; width: 100%; }
+  .round-summary { grid-template-columns: 1fr; }
+  .round-summary .round-output { grid-column: auto; }
+  .round-trace-band { grid-template-columns: 1fr; gap: 3px; }
+  .round-trace-band em { text-align: left; }
+  .round-media-row { grid-template-columns: 1fr; }
+  .round-media-note { grid-column: auto; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <section class="hero-panel">
+    <div>
+      <h1>Case 52414510932：不是两个 TTS 声音，而是视频原生语音叠加正式 VO</h1>
+      <p>5 条 ElevenLabs VO 全部使用同一个 voice_id。第二条人声来自 5 个 sound:on 的 Seedance 片段原生音轨：Agent 起初将这些视频静音，随后为消除 lint 声明冲突删掉全部 muted；第二次 lint 已明确报视频原声与 VO 同时播放，仍被 acknowledge 后交付。</p>
+    </div>
+    <div class="verdict">
+      <h2>一眼结论</h2>
+      <div class="verdict-grid">
+        
+        <div class="verdict-item good"><span>正式 TTS voice_id</span><strong>1 个</strong></div>
+        <div class="verdict-item bad"><span>Sound-on 视频</span><strong>5 / 5</strong></div>
+        <div class="verdict-item bad"><span>已知 overlap</span><strong>acknowledged</strong></div>
+        <div class="verdict-item bad"><span>Final audio QA</span><strong>0 次</strong></div>
+        
+      </div>
+    </div>
+  </section>
+
+  <div class="topbar">
+    <div class="title">
+      <h1>Case 52414510932 调用链看板</h1>
+      <p>从 sound:on、实际 AAC/语音证据、取消静音、lint overlap 告警到双人声交付的完整因果链。</p>
+    </div>
+    <nav class="nav">
+      <a href="#assets">素材</a>
+      <a href="#rounds">轮次</a>
+      <a href="#story">流程</a>
+      <a href="#evidence">证据</a>
+      <a href="#prompts">生成参数</a>
+      <a href="#chain">调用链</a>
+      <a href="#skills">Skills</a>
+    </nav>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span>总调用</span><strong>79</strong></div>
+    <div class="stat"><span>资产记录</span><strong>13</strong></div>
+    <div class="stat"><span>本地素材</span><strong>24</strong></div>
+    <div class="stat"><span>风险调用</span><strong>28</strong></div>
+    <div class="stat"><span>读取文件</span><strong>22</strong></div>
+    <div class="stat"><span>Trace 校准规则</span><strong>10/27</strong></div>
+  </div>
+
+  <div class="layout">
+    <main>
+      
+      
+      <section id="story">
+        <h2>业务可视化调用链</h2>
+        <div class="linear-rail">
+      <article class="biz-node">
+        <div class="biz-marker good">1</div>
+        <div class="biz-card"><div class="biz-main">
+          <div class="biz-kicker">正式旁白</div><h3>5 条 TTS 都是同一个 narrator voice_id</h3>
+          <p><code>dCK3Zxor7cs21Fya12FS</code> 被用于 VO_L1 到 VO_L5。脚本只规划一个 <code>VID_narrator</code>，因此不是声音搜索或 TTS 选了两个 narrator。</p>
+          <div class="biz-media wide"><figure class="evidence-media"><audio src="case-data/cases/52414510932/media/VO_L4_step3.mp3" controls preload="metadata"></audio><figcaption>正式 ElevenLabs VO 示例</figcaption></figure></div>
+        </div><div class="biz-proof"><span class="biz-label">结论</span><strong>Formal TTS owner = 1</strong>
+          <details class="related-calls">
+            <summary>7 个关联调用 <span><a class="call-chip" href="#chain" data-call="28">#28</a><a class="call-chip" href="#chain" data-call="29">#29</a><a class="call-chip" href="#chain" data-call="30">#30</a><a class="call-chip" href="#chain" data-call="31">#31</a><a class="call-chip" href="#chain" data-call="32">#32</a><a class="call-chip" href="#chain" data-call="33">#33</a>…</span></summary>
+            <div class="related-call-list">
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="28">#28</a>
+                  <strong>read_file</strong>
+                  <span>19:36:11</span>
+                </div>
+                <p>/.skills/0/generation-skill/references/voice-production-and-resolution.md</p>
+                <p class="muted">1 --- 2 id: voice-production-and-resolution 3 description: &quot;Shared rules for voice resolution, public search, preview, clone authorization,...</p>
+                <div class="call-mini-problem">Causal read-but-violated: the voice contract forbids separate VO duplicating embedded speech</div>
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="29">#29</a>
+                  <strong>voice_search</strong>
+                  <span>19:36:17</span>
+                </div>
+                <p>{&#x27;query&#x27;: &#x27;For an explainer/tutorial voiceover, the target spoken language must be English and the voice must be female. Warm, confident, and brisk d...</p>
+                <p class="muted">{&quot;trace_id&quot;: &quot;fadd1769-c724-409d-810b-0d4389d743b9&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;status&quot;: &quot;success&quot;, &quot;final_...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="30">#30</a>
+                  <strong>audio_produce</strong>
+                  <span>19:37:29</span>
+                </div>
+                <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L3_step2&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: ...</p>
+                <p class="muted">{&quot;trace_id&quot;: &quot;3d838b38-58a5-478d-b510-fa97dc8aab3f&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;34a9804b-bd85...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="31">#31</a>
+                  <strong>audio_produce</strong>
+                  <span>19:37:29</span>
+                </div>
+                <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L2_step1&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: ...</p>
+                <p class="muted">{&quot;trace_id&quot;: &quot;1aa7f4f8-d42b-4bb4-9791-111abb0d736e&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;035a8871-3dae...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="32">#32</a>
+                  <strong>audio_produce</strong>
+                  <span>19:37:29</span>
+                </div>
+                <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L1_hook&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &quot;...</p>
+                <p class="muted">{&quot;trace_id&quot;: &quot;9a532fa2-b6b3-440f-aeb2-00217c1fe59a&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;1a5e8704-98a0...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="33">#33</a>
+                  <strong>audio_produce</strong>
+                  <span>19:37:29</span>
+                </div>
+                <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L4_step3&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: ...</p>
+                <p class="muted">{&quot;trace_id&quot;: &quot;b27631bc-e443-4e66-b74e-31705530233f&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;10661f51-5ac7...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="34">#34</a>
+                  <strong>audio_produce</strong>
+                  <span>19:37:29</span>
+                </div>
+                <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L5_cta&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &quot;S...</p>
+                <p class="muted">{&quot;trace_id&quot;: &quot;e76825b3-83ee-4034-bbac-1e874f3326ff&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;8843d38d-af9f...</p>
+                
+              </div>
+            </div>
+          </details>
+        </div></div>
+      </article>
+      <article class="biz-node">
+        <div class="biz-marker bad">2</div>
+        <div class="biz-card bad-card"><div class="biz-main">
+          <div class="biz-kicker">第二条人声来源</div><h3>5 个 Seedance 片段全部使用 sound:on，并实际带 AAC</h3>
+          <p>Prompt 尾部虽然写了 “No human speech”，但这只是生成意图，不是输出事实。5 次 probe 都确认有 AAC；本地 STT 在 seg04/seg05 明确识别出生成语音。</p>
+          <div class="biz-media wide"><figure class="evidence-media"><video src="case-data/cases/52414510932/media/seg04_step3.mp4" controls muted loop playsinline></video><figcaption>原生语音：Shapes transform. Stories fold.</figcaption></figure><figure class="evidence-media"><video src="case-data/cases/52414510932/media/seg05_recap.mp4" controls muted loop playsinline></video><figcaption>原生语音：And that&#x27;s how it&#x27;s done.</figcaption></figure></div>
+        </div><div class="biz-proof"><span class="biz-label">输入→输出</span><strong>sound:on → embedded speech</strong>
+          <details class="related-calls">
+            <summary>16 个关联调用 <span><a class="call-chip" href="#chain" data-call="38">#38</a><a class="call-chip" href="#chain" data-call="39">#39</a><a class="call-chip" href="#chain" data-call="40">#40</a><a class="call-chip" href="#chain" data-call="41">#41</a><a class="call-chip" href="#chain" data-call="42">#42</a><a class="call-chip" href="#chain" data-call="43">#43</a>…</span></summary>
+            <div class="related-call-list">
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="38">#38</a>
+                  <strong>video_generate</strong>
+                  <span>19:38:38</span>
+                </div>
+                <p>name=seg01_hook; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=4; sound=on; aspect=16:9</p>
+                <p class="muted">ok=True error=none file=/projects/52414510932/workspace/assets/seg01_hook_20260811T114133_8fea129f.mp4</p>
+                <div class="call-mini-problem">sound:on created a native audio owner candidate; prompt intent did not prove the output speech-free</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="39">#39</a>
+                  <strong>video_generate</strong>
+                  <span>19:38:38</span>
+                </div>
+                <p>name=seg03_step2; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=6; sound=on; aspect=16:9</p>
+                <p class="muted">ok=True error=none file=/projects/52414510932/workspace/assets/seg03_step2_20260811T114317_7b2046b8.mp4</p>
+                <div class="call-mini-problem">sound:on created a native audio owner candidate; prompt intent did not prove the output speech-free</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="40">#40</a>
+                  <strong>video_generate</strong>
+                  <span>19:38:38</span>
+                </div>
+                <p>name=seg05_recap; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=4; sound=on; aspect=16:9</p>
+                <p class="muted">ok=True error=none file=/projects/52414510932/workspace/assets/seg05_recap_20260811T114300_a28b00b1.mp4</p>
+                <div class="call-mini-problem">sound:on created a native audio owner candidate; final clip contains generated speech</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="41">#41</a>
+                  <strong>video_generate</strong>
+                  <span>19:38:38</span>
+                </div>
+                <p>name=seg04_step3; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=5; sound=on; aspect=16:9</p>
+                <p class="muted">ok=True error=none file=/projects/52414510932/workspace/assets/seg04_step3_20260811T114128_ea16ec8d.mp4</p>
+                <div class="call-mini-problem">sound:on created a native audio owner candidate; STT later confirms &#x27;Shapes transform. Stories fold.&#x27;</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="42">#42</a>
+                  <strong>video_generate</strong>
+                  <span>19:38:38</span>
+                </div>
+                <p>name=seg02_step1; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=5; sound=on; aspect=16:9</p>
+                <p class="muted">ok=True error=none file=/projects/52414510932/workspace/assets/seg02_step1_20260811T114127_0e8ff07e.mp4</p>
+                <div class="call-mini-problem">sound:on created a native audio owner candidate; prompt intent did not prove the output speech-free</div>
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="43">#43</a>
+                  <strong>write_todos</strong>
+                  <span>19:43:27</span>
+                </div>
+                <p>Write the locked script handoff file=completed; Search for and audition narrator voice, then produce all 5 VO lines=completed; Generate all 5 video s...</p>
+                <p class="muted">Updated todo list to [{&#x27;content&#x27;: &#x27;Write the locked script handoff file&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;Search for and audition narr...</p>
+                
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="44">#44</a>
+                  <strong>media_probe</strong>
+                  <span>19:43:31</span>
+                </div>
+                <p>file=/projects/52414510932/workspace/assets/seg04_step3_20260811T114128_ea16ec8d.mp4</p>
+                <p class="muted">duration=5.086000 codec=h264 1280x720 pix_fmt=yuv420p</p>
+                <div class="call-mini-problem">Probe confirmed an AAC stream, but the agent did not run STT or combined audio QA</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="45">#45</a>
+                  <strong>media_probe</strong>
+                  <span>19:43:31</span>
+                </div>
+                <p>file=/projects/52414510932/workspace/assets/seg01_hook_20260811T114133_8fea129f.mp4</p>
+                <p class="muted">duration=4.087000 codec=h264 1280x720 pix_fmt=yuv420p</p>
+                <div class="call-mini-problem">Probe confirmed an AAC stream, but the agent did not run STT or combined audio QA</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="46">#46</a>
+                  <strong>media_probe</strong>
+                  <span>19:43:31</span>
+                </div>
+                <p>file=/projects/52414510932/workspace/assets/seg05_recap_20260811T114300_a28b00b1.mp4</p>
+                <p class="muted">duration=4.064000 codec=h264 1280x720 pix_fmt=yuv420p</p>
+                <div class="call-mini-problem">Probe confirmed an AAC stream; STT later confirms &#x27;And that&#x27;s how it&#x27;s done.&#x27;</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="47">#47</a>
+                  <strong>media_probe</strong>
+                  <span>19:43:31</span>
+                </div>
+                <p>file=/projects/52414510932/workspace/assets/seg03_step2_20260811T114317_7b2046b8.mp4</p>
+                <p class="muted">duration=6.061000 codec=h264 1280x720 pix_fmt=yuv420p</p>
+                <div class="call-mini-problem">Probe confirmed an AAC stream, but the agent did not run STT or combined audio QA</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="48">#48</a>
+                  <strong>media_probe</strong>
+                  <span>19:43:31</span>
+                </div>
+                <p>file=/projects/52414510932/workspace/assets/seg02_step1_20260811T114127_0e8ff07e.mp4</p>
+                <p class="muted">duration=5.086000 codec=h264 1280x720 pix_fmt=yuv420p</p>
+                <div class="call-mini-problem">Probe confirmed an AAC stream, but the agent did not run STT or combined audio QA</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="49">#49</a>
+                  <strong>analyze_file_content</strong>
+                  <span>19:43:49</span>
+                </div>
+                <p>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</p>
+                <p class="muted">### Conclusion This is a paper collage style animation. Visible objects include paper cutout hands, paper cutout triangular pieces, a folde...</p>
+                <div class="call-mini-problem">Visual-only AFC ignored the sound-on clip&#x27;s native audio</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="50">#50</a>
+                  <strong>analyze_file_content</strong>
+                  <span>19:43:49</span>
+                </div>
+                <p>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</p>
+                <p class="muted">### Conclusion This is a paper collage style animation. The visible objects move continuously, there is no burned-in text/captions, no huma...</p>
+                <div class="call-mini-problem">Visual-only AFC ignored the sound-on clip&#x27;s native audio</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="51">#51</a>
+                  <strong>analyze_file_content</strong>
+                  <span>19:43:49</span>
+                </div>
+                <p>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</p>
+                <p class="muted">### Conclusion This is a paper collage style animation. Visible objects include a newspaper-formed bed that folds into a stack of newspaper...</p>
+                <div class="call-mini-problem">Visual-only AFC ignored the sound-on clip&#x27;s native audio</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="52">#52</a>
+                  <strong>analyze_file_content</strong>
+                  <span>19:43:49</span>
+                </div>
+                <p>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</p>
+                <p class="muted">### Conclusion This is a paper collage style animation. Visible objects move and converge to the center of the frame. No burned-in text, hu...</p>
+                <div class="call-mini-problem">Visual-only AFC ignored the sound-on clip&#x27;s native audio</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="53">#53</a>
+                  <strong>analyze_file_content</strong>
+                  <span>19:43:49</span>
+                </div>
+                <p>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</p>
+                <p class="muted">### Conclusion This is a paper collage style animation. Visible objects move continuously, there is no burned-in text, no human faces or mo...</p>
+                <div class="call-mini-problem">Visual-only AFC ignored the sound-on clip&#x27;s native audio</div>
+              </div>
+            </div>
+          </details>
+        </div></div>
+      </article>
+      <article class="biz-node">
+        <div class="biz-marker warn">3</div>
+        <div class="biz-card warn-card"><div class="biz-main">
+          <div class="biz-kicker">初始合成</div><h3>第一版 HTML 将所有生成视频 muted，只有正式 VO 可听</h3>
+          <p>这一步本来保持了单一 narrator owner。问题只是视频同时声明 <code>data-has-audio=true</code>，与 muted 形成结构声明冲突。</p>
+        </div><div class="biz-proof"><span class="biz-label">正确听感状态</span><strong>native audio silent</strong>
+          <details class="related-calls">
+            <summary>2 个关联调用 <span><a class="call-chip" href="#chain" data-call="57">#57</a><a class="call-chip" href="#chain" data-call="58">#58</a></span></summary>
+            <div class="related-call-list">
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="57">#57</a>
+                  <strong>write_file</strong>
+                  <span>19:45:34</span>
+                </div>
+                <p>/projects/52414510932/workspace/composition.html; content=14083 chars</p>
+                <p class="muted">Updated file /projects/52414510932/workspace/composition.html</p>
+                <div class="call-mini-problem">HTML initially kept all five generated videos muted, which preserved one audible narrator owner</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="58">#58</a>
+                  <strong>lint_composition</strong>
+                  <span>19:45:37</span>
+                </div>
+                <p>{&#x27;fps&#x27;: 30, &#x27;html_file&#x27;: &#x27;/projects/52414510932/workspace/composition.html&#x27;}</p>
+                <p class="muted">{&quot;success&quot;: true, &quot;valid&quot;: false, &quot;errors&quot;: [{&quot;code&quot;: &quot;VIDEO_MUTED_WITH_DECLARED_AUDIO&quot;, &quot;severity&quot;: &quot;error&quot;, &quot;message&quot;: &quot;&lt;video id=\&quot;v1\&quot;&gt;...</p>
+                <div class="call-mini-problem">Lint exposed a declaration conflict; its suggested silent-video repair was not selected</div>
+              </div>
+            </div>
+          </details>
+        </div></div>
+      </article>
+      <article class="biz-node">
+        <div class="biz-marker bad">4</div>
+        <div class="biz-card bad-card"><div class="biz-main">
+          <div class="biz-kicker">错误修复</div><h3>Agent 删除 5 个 muted，让生成片原声全部恢复可听</h3>
+          <p>Lint 已给出两个方向：需要可听则删 muted；需要静音视觉则移除音频声明并保持静音。因为已有正式 post VO，正确 ownership 应是后者，Agent 却选择了前者。</p>
+        </div><div class="biz-proof"><span class="biz-label">双 VO 引入点</span><strong>remove muted × 5</strong>
+          <details class="related-calls">
+            <summary>1 个关联调用 <span><a class="call-chip" href="#chain" data-call="59">#59</a></span></summary>
+            <div class="related-call-list">
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="59">#59</a>
+                  <strong>edit_file</strong>
+                  <span>19:45:52</span>
+                </div>
+                <p>/projects/52414510932/workspace/composition.html; replace 1046-&gt;1016 chars</p>
+                <p class="muted">Successfully replaced 1 instance(s) of the string in &#x27;/projects/52414510932/workspace/composition.html&#x27;</p>
+                <div class="call-mini-problem">Causal error: removed muted from all five videos, making their generated native speech audible</div>
+              </div>
+            </div>
+          </details>
+        </div></div>
+      </article>
+      <article class="biz-node">
+        <div class="biz-marker bad">5</div>
+        <div class="biz-card bad-card"><div class="biz-main">
+          <div class="biz-kicker">已知告警放行</div><h3>第二次 lint 明确报 native-video audio 与 VO 同时播放</h3>
+          <p>告警举例：<code>v1:audio</code> 与 <code>vo1</code> 重叠 2.960 秒，<code>v5</code> 与 <code>vo5</code> 也重叠。Agent 没有恢复静音或做 STT，而是在 submit_render 中 acknowledge 该 finding。</p>
+        </div><div class="biz-proof"><span class="biz-label">门禁失效</span><strong>known overlap accepted</strong>
+          <details class="related-calls">
+            <summary>2 个关联调用 <span><a class="call-chip" href="#chain" data-call="62">#62</a><a class="call-chip" href="#chain" data-call="75">#75</a></span></summary>
+            <div class="related-call-list">
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="62">#62</a>
+                  <strong>lint_composition</strong>
+                  <span>19:46:04</span>
+                </div>
+                <p>{&#x27;fps&#x27;: 30, &#x27;html_file&#x27;: &#x27;/projects/52414510932/workspace/composition.html&#x27;}</p>
+                <p class="muted">{&quot;success&quot;: true, &quot;valid&quot;: false, &quot;errors&quot;: [], &quot;questions&quot;: [{&quot;code&quot;: &quot;MOTION_CONTRACT_COVERAGE_AUDIO_OVERLAP&quot;, &quot;severity&quot;: &quot;question&quot;, &quot;m...</p>
+                <div class="call-mini-problem">Lint explicitly reported native-video audio overlapping separate VO; the warning was not resolved</div>
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="75">#75</a>
+                  <strong>submit_render</strong>
+                  <span>19:47:00</span>
+                </div>
+                <p>html=/projects/52414510932/workspace/composition.html; output=fitted_sheet_fold_collage_R01; fps=30; format=None; quality=high</p>
+                <p class="muted">success job=8vwax54m status=pending warnings=0</p>
+                <div class="call-mini-problem">Render submitted by acknowledging the known same-role audio overlap</div>
+              </div>
+            </div>
+          </details>
+        </div></div>
+      </article>
+      <article class="biz-node">
+        <div class="biz-marker bad">6</div>
+        <div class="biz-card bad-card"><div class="biz-main">
+          <div class="biz-kicker">最终交付</div><h3>成片混入生成语音 + 正式 VO + BGM，且没有 final audio QA</h3>
+          <p>Render 完成后没有对最终 MP4 做 audio probe、STT 或 combined AFC，直接交付；用户侧还把未验证的 native audio 描述成 “Collage SFX”，掩盖了其中的人声。</p>
+          <div class="biz-media wide"><figure class="evidence-media"><video src="case-data/cases/52414510932/media/fitted_sheet_fold_collage_R01.mp4" controls muted loop playsinline></video><figcaption>最终 23.146667s 双人声成片</figcaption></figure></div>
+        </div><div class="biz-proof"><span class="biz-label">结果</span><strong>duplicate speech delivered</strong>
+          <details class="related-calls">
+            <summary>3 个关联调用 <span><a class="call-chip" href="#chain" data-call="77">#77</a><a class="call-chip" href="#chain" data-call="78">#78</a><a class="call-chip" href="#chain" data-call="79">#79</a></span></summary>
+            <div class="related-call-list">
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="77">#77</a>
+                  <strong>query_render</strong>
+                  <span>19:48:07</span>
+                </div>
+                <p>job_id=8vwax54m</p>
+                <p class="muted">success=True status=done asset=None file=/projects/52414510932/workspace/assets/fitted_sheet_fold_collage_R01.mp4</p>
+                <div class="call-mini-problem">Render completed, but no final MP4 audio probe, STT, or combined speech verification followed</div>
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="78">#78</a>
+                  <strong>write_todos</strong>
+                  <span>19:48:13</span>
+                </div>
+                <p>Write the locked script handoff file=completed; Search for and audition narrator voice, then produce all 5 VO lines=completed; Generate all 5 video s...</p>
+                <p class="muted">Updated todo list to [{&#x27;content&#x27;: &#x27;Write the locked script handoff file&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;Search for and audition narr...</p>
+                
+              </div>
+            
+              <div class="call-mini bad">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="79">#79</a>
+                  <strong>show_final_video</strong>
+                  <span>19:48:16</span>
+                </div>
+                <p>file_path=/projects/52414510932/workspace/assets/fitted_sheet_fold_collage_R01.mp4</p>
+                <p class="muted">a_RuYtZ1m</p>
+                <div class="call-mini-problem">Delivered a final video containing native generated speech plus formal narrator VO without final audio QA</div>
+              </div>
+            </div>
+          </details>
+        </div></div>
+      </article>
+    </div>
+      </section>
+
+      <section id="evidence">
+        <h2>问题证据卡</h2>
+        <div class="evidence-grid">
+      <article class="evidence-card good-card"><div class="evidence-title">不是两个 TTS voice</div><p>VO_L1-L5 全部绑定 <code>dCK3Zxor7cs21Fya12FS</code>；Script 也只有一个 narrator identity。</p><a href="#chain" data-call="30">看 TTS 调用</a></article>
+      <article class="evidence-card bad-card"><div class="evidence-title">5/5 sound:on</div><p>所有 Seedance payload 都打开原生声音；Prompt 的 “No human speech” 没有被实际音频检测验证。</p><a href="#chain" data-call="38">看生成调用</a></article>
+      <article class="evidence-card bad-card"><div class="evidence-title">STT 命中生成语音</div><p>seg04：Shapes transform. Stories fold.；seg05：And that's how it's done.</p><a href="#media">听原生片段</a></article>
+      <article class="evidence-card bad-card"><div class="evidence-title">取消静音是引入点</div><p>#59 一次性删掉五个 <code>muted</code>，把原生 AAC 从视觉素材变成最终可听音轨。</p><a href="#chain" data-call="59">看 HTML 修改</a></article>
+      <article class="evidence-card bad-card"><div class="evidence-title">Overlap 已被明确报告</div><p>#62 直接写出 v1:audio/vo1 与 v5/vo5 同角色混音；#75 acknowledge 后提交。</p><a href="#chain" data-call="62">看 lint</a></article>
+      <article class="evidence-card bad-card"><div class="evidence-title">0 次 final audio QA</div><p>最终 MP4 没有 media_probe、STT 或 combined AFC；“Collage SFX” 是无证据的交付描述。</p><a href="#chain" data-call="79">看交付</a></article>
+    </div>
+      </section>
+
+      <section id="overview">
+        <h2>两轮会话概览</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Start UTC</th><th>Trace</th><th>User Input</th><th>Tools</th><th>Latency</th></tr></thead>
+            <tbody>
+        <tr>
+          <td>2026-08-11T19:33:24.094138+08:00</td>
+          <td><code>messages.json</code><br><span class="muted">thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</span></td>
+          <td>Create a paper-collage animation explainer showing how to fold a fitted sheet, in the style of hand-made paper stop-motion where an unseen pair of hands never stops rearranging the board. STORY (20–25s, one idea per beat): 0:00–0:03 HOOK + TITLE — one VO line saying exactly what this video explains, with a huge, bold, oversized topic title landing on the beat. 0:03–0:08 STEP 1 — the action, performed on screen. 0:08–0:13 STEP 2 — built on top of Step 1&#x27;s leftover pieces. 0:13–0:18 STEP 3 — the last piece completes the composition. 0:18–0:23 RECAP + CTA — the three steps reassemble into one pa...</td>
+          <td>79</td>
+          <td>s</td>
+        </tr>
+        </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="assets">
+        <h2>素材预览</h2>
+        <div class="grid-assets">
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/52414510932/media/BGM_collage_upbeat.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>BGM_collage_upbeat.mp3</h3>
+        <p>audio/mpeg · 469.4 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/52414510932/media/VO_L1_hook.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>VO_L1_hook.mp3</h3>
+        <p>audio/mpeg · 47.4 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/52414510932/media/VO_L2_step1.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>VO_L2_step1.mp3</h3>
+        <p>audio/mpeg · 79.6 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/52414510932/media/VO_L3_step2.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>VO_L3_step2.mp3</h3>
+        <p>audio/mpeg · 87.4 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/52414510932/media/VO_L4_step3.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>VO_L4_step3.mp3</h3>
+        <p>audio/mpeg · 74.7 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/52414510932/media/VO_L5_cta.mp3" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>VO_L5_cta.mp3</h3>
+        <p>audio/mpeg · 39.6 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/52414510932/media/collage_style_ref_main.jpg" alt="collage_style_ref_main.jpg" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>collage_style_ref_main.jpg</h3>
+        <p>image/jpeg · 1095.9 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><video src="case-data/cases/52414510932/media/fitted_sheet_fold_collage_R01.mp4" controls muted loop playsinline></video></div>
+      <div class="asset-body">
+        <h3>fitted_sheet_fold_collage_R01.mp4</h3>
+        <p>video/mp4 · 12429.1 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/52414510932/media/fitted_sheet_fold_collage_R01_audio.wav" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>fitted_sheet_fold_collage_R01_audio.wav</h3>
+        <p>audio/x-wav · 723.4 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/52414510932/media/qc_t11_step2.png.jpg" alt="qc_t11_step2.png.jpg" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>qc_t11_step2.png.jpg</h3>
+        <p>image/jpeg · 270.9 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/52414510932/media/qc_t17_step3.png.jpg" alt="qc_t17_step3.png.jpg" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>qc_t17_step3.png.jpg</h3>
+        <p>image/jpeg · 561.3 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/52414510932/media/qc_t21_cta.png.jpg" alt="qc_t21_cta.png.jpg" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>qc_t21_cta.png.jpg</h3>
+        <p>image/jpeg · 133.1 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/52414510932/media/qc_t2_title.png.jpg" alt="qc_t2_title.png.jpg" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>qc_t2_title.png.jpg</h3>
+        <p>image/jpeg · 426.5 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/52414510932/media/qc_t5_step1.png.jpg" alt="qc_t5_step1.png.jpg" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>qc_t5_step1.png.jpg</h3>
+        <p>image/jpeg · 505.7 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><video src="case-data/cases/52414510932/media/seg01_hook.mp4" controls muted loop playsinline></video></div>
+      <div class="asset-body">
+        <h3>seg01_hook.mp4</h3>
+        <p>video/mp4 · 1144.7 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/52414510932/media/seg01_hook_native.wav" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>seg01_hook_native.wav</h3>
+        <p>audio/x-wav · 127.8 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><video src="case-data/cases/52414510932/media/seg02_step1.mp4" controls muted loop playsinline></video></div>
+      <div class="asset-body">
+        <h3>seg02_step1.mp4</h3>
+        <p>video/mp4 · 1202.9 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/52414510932/media/seg02_step1_native.wav" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>seg02_step1_native.wav</h3>
+        <p>audio/x-wav · 159.0 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><video src="case-data/cases/52414510932/media/seg03_step2.mp4" controls muted loop playsinline></video></div>
+      <div class="asset-body">
+        <h3>seg03_step2.mp4</h3>
+        <p>video/mp4 · 1190.1 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/52414510932/media/seg03_step2_native.wav" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>seg03_step2_native.wav</h3>
+        <p>audio/x-wav · 189.5 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><video src="case-data/cases/52414510932/media/seg04_step3.mp4" controls muted loop playsinline></video></div>
+      <div class="asset-body">
+        <h3>seg04_step3.mp4</h3>
+        <p>video/mp4 · 1521.5 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/52414510932/media/seg04_step3_native.wav" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>seg04_step3_native.wav</h3>
+        <p>audio/x-wav · 159.0 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><video src="case-data/cases/52414510932/media/seg05_recap.mp4" controls muted loop playsinline></video></div>
+      <div class="asset-body">
+        <h3>seg05_recap.mp4</h3>
+        <p>video/mp4 · 952.6 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><audio src="case-data/cases/52414510932/media/seg05_recap_native.wav" controls preload="metadata"></audio></div>
+      <div class="asset-body">
+        <h3>seg05_recap_native.wav</h3>
+        <p>audio/x-wav · 127.1 KB</p>
+      </div>
+    </article>
+    </div>
+      </section>
+
+      <section id="prompts">
+        <h2>资产记录与 Prompt</h2>
+        <div class="grid-assets">
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">audio</span>
+            <span class="badge muted-badge">audio_produce</span>
+            <span class="badge muted-badge">elevenlabs</span>
+          </div>
+          <h3>VO_L3_step2</h3>
+          <p class="mono">eleven_v3</p>
+          <p>Step two — scoop in the other two corners so all four nest together.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">audio</span>
+            <span class="badge muted-badge">audio_produce</span>
+            <span class="badge muted-badge">elevenlabs</span>
+          </div>
+          <h3>VO_L2_step1</h3>
+          <p class="mono">eleven_v3</p>
+          <p>Step one — hold two corners together, pocket inside pocket.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">audio</span>
+            <span class="badge muted-badge">audio_produce</span>
+            <span class="badge muted-badge">elevenlabs</span>
+          </div>
+          <h3>VO_L1_hook</h3>
+          <p class="mono">eleven_v3</p>
+          <p>Fitting a fitted sheet doesn&#x27;t have to be a wrestling match.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">audio</span>
+            <span class="badge muted-badge">audio_produce</span>
+            <span class="badge muted-badge">elevenlabs</span>
+          </div>
+          <h3>VO_L4_step3</h3>
+          <p class="mono">eleven_v3</p>
+          <p>Step three — fold the whole thing flat. Clean rectangle, every time.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">audio</span>
+            <span class="badge muted-badge">audio_produce</span>
+            <span class="badge muted-badge">elevenlabs</span>
+          </div>
+          <h3>VO_L5_cta</h3>
+          <p class="mono">eleven_v3</p>
+          <p>Save this, and you&#x27;ll never dread it again.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">image</span>
+            <span class="badge muted-badge">image_generate</span>
+            <span class="badge muted-badge">seedream</span>
+          </div>
+          <h3>collage_style_ref_main</h3>
+          <p class="mono">seedream-4-5-251128</p>
+          <p>Premium paper collage stop-motion animation frame, 16:9 landscape. Bold warm red-orange color-blocked paper ground. Large fitted bedsheet cut-out made of torn magazine paper with visible scissor-cut edges, tumbling mid-flight, speed-blur paper tears trailing behind it. Smaller paper scraps — corner pockets, elastic swirls — scattered around the sheet, all mid-movement. Hard drop-shadows on every element. Halftone risograph screen texture overlay across the whole frame. Tape and staple accents holding paper layers. Bold graphic energy. Nothing static — every piece is captured mid-action, mid-rotation, mid-slide. Tactile zine aesthetic. Professional craft illustration style.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>seg01_hook</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>Premium paper collage stop-motion animation. Bold warm red-orange color-blocked paper ground. A large fitted bedsheet cut-out made of torn magazine paper tumbles in from off-frame left, spinning mid-air with trailing paper-tear speed blurs. Corner-pocket paper scraps and elastic-swirl cut-outs scatter outward from the impact. At least 4 distinct paper elements animate simultaneously throughout the whole clip. Camera starts wide then crashes in fast with a dramatic punch-in zoom. Halftone risograph texture throughout. Hard drop-shadows on every layer. Tape and staple accents. Everything in constant motion, nothing static. No human speech, no mouth movement, no talking — offscreen narration only. No text or captions baked into footage.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>seg03_step2</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>Premium paper collage stop-motion animation. Color ground is teal-sage — introduced by a torn-paper tear-away wipe from the right edge. Two previously tucked corners visible as a single paper shape at center-left. A second pair of paper corner cut-outs slides in from the right edge. Paper hands guide all four corners together into a nested stack — layered paper shapes with visible depth and drop-shadows. A circular cut-paper highlight oscillates over the nested pocket region. Camera performs a push-in zoom tightening on the pocket area mid-beat. At least 3 paper elements always in motion. Halftone risograph texture throughout. Hard drop-shadows. Nothing freezes. No human speech, no mouth movement — offscreen narration only. No text or captions baked into footage.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>seg05_recap</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>Premium paper collage stop-motion animation. Color ground returns to warm red-orange echoing the opening. Camera whip-pans back from a close view to reveal a wide payoff composition. Three small paper thumbnails — representations of the three folding stages — fly in simultaneously from the screen corners converging toward center. They land into a hero arrangement. A large rubber-stamp-shaped paper element slams down center-frame with force and a slight overshoot bounce. Camera settles from the whip-pan into a locked frame; all elements continue a subtle wobble for the remainder. At least 3 paper elements always moving. Halftone risograph texture throughout. Hard drop-shadows. Energetic and satisfying finish. No human speech, no mouth movement — offscreen narration only. No text baked into footage.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>seg04_step3</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>Premium paper collage stop-motion animation. Color ground is cobalt blue — introduced by a full-frame color-panel sweep from the left. The nested corner cluster from the previous step anchors center-left. Paper hands fold the sheet against a bold flat paper rectangle surface. Three distinct snappy paper-hinge folds happen in sequence, each with overshoot snap. On the final fold the sheet forms a neat layered rectangle. Confetti paper scraps rain down from the top edge at the moment of the final fold. Camera tilts slightly upward during the folding sequence. At least 3 paper elements always animating. Halftone risograph texture throughout. Hard drop-shadows. Tape accents. Nothing static. No human speech, no mouth movement — offscreen narration only. No text baked into footage.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge">video_generate</span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>seg02_step1</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>Premium paper collage stop-motion animation. Color ground is mustard yellow — established by a hard paper-swipe wipe from frame left. Large fitted-sheet paper cut-out at center frame made of torn magazine paper. Two paper-hand cut-outs swing in from opposite sides with snappy overshoot motion, grabbing two corners of the sheet and tucking them pocket-inside-pocket. A cut-paper arrow wobbles in a circle around the tucked corners. At least 3 paper elements animating simultaneously at all times. Camera performs a lateral track to the left across the beat. Halftone risograph texture throughout. Hard drop-shadows. Tape accents. Nothing ever holds still. No human speech, no mouth movement, no talking — offscreen narration only. No text or captions baked into footage.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">audio</span>
+            <span class="badge muted-badge">music_generate</span>
+            <span class="badge muted-badge">elevenlabs</span>
+          </div>
+          <h3>BGM_collage_upbeat</h3>
+          <p class="mono">music_v1</p>
+          <p>Upbeat lo-fi indie-pop instrumental. Punchy, snappy rhythm with percussive paper-like claps and light crunchy beats. Warm analog feel. Brisk tempo around 120 BPM. Playful and energetic but not chaotic — cheerful and forward-moving. Good for short instructional social media video. No vocals.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">final</span>
+            <span class="badge muted-badge">show_final_video</span>
+            <span class="badge muted-badge">local</span>
+          </div>
+          <h3>final_video</h3>
+          <p class="mono">/projects/52414510932/workspace/assets/fitted_sheet_fold_collage_R01.mp4</p>
+          <p></p>
+        </article>
+        </div>
+      </section>
+
+      <section>
+        <h2>生成/渲染主链路</h2>
+        
+        <div class="step good">
+          <div><strong>audio_produce</strong> <span>19:37:29</span></div>
+          <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L3_step2&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &#x27;Step two — scoop in the other...</p>
+          <p class="muted">{&quot;trace_id&quot;: &quot;3d838b38-58a5-478d-b510-fa97dc8aab3f&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;34a9804b-bd85-4965-949a-8094dafdb210&quot;, &quot;file&quot;: &quot;/proj...</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>audio_produce</strong> <span>19:37:29</span></div>
+          <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L2_step1&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &#x27;Step one — hold two corners t...</p>
+          <p class="muted">{&quot;trace_id&quot;: &quot;1aa7f4f8-d42b-4bb4-9791-111abb0d736e&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;035a8871-3dae-4dce-9ba0-d90f13776a10&quot;, &quot;file&quot;: &quot;/proj...</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>audio_produce</strong> <span>19:37:29</span></div>
+          <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L1_hook&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &quot;Fitting a fitted sheet doesn&#x27;t...</p>
+          <p class="muted">{&quot;trace_id&quot;: &quot;9a532fa2-b6b3-440f-aeb2-00217c1fe59a&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;1a5e8704-98a0-4a01-b9f2-f2254307cc91&quot;, &quot;file&quot;: &quot;/proj...</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>audio_produce</strong> <span>19:37:29</span></div>
+          <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L4_step3&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &#x27;Step three — fold the whole t...</p>
+          <p class="muted">{&quot;trace_id&quot;: &quot;b27631bc-e443-4e66-b74e-31705530233f&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;10661f51-5ac7-46d8-bdaf-33ecde14be56&quot;, &quot;file&quot;: &quot;/proj...</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>audio_produce</strong> <span>19:37:29</span></div>
+          <p>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L5_cta&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &quot;Save this, and you&#x27;ll never dre...</p>
+          <p class="muted">{&quot;trace_id&quot;: &quot;e76825b3-83ee-4034-bbac-1e874f3326ff&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;8843d38d-af9f-411d-add5-aa0f26c05f01&quot;, &quot;file&quot;: &quot;/proj...</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>image_generate</strong> <span>19:37:54</span></div>
+          <p>name=collage_style_ref_main; seedream/seedream-4-5-251128; mode=text2image; size=2K</p>
+          <p class="muted">ok=True error=none file=/projects/52414510932/workspace/assets/collage_style_ref_main_20260811T113804_4b32afcd.png</p>
+        </div>
+        
+
+        <div class="step bad">
+          <div><strong>video_generate</strong> <span>19:38:38</span></div>
+          <p>name=seg01_hook; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=4; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/52414510932/workspace/assets/seg01_hook_20260811T114133_8fea129f.mp4</p>
+        </div>
+        
+
+        <div class="step bad">
+          <div><strong>video_generate</strong> <span>19:38:38</span></div>
+          <p>name=seg03_step2; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=6; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/52414510932/workspace/assets/seg03_step2_20260811T114317_7b2046b8.mp4</p>
+        </div>
+        
+
+        <div class="step bad">
+          <div><strong>video_generate</strong> <span>19:38:38</span></div>
+          <p>name=seg05_recap; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=4; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/52414510932/workspace/assets/seg05_recap_20260811T114300_a28b00b1.mp4</p>
+        </div>
+        
+
+        <div class="step bad">
+          <div><strong>video_generate</strong> <span>19:38:38</span></div>
+          <p>name=seg04_step3; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=5; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/52414510932/workspace/assets/seg04_step3_20260811T114128_ea16ec8d.mp4</p>
+        </div>
+        
+
+        <div class="step bad">
+          <div><strong>video_generate</strong> <span>19:38:38</span></div>
+          <p>name=seg02_step1; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=5; sound=on; aspect=16:9</p>
+          <p class="muted">ok=True error=none file=/projects/52414510932/workspace/assets/seg02_step1_20260811T114127_0e8ff07e.mp4</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>music_generate</strong> <span>19:44:17</span></div>
+          <p>name=BGM_collage_upbeat; elevenlabs/music_v1; duration_ms=30000; instrumental=True</p>
+          <p class="muted">ok=True error=none file=/projects/52414510932/workspace/assets/BGM_collage_upbeat_20260811T114426_7b764428.mp3</p>
+        </div>
+        
+      </section>
+
+      <section id="chain">
+        <h2>技术明细</h2>
+        <details id="chainDetails" class="technical-details">
+          <summary>展开完整调用表（79 行）</summary>
+          <div class="controls">
+            <select id="toolFilter">
+              <option value="">All tools (79)</option>
+              <option value="__problem">Only flagged (28)</option>
+              <option value="add_attachments">add_attachments (2)</option>
+<option value="analyze_file_content">analyze_file_content (10)</option>
+<option value="audio_produce">audio_produce (5)</option>
+<option value="edit_file">edit_file (3)</option>
+<option value="image_generate">image_generate (1)</option>
+<option value="lint_composition">lint_composition (2)</option>
+<option value="list_fonts">list_fonts (1)</option>
+<option value="ls">ls (2)</option>
+<option value="media_probe">media_probe (5)</option>
+<option value="music_generate">music_generate (1)</option>
+<option value="query_render">query_render (2)</option>
+<option value="read_file">read_file (22)</option>
+<option value="render_frame">render_frame (5)</option>
+<option value="show_final_video">show_final_video (1)</option>
+<option value="submit_render">submit_render (1)</option>
+<option value="video_generate">video_generate (5)</option>
+<option value="voice_search">voice_search (1)</option>
+<option value="write_file">write_file (2)</option>
+<option value="write_todos">write_todos (8)</option>
+            </select>
+            <input id="searchBox" placeholder="搜索工具、参数、结果、问题">
+          </div>
+          <div class="table-wrap">
+            <table id="chainTable">
+              <thead><tr><th>#</th><th>UTC</th><th>Trace</th><th>Tool</th><th>Key params</th><th>Result</th><th>Problem</th></tr></thead>
+              <tbody>
+        <tr id="call-1" class="" data-index="1" data-tool="write_todos" data-problem="0">
+          <td>1</td>
+          <td>19:33:28</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Read creative and production skills to plan this paper-collage explainer=in_progress; Develop creative direction, script, and shot breakdown=pending; Generate all visual assets (style frame + scene imagery)=pending; Produce voiceover and music=pending; Compose and render the fin...</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Read creative and production skills to plan this paper-collage explainer&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;Develop creative direction, sc...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-2" class="has-problem" data-index="2" data-tool="read_file" data-problem="1">
+          <td>2</td>
+          <td>19:33:31</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/script-skill/SKILL.md</td>
+          <td>1 --- 2 name: script-skill 3 description: Plan every new video at sequence level from a locked creative direction or production-ready brief. Own the script, shot breakdown, readab...</td>
+          <td>Read but violated: measured VO-first handoff and production ownership were not enforced</td>
+        </tr>
+        
+
+        <tr id="call-3" class="" data-index="3" data-tool="read_file" data-problem="0">
+          <td>3</td>
+          <td>19:33:31</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/brainstorm-skill/SKILL.md</td>
+          <td>1 --- 2 name: brainstorm-skill 3 description: Creative direction development plus the mandatory URL-video approval owner. For URL-backed video work, always capture once, inspect a...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-4" class="" data-index="4" data-tool="read_file" data-problem="0">
+          <td>4</td>
+          <td>19:33:34</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/brainstorm-skill/references/creative-ideation-principles.md</td>
+          <td>1 # Content 2 3 ## Contents 4 5 - **1. The &quot;Tight Brief&quot; Principle** - constraint is freedom; vague briefs need anchoring before exploration 6 - **2. The &quot;Would I Click This?&quot; Tes...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-5" class="" data-index="5" data-tool="read_file" data-problem="0">
+          <td>5</td>
+          <td>19:33:34</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/brainstorm-skill/references/creative-rhythm-design.md</td>
+          <td>1 # Creative Density and Rhythm Planning 2 3 Use this reference to turn a locked concept into a macro beat curve. Brainstorm owns the audience-level plan; script-skill owns sequen...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-6" class="" data-index="6" data-tool="read_file" data-problem="0">
+          <td>6</td>
+          <td>19:33:37</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/brainstorm-skill/references/creative-brief-contract.md</td>
+          <td>1 # Creative Brief v1 Contract 2 3 Read completely before writing or handing off a Creative Brief. 4 5 # Runtime Shape 6 7 Write one immutable snapshot: 8 9 ```text 10 &lt;project_la...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-7" class="" data-index="7" data-tool="read_file" data-problem="0">
+          <td>7</td>
+          <td>19:33:37</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/brainstorm-skill/references/image-generation-guide.md</td>
+          <td>1 --- 2 id: image-generation-guide 3 description: &quot;Executable image generation contract for image_generate routing, reference preservation, schema fields, prompt hygiene, readable...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-8" class="" data-index="8" data-tool="read_file" data-problem="0">
+          <td>8</td>
+          <td>19:33:40</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/script-skill/references/voice-strategy-execution.md</td>
+          <td>1 --- 2 id: voice-strategy-planning 3 description: &quot;Script-stage planning rules for exact speech, visible/offscreen speaker relationship, planned source, voice direction, and voca...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-9" class="" data-index="9" data-tool="read_file" data-problem="0">
+          <td>9</td>
+          <td>19:33:40</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/script-skill/references/video-models-routing.md</td>
+          <td>1 --- 2 id: video-models-routing 3 description: &quot;Executable video model routing contract for HappyHorse, Seedance Fast, Seedance, and Kling. Uses Strategy Genes for hard routing r...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-10" class="has-problem" data-index="10" data-tool="read_file" data-problem="1">
+          <td>10</td>
+          <td>19:33:44</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/generation-skill/SKILL.md</td>
+          <td>1 --- 2 name: generation-skill 3 description: Execute production generation for video projects from Script Handoff and any required Subject Manifest. Own generation units, model/p...</td>
+          <td>Generation root was read, but its blocking references and Generation Handoff were skipped</td>
+        </tr>
+        
+
+        <tr id="call-11" class="has-problem" data-index="11" data-tool="read_file" data-problem="1">
+          <td>11</td>
+          <td>19:33:44</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/assembly-skill/SKILL.md</td>
+          <td>1 --- 2 name: assembly-skill 3 description: Prepare and lock actual video/audio materials for video projects, including probes, sequence coverage, rough-cut windows, measured post...</td>
+          <td>Causal read-but-violated: Assembly required STT for sound-on clips overlapping post VO</td>
+        </tr>
+        
+
+        <tr id="call-12" class="has-problem" data-index="12" data-tool="read_file" data-problem="1">
+          <td>12</td>
+          <td>19:33:47</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/SKILL.md</td>
+          <td>1 --- 2 name: motion-skill 3 description: Compose and render final HTML video from locked production materials. Own composition.html, final packaging, DOM-native text/data/UI, ele...</td>
+          <td>Motion root was read, but mandatory audio reference and final audio probe were skipped</td>
+        </tr>
+        
+
+        <tr id="call-13" class="" data-index="13" data-tool="read_file" data-problem="0">
+          <td>13</td>
+          <td>19:33:47</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/generation-skill/references/generation-blueprint-design.md</td>
+          <td>1 --- 2 id: generation-blueprint-design 3 description: &quot;Production blueprint design for generation-skill: sequence planning, shot duration and VO fit budgeting, visual consistency...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-14" class="" data-index="14" data-tool="read_file" data-problem="0">
+          <td>14</td>
+          <td>19:33:50</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/generation-skill/references/generation-execution-rules.md</td>
+          <td>1 --- 2 id: generation-execution-rules 3 description: &quot;Generation v2 execution rules for Subject asset mapping, call modes, prompts, durations, fallbacks, probes, and output organ...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-15" class="" data-index="15" data-tool="read_file" data-problem="0">
+          <td>15</td>
+          <td>19:33:50</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/references/design-visual-styles.md</td>
+          <td>1 # Visual style library 2 3 Named visual identities. Pick one when the user gives you a style brief; let the brand override anywhere it conflicts. 4 5 **Design receipt ids.** The...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-16" class="" data-index="16" data-tool="read_file" data-problem="0">
+          <td>16</td>
+          <td>19:33:54</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/references/design-beat-planning.md</td>
+          <td>1 # Beat planning (multi-scene rhythm) 2 3 **Read this BEFORE writing any multi-scene composition.** For motion principles within a single scene (easing, stagger), see [design-mot...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-17" class="" data-index="17" data-tool="read_file" data-problem="0">
+          <td>17</td>
+          <td>19:33:54</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/references/tech-html.md offset= limit=120</td>
+          <td>1 # tech-html — Motion HTML authoring guide 2 3 For `data-*` attribute shapes see `tech-data-attributes.md`. 4 5 **In-HTML resource references:** 6 - Media, image, subtitle, poste...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-18" class="" data-index="18" data-tool="read_file" data-problem="0">
+          <td>18</td>
+          <td>19:33:57</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/references/design-motion.md</td>
+          <td>1 # Motion principles (design) 2 3 --- 4 5 ## Layout Before Animation 6 7 Build the hero frame (peak-visibility moment) as static layout first; animate FROM offscreen TO that posi...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-19" class="" data-index="19" data-tool="read_file" data-problem="0">
+          <td>19</td>
+          <td>19:33:57</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/references/tech-html.md offset=120 limit=60</td>
+          <td>1 # tech-html — Motion HTML authoring guide 2 3 For `data-*` attribute shapes see `tech-data-attributes.md`. 4 5 **In-HTML resource references:** 6 - Media, image, subtitle, poste...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-20" class="" data-index="20" data-tool="read_file" data-problem="0">
+          <td>20</td>
+          <td>19:34:01</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/references/design-transitions.md</td>
+          <td>1 # Scene transitions (design) 2 3 Two paths: 4 1. **Declarative crossfade / hard cut** — sequential same-track scenes in a `data-hf-sequence` container; framework computes overla...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-21" class="" data-index="21" data-tool="read_file" data-problem="0">
+          <td>21</td>
+          <td>19:34:01</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/references/design-house-style.md offset= limit=100</td>
+          <td>1 # House style (creative direction) 2 3 Baseline for compositions without a brand spec; spec overrides house style. 4 5 --- 6 7 ## Anti-slop ban list (AI tells) 8 9 These are **b...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-22" class="" data-index="22" data-tool="write_todos" data-problem="0">
+          <td>22</td>
+          <td>19:34:39</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Write the locked script handoff file=in_progress; Produce the voiceover (VO-first: measure speech before generating video)=pending; Generate all 5 video segments simultaneously=pending; QA all generated clips, probe durations, write generation handoff=pending; Assemble timeline ...</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Write the locked script handoff file&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;Produce the voiceover (VO-first: measure speech before generating ...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-23" class="" data-index="23" data-tool="ls" data-problem="0">
+          <td>23</td>
+          <td>19:34:42</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">ls</span></td>
+          <td>{&#x27;path&#x27;: &#x27;/projects&#x27;}</td>
+          <td>[&#x27;/projects/03652661623&#x27;, &#x27;/projects/03718986716&#x27;, &#x27;/projects/04161476955&#x27;, &#x27;/projects/04644706574&#x27;, &#x27;/projects/04901435234&#x27;, &#x27;/projects/05014577076&#x27;, &#x27;/projects/05363664846&#x27;, &#x27;/p...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-24" class="" data-index="24" data-tool="ls" data-problem="0">
+          <td>24</td>
+          <td>19:34:44</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">ls</span></td>
+          <td>{&#x27;path&#x27;: &#x27;/projects/52414510932&#x27;}</td>
+          <td>[&#x27;/projects/52414510932/workspace&#x27;, &#x27;/projects/52414510932/conversation_history&#x27;]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-25" class="" data-index="25" data-tool="write_file" data-problem="0">
+          <td>25</td>
+          <td>19:35:59</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">write_file</span></td>
+          <td>/projects/52414510932/workspace/fitted-sheet-fold__script_handoff__locked__R01.md; content=14107 chars</td>
+          <td>Updated file /projects/52414510932/workspace/fitted-sheet-fold__script_handoff__locked__R01.md</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-26" class="has-problem" data-index="26" data-tool="read_file" data-problem="1">
+          <td>26</td>
+          <td>19:36:02</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/projects/52414510932/workspace/fitted-sheet-fold__script_handoff__locked__R01.md</td>
+          <td>1 --- 2 schema: script_handoff_v2 3 project_label: fitted-sheet-fold 4 revision: R01 5 status: locked 6 handoff_artifact_read_required: true 7 --- 8 9 ```yaml script_handoff_v2 10...</td>
+          <td>Script Handoff read stopped at line 200 and was never continued to EOF</td>
+        </tr>
+        
+
+        <tr id="call-27" class="" data-index="27" data-tool="write_todos" data-problem="0">
+          <td>27</td>
+          <td>19:36:08</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Write the locked script handoff file=completed; Search for and audition narrator voice, then produce all 5 VO lines=in_progress; Generate all 5 video segments simultaneously=pending; QA all generated clips, probe durations, write generation handoff=pending; Assemble timeline and...</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Write the locked script handoff file&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;Search for and audition narrator voice, then produce all 5 VO lines&#x27;...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-28" class="has-problem" data-index="28" data-tool="read_file" data-problem="1">
+          <td>28</td>
+          <td>19:36:11</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/generation-skill/references/voice-production-and-resolution.md</td>
+          <td>1 --- 2 id: voice-production-and-resolution 3 description: &quot;Shared rules for voice resolution, public search, preview, clone authorization, TTS production, measured fit, and spoke...</td>
+          <td>Causal read-but-violated: the voice contract forbids separate VO duplicating embedded speech</td>
+        </tr>
+        
+
+        <tr id="call-29" class="" data-index="29" data-tool="voice_search" data-problem="0">
+          <td>29</td>
+          <td>19:36:17</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">voice_search</span></td>
+          <td>{&#x27;query&#x27;: &#x27;For an explainer/tutorial voiceover, the target spoken language must be English and the voice must be female. Warm, confident, and brisk delivery. North American accent...</td>
+          <td>{&quot;trace_id&quot;: &quot;fadd1769-c724-409d-810b-0d4389d743b9&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;status&quot;: &quot;success&quot;, &quot;final_tags&quot;: {&quot;accent&quot;: &quot;american&quot;, &quot;gender&quot;: ...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-30" class="" data-index="30" data-tool="audio_produce" data-problem="0">
+          <td>30</td>
+          <td>19:37:29</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">audio_produce</span></td>
+          <td>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L3_step2&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &#x27;Step two — scoop in the other...</td>
+          <td>{&quot;trace_id&quot;: &quot;3d838b38-58a5-478d-b510-fa97dc8aab3f&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;34a9804b-bd85-4965-949a-8094dafdb210&quot;, &quot;file&quot;: &quot;/proj...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-31" class="" data-index="31" data-tool="audio_produce" data-problem="0">
+          <td>31</td>
+          <td>19:37:29</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">audio_produce</span></td>
+          <td>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L2_step1&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &#x27;Step one — hold two corners t...</td>
+          <td>{&quot;trace_id&quot;: &quot;1aa7f4f8-d42b-4bb4-9791-111abb0d736e&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;035a8871-3dae-4dce-9ba0-d90f13776a10&quot;, &quot;file&quot;: &quot;/proj...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-32" class="" data-index="32" data-tool="audio_produce" data-problem="0">
+          <td>32</td>
+          <td>19:37:29</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">audio_produce</span></td>
+          <td>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L1_hook&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &quot;Fitting a fitted sheet doesn&#x27;t...</td>
+          <td>{&quot;trace_id&quot;: &quot;9a532fa2-b6b3-440f-aeb2-00217c1fe59a&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;1a5e8704-98a0-4a01-b9f2-f2254307cc91&quot;, &quot;file&quot;: &quot;/proj...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-33" class="" data-index="33" data-tool="audio_produce" data-problem="0">
+          <td>33</td>
+          <td>19:37:29</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">audio_produce</span></td>
+          <td>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L4_step3&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &#x27;Step three — fold the whole t...</td>
+          <td>{&quot;trace_id&quot;: &quot;b27631bc-e443-4e66-b74e-31705530233f&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;10661f51-5ac7-46d8-bdaf-33ecde14be56&quot;, &quot;file&quot;: &quot;/proj...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-34" class="" data-index="34" data-tool="audio_produce" data-problem="0">
+          <td>34</td>
+          <td>19:37:29</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">audio_produce</span></td>
+          <td>{&#x27;mode&#x27;: &#x27;text2speech&#x27;, &#x27;name&#x27;: &#x27;VO_L5_cta&#x27;, &#x27;model&#x27;: &#x27;eleven_v3&#x27;, &#x27;provider&#x27;: &#x27;elevenlabs&#x27;, &#x27;provider_param&#x27;: {&#x27;elevenlabs_text2speech&#x27;: {&#x27;text&#x27;: &quot;Save this, and you&#x27;ll never dre...</td>
+          <td>{&quot;trace_id&quot;: &quot;e76825b3-83ee-4034-bbac-1e874f3326ff&quot;, &quot;ok&quot;: true, &quot;message&quot;: &quot;&quot;, &quot;error_code&quot;: &quot;none&quot;, &quot;data&quot;: {&quot;request_id&quot;: &quot;8843d38d-af9f-411d-add5-aa0f26c05f01&quot;, &quot;file&quot;: &quot;/proj...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-35" class="" data-index="35" data-tool="write_todos" data-problem="0">
+          <td>35</td>
+          <td>19:37:45</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Write the locked script handoff file=completed; Search for and audition narrator voice, then produce all 5 VO lines=completed; Generate all 5 video segments simultaneously=in_progress; QA all generated clips, probe durations, write generation handoff=pending; Assemble timeline a...</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Write the locked script handoff file&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;Search for and audition narrator voice, then produce all 5 VO lines&#x27;...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-36" class="" data-index="36" data-tool="image_generate" data-problem="0">
+          <td>36</td>
+          <td>19:37:54</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">image_generate</span></td>
+          <td>name=collage_style_ref_main; seedream/seedream-4-5-251128; mode=text2image; size=2K</td>
+          <td>ok=True error=none file=/projects/52414510932/workspace/assets/collage_style_ref_main_20260811T113804_4b32afcd.png</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-37" class="" data-index="37" data-tool="add_attachments" data-problem="0">
+          <td>37</td>
+          <td>19:38:09</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">add_attachments</span></td>
+          <td>collage_style_ref_main_20260811T113804_4b32afcd.png</td>
+          <td>[{&quot;asset_id&quot;: &quot;a_Piu8ysC&quot;, &quot;mime_type&quot;: &quot;image/jpeg&quot;, &quot;name&quot;: &quot;collage_style_ref_main_20260811T113804_4b32afcd.png&quot;}]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-38" class="has-problem" data-index="38" data-tool="video_generate" data-problem="1">
+          <td>38</td>
+          <td>19:38:38</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=seg01_hook; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=4; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/52414510932/workspace/assets/seg01_hook_20260811T114133_8fea129f.mp4</td>
+          <td>sound:on created a native audio owner candidate; prompt intent did not prove the output speech-free</td>
+        </tr>
+        
+
+        <tr id="call-39" class="has-problem" data-index="39" data-tool="video_generate" data-problem="1">
+          <td>39</td>
+          <td>19:38:38</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=seg03_step2; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=6; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/52414510932/workspace/assets/seg03_step2_20260811T114317_7b2046b8.mp4</td>
+          <td>sound:on created a native audio owner candidate; prompt intent did not prove the output speech-free</td>
+        </tr>
+        
+
+        <tr id="call-40" class="has-problem" data-index="40" data-tool="video_generate" data-problem="1">
+          <td>40</td>
+          <td>19:38:38</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=seg05_recap; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=4; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/52414510932/workspace/assets/seg05_recap_20260811T114300_a28b00b1.mp4</td>
+          <td>sound:on created a native audio owner candidate; final clip contains generated speech</td>
+        </tr>
+        
+
+        <tr id="call-41" class="has-problem" data-index="41" data-tool="video_generate" data-problem="1">
+          <td>41</td>
+          <td>19:38:38</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=seg04_step3; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=5; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/52414510932/workspace/assets/seg04_step3_20260811T114128_ea16ec8d.mp4</td>
+          <td>sound:on created a native audio owner candidate; STT later confirms &#x27;Shapes transform. Stories fold.&#x27;</td>
+        </tr>
+        
+
+        <tr id="call-42" class="has-problem" data-index="42" data-tool="video_generate" data-problem="1">
+          <td>42</td>
+          <td>19:38:38</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=seg02_step1; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=5; sound=on; aspect=16:9</td>
+          <td>ok=True error=none file=/projects/52414510932/workspace/assets/seg02_step1_20260811T114127_0e8ff07e.mp4</td>
+          <td>sound:on created a native audio owner candidate; prompt intent did not prove the output speech-free</td>
+        </tr>
+        
+
+        <tr id="call-43" class="" data-index="43" data-tool="write_todos" data-problem="0">
+          <td>43</td>
+          <td>19:43:27</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Write the locked script handoff file=completed; Search for and audition narrator voice, then produce all 5 VO lines=completed; Generate all 5 video segments simultaneously=completed; QA all generated clips, probe durations, write generation handoff=in_progress; Assemble timeline...</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Write the locked script handoff file&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;Search for and audition narrator voice, then produce all 5 VO lines&#x27;...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-44" class="has-problem" data-index="44" data-tool="media_probe" data-problem="1">
+          <td>44</td>
+          <td>19:43:31</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/52414510932/workspace/assets/seg04_step3_20260811T114128_ea16ec8d.mp4</td>
+          <td>duration=5.086000 codec=h264 1280x720 pix_fmt=yuv420p</td>
+          <td>Probe confirmed an AAC stream, but the agent did not run STT or combined audio QA</td>
+        </tr>
+        
+
+        <tr id="call-45" class="has-problem" data-index="45" data-tool="media_probe" data-problem="1">
+          <td>45</td>
+          <td>19:43:31</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/52414510932/workspace/assets/seg01_hook_20260811T114133_8fea129f.mp4</td>
+          <td>duration=4.087000 codec=h264 1280x720 pix_fmt=yuv420p</td>
+          <td>Probe confirmed an AAC stream, but the agent did not run STT or combined audio QA</td>
+        </tr>
+        
+
+        <tr id="call-46" class="has-problem" data-index="46" data-tool="media_probe" data-problem="1">
+          <td>46</td>
+          <td>19:43:31</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/52414510932/workspace/assets/seg05_recap_20260811T114300_a28b00b1.mp4</td>
+          <td>duration=4.064000 codec=h264 1280x720 pix_fmt=yuv420p</td>
+          <td>Probe confirmed an AAC stream; STT later confirms &#x27;And that&#x27;s how it&#x27;s done.&#x27;</td>
+        </tr>
+        
+
+        <tr id="call-47" class="has-problem" data-index="47" data-tool="media_probe" data-problem="1">
+          <td>47</td>
+          <td>19:43:31</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/52414510932/workspace/assets/seg03_step2_20260811T114317_7b2046b8.mp4</td>
+          <td>duration=6.061000 codec=h264 1280x720 pix_fmt=yuv420p</td>
+          <td>Probe confirmed an AAC stream, but the agent did not run STT or combined audio QA</td>
+        </tr>
+        
+
+        <tr id="call-48" class="has-problem" data-index="48" data-tool="media_probe" data-problem="1">
+          <td>48</td>
+          <td>19:43:31</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/52414510932/workspace/assets/seg02_step1_20260811T114127_0e8ff07e.mp4</td>
+          <td>duration=5.086000 codec=h264 1280x720 pix_fmt=yuv420p</td>
+          <td>Probe confirmed an AAC stream, but the agent did not run STT or combined audio QA</td>
+        </tr>
+        
+
+        <tr id="call-49" class="has-problem" data-index="49" data-tool="analyze_file_content" data-problem="1">
+          <td>49</td>
+          <td>19:43:49</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</td>
+          <td>### Conclusion This is a paper collage style animation. Visible objects include paper cutout hands, paper cutout triangular pieces, a folded newspaper-textured envelope, a solid t...</td>
+          <td>Visual-only AFC ignored the sound-on clip&#x27;s native audio</td>
+        </tr>
+        
+
+        <tr id="call-50" class="has-problem" data-index="50" data-tool="analyze_file_content" data-problem="1">
+          <td>50</td>
+          <td>19:43:49</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</td>
+          <td>### Conclusion This is a paper collage style animation. The visible objects move continuously, there is no burned-in text/captions, no human faces or mouth movements, and the over...</td>
+          <td>Visual-only AFC ignored the sound-on clip&#x27;s native audio</td>
+        </tr>
+        
+
+        <tr id="call-51" class="has-problem" data-index="51" data-tool="analyze_file_content" data-problem="1">
+          <td>51</td>
+          <td>19:43:49</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</td>
+          <td>### Conclusion This is a paper collage style animation. Visible objects include a newspaper-formed bed that folds into a stack of newspapers, scattered paper scraps, a clipboard, ...</td>
+          <td>Visual-only AFC ignored the sound-on clip&#x27;s native audio</td>
+        </tr>
+        
+
+        <tr id="call-52" class="has-problem" data-index="52" data-tool="analyze_file_content" data-problem="1">
+          <td>52</td>
+          <td>19:43:49</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</td>
+          <td>### Conclusion This is a paper collage style animation. Visible objects move and converge to the center of the frame. No burned-in text, human faces, or mouths are visible. ### Ev...</td>
+          <td>Visual-only AFC ignored the sound-on clip&#x27;s native audio</td>
+        </tr>
+        
+
+        <tr id="call-53" class="has-problem" data-index="53" data-tool="analyze_file_content" data-problem="1">
+          <td>53</td>
+          <td>19:43:49</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</td>
+          <td>### Conclusion This is a paper collage style animation. Visible objects move continuously, there is no burned-in text, no human faces or mouth movement, and it shows hands perform...</td>
+          <td>Visual-only AFC ignored the sound-on clip&#x27;s native audio</td>
+        </tr>
+        
+
+        <tr id="call-54" class="" data-index="54" data-tool="write_todos" data-problem="0">
+          <td>54</td>
+          <td>19:44:10</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Write the locked script handoff file=completed; Search for and audition narrator voice, then produce all 5 VO lines=completed; Generate all 5 video segments simultaneously=completed; QA all generated clips, probe durations, write generation handoff=completed; Generate BGM, build...</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Write the locked script handoff file&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;Search for and audition narrator voice, then produce all 5 VO lines&#x27;...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-55" class="" data-index="55" data-tool="music_generate" data-problem="0">
+          <td>55</td>
+          <td>19:44:17</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">music_generate</span></td>
+          <td>name=BGM_collage_upbeat; elevenlabs/music_v1; duration_ms=30000; instrumental=True</td>
+          <td>ok=True error=none file=/projects/52414510932/workspace/assets/BGM_collage_upbeat_20260811T114426_7b764428.mp3</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-56" class="" data-index="56" data-tool="list_fonts" data-problem="0">
+          <td>56</td>
+          <td>19:44:28</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">list_fonts</span></td>
+          <td>{}</td>
+          <td>[{&quot;id&quot;: &quot;noto-sans-cjksc&quot;, &quot;name&quot;: &quot;Noto Sans CJK SC&quot;, &quot;languages&quot;: [&quot;zh-Hans&quot;, &quot;en&quot;], &quot;weights&quot;: [100, 300, 400, 500, 700, 900], &quot;styles&quot;: [&quot;normal&quot;], &quot;default&quot;: {&quot;weight&quot;: 400, ...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-57" class="has-problem" data-index="57" data-tool="write_file" data-problem="1">
+          <td>57</td>
+          <td>19:45:34</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">write_file</span></td>
+          <td>/projects/52414510932/workspace/composition.html; content=14083 chars</td>
+          <td>Updated file /projects/52414510932/workspace/composition.html</td>
+          <td>HTML initially kept all five generated videos muted, which preserved one audible narrator owner</td>
+        </tr>
+        
+
+        <tr id="call-58" class="has-problem" data-index="58" data-tool="lint_composition" data-problem="1">
+          <td>58</td>
+          <td>19:45:37</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">lint_composition</span></td>
+          <td>{&#x27;fps&#x27;: 30, &#x27;html_file&#x27;: &#x27;/projects/52414510932/workspace/composition.html&#x27;}</td>
+          <td>{&quot;success&quot;: true, &quot;valid&quot;: false, &quot;errors&quot;: [{&quot;code&quot;: &quot;VIDEO_MUTED_WITH_DECLARED_AUDIO&quot;, &quot;severity&quot;: &quot;error&quot;, &quot;message&quot;: &quot;&lt;video id=\&quot;v1\&quot;&gt; declares data-has-audio=\&quot;true\&quot; but al...</td>
+          <td>Lint exposed a declaration conflict; its suggested silent-video repair was not selected</td>
+        </tr>
+        
+
+        <tr id="call-59" class="has-problem" data-index="59" data-tool="edit_file" data-problem="1">
+          <td>59</td>
+          <td>19:45:52</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">edit_file</span></td>
+          <td>/projects/52414510932/workspace/composition.html; replace 1046-&gt;1016 chars</td>
+          <td>Successfully replaced 1 instance(s) of the string in &#x27;/projects/52414510932/workspace/composition.html&#x27;</td>
+          <td>Causal error: removed muted from all five videos, making their generated native speech audible</td>
+        </tr>
+        
+
+        <tr id="call-60" class="" data-index="60" data-tool="edit_file" data-problem="0">
+          <td>60</td>
+          <td>19:45:56</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">edit_file</span></td>
+          <td>/projects/52414510932/workspace/composition.html; replace 77-&gt;78 chars</td>
+          <td>Successfully replaced 1 instance(s) of the string in &#x27;/projects/52414510932/workspace/composition.html&#x27;</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-61" class="" data-index="61" data-tool="edit_file" data-problem="0">
+          <td>61</td>
+          <td>19:46:01</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">edit_file</span></td>
+          <td>/projects/52414510932/workspace/composition.html; replace 233-&gt;81 chars</td>
+          <td>Successfully replaced 1 instance(s) of the string in &#x27;/projects/52414510932/workspace/composition.html&#x27;</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-62" class="has-problem" data-index="62" data-tool="lint_composition" data-problem="1">
+          <td>62</td>
+          <td>19:46:04</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">lint_composition</span></td>
+          <td>{&#x27;fps&#x27;: 30, &#x27;html_file&#x27;: &#x27;/projects/52414510932/workspace/composition.html&#x27;}</td>
+          <td>{&quot;success&quot;: true, &quot;valid&quot;: false, &quot;errors&quot;: [], &quot;questions&quot;: [{&quot;code&quot;: &quot;MOTION_CONTRACT_COVERAGE_AUDIO_OVERLAP&quot;, &quot;severity&quot;: &quot;question&quot;, &quot;message&quot;: &quot;Audio &lt;v1:audio&gt; and &lt;vo1&gt; ove...</td>
+          <td>Lint explicitly reported native-video audio overlapping separate VO; the warning was not resolved</td>
+        </tr>
+        
+
+        <tr id="call-63" class="" data-index="63" data-tool="render_frame" data-problem="0">
+          <td>63</td>
+          <td>19:46:13</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">render_frame</span></td>
+          <td>html=/projects/52414510932/workspace/composition.html; output=qc_t2_title; time=2</td>
+          <td>success=True asset=None file=/projects/52414510932/workspace/assets/qc_t2_title.png</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-64" class="" data-index="64" data-tool="render_frame" data-problem="0">
+          <td>64</td>
+          <td>19:46:13</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">render_frame</span></td>
+          <td>html=/projects/52414510932/workspace/composition.html; output=qc_t5_step1; time=5.5</td>
+          <td>success=True asset=None file=/projects/52414510932/workspace/assets/qc_t5_step1.png</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-65" class="" data-index="65" data-tool="render_frame" data-problem="0">
+          <td>65</td>
+          <td>19:46:13</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">render_frame</span></td>
+          <td>html=/projects/52414510932/workspace/composition.html; output=qc_t21_cta; time=21.5</td>
+          <td>success=True asset=None file=/projects/52414510932/workspace/assets/qc_t21_cta.png</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-66" class="" data-index="66" data-tool="render_frame" data-problem="0">
+          <td>66</td>
+          <td>19:46:13</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">render_frame</span></td>
+          <td>html=/projects/52414510932/workspace/composition.html; output=qc_t11_step2; time=11.5</td>
+          <td>success=True asset=None file=/projects/52414510932/workspace/assets/qc_t11_step2.png</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-67" class="" data-index="67" data-tool="render_frame" data-problem="0">
+          <td>67</td>
+          <td>19:46:13</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">render_frame</span></td>
+          <td>html=/projects/52414510932/workspace/composition.html; output=qc_t17_step3; time=17.5</td>
+          <td>success=True asset=None file=/projects/52414510932/workspace/assets/qc_t17_step3.png</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-68" class="" data-index="68" data-tool="analyze_file_content" data-problem="0">
+          <td>68</td>
+          <td>19:46:32</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=QC check: 1) Is the title text &quot;How to Fold a Fitted Sheet&quot; clearly readable? 2) Does any text bleed off the ...</td>
+          <td>### Conclusion 1. The title text &quot;How to Fold a Fitted Sheet&quot; is clearly readable. 2. No text bleeds off the frame edges. 3. The text contrasts well against the background. 4. The...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-69" class="" data-index="69" data-tool="analyze_file_content" data-problem="0">
+          <td>69</td>
+          <td>19:46:32</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=QC check: 1) Is &quot;Step 3&quot; label visible? 2) Is &quot;Fold flat - done!&quot; caption readable? 3) Text contrast OK? 4) A...</td>
+          <td>### Conclusion 1. The &quot;Step 3&quot; label is visible. 2. The &quot;Fold flat - done!&quot; caption is readable. 3. Text contrast is acceptable for both text elements. 4. There are no QC issues w...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-70" class="" data-index="70" data-tool="analyze_file_content" data-problem="0">
+          <td>70</td>
+          <td>19:46:32</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=QC check: 1) Is &quot;Step 1&quot; label clearly readable and visible? 2) Is &quot;Match two corners&quot; caption readable at th...</td>
+          <td>### Conclusion 1. The &quot;Step 1&quot; label is clearly readable and visible. 2. The &quot;Match two corners&quot; caption at the bottom is readable. 3. All text has strong contrast against its bac...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-71" class="" data-index="71" data-tool="analyze_file_content" data-problem="0">
+          <td>71</td>
+          <td>19:46:32</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=QC check: 1) Is &quot;Save this!&quot; CTA stamp visible and centered? 2) Is it large and readable? 3) Does it contrast...</td>
+          <td>### Conclusion 1. The &quot;SAVE THIS!&quot; CTA stamp is visible, and is horizontally centered on the canvas; it is not vertically centered. 2. It is large and clearly readable. 3. It has ...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-72" class="" data-index="72" data-tool="analyze_file_content" data-problem="0">
+          <td>72</td>
+          <td>19:46:32</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=QC check: 1) Is &quot;Step 2&quot; label visible in the top-left? 2) Is &quot;Nest all four corners&quot; readable at the bottom?...</td>
+          <td>### Conclusion 1. Yes, the &quot;Step 2&quot; label is visible in the top-left. 2. Yes, &quot;Nest all four corners&quot; is readable at the bottom. 3. Yes, text contrast is acceptable. 4. No text bl...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-73" class="" data-index="73" data-tool="add_attachments" data-problem="0">
+          <td>73</td>
+          <td>19:46:50</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">add_attachments</span></td>
+          <td>qc_t2_title.png, qc_t5_step1.png, qc_t11_step2.png, qc_t17_step3.png, qc_t21_cta.png</td>
+          <td>[{&quot;asset_id&quot;: &quot;a_ofYbmLb&quot;, &quot;mime_type&quot;: &quot;image/png&quot;, &quot;name&quot;: &quot;qc_t2_title.png&quot;}, {&quot;asset_id&quot;: &quot;a_VXSj23L&quot;, &quot;mime_type&quot;: &quot;image/png&quot;, &quot;name&quot;: &quot;qc_t5_step1.png&quot;}, {&quot;asset_id&quot;: &quot;a_2i...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-74" class="" data-index="74" data-tool="write_todos" data-problem="0">
+          <td>74</td>
+          <td>19:46:56</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Write the locked script handoff file=completed; Search for and audition narrator voice, then produce all 5 VO lines=completed; Generate all 5 video segments simultaneously=completed; QA all generated clips, probe durations, write generation handoff=completed; Generate BGM, build...</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Write the locked script handoff file&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;Search for and audition narrator voice, then produce all 5 VO lines&#x27;...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-75" class="has-problem" data-index="75" data-tool="submit_render" data-problem="1">
+          <td>75</td>
+          <td>19:47:00</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">submit_render</span></td>
+          <td>html=/projects/52414510932/workspace/composition.html; output=fitted_sheet_fold_collage_R01; fps=30; format=None; quality=high</td>
+          <td>success job=8vwax54m status=pending warnings=0</td>
+          <td>Render submitted by acknowledging the known same-role audio overlap</td>
+        </tr>
+        
+
+        <tr id="call-76" class="" data-index="76" data-tool="query_render" data-problem="0">
+          <td>76</td>
+          <td>19:47:05</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">query_render</span></td>
+          <td>job_id=8vwax54m</td>
+          <td>success=True status=running asset=None file=</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-77" class="has-problem" data-index="77" data-tool="query_render" data-problem="1">
+          <td>77</td>
+          <td>19:48:07</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">query_render</span></td>
+          <td>job_id=8vwax54m</td>
+          <td>success=True status=done asset=None file=/projects/52414510932/workspace/assets/fitted_sheet_fold_collage_R01.mp4</td>
+          <td>Render completed, but no final MP4 audio probe, STT, or combined speech verification followed</td>
+        </tr>
+        
+
+        <tr id="call-78" class="" data-index="78" data-tool="write_todos" data-problem="0">
+          <td>78</td>
+          <td>19:48:13</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Write the locked script handoff file=completed; Search for and audition narrator voice, then produce all 5 VO lines=completed; Generate all 5 video segments simultaneously=completed; QA all generated clips, probe durations, write generation handoff=completed; Generate BGM, build...</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Write the locked script handoff file&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;Search for and audition narrator voice, then produce all 5 VO lines&#x27;...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-79" class="has-problem" data-index="79" data-tool="show_final_video" data-problem="1">
+          <td>79</td>
+          <td>19:48:16</td>
+          <td><code>thread_08118043385_52414510932_01KZR9JGZJD685RMCDFH6D5Z66</code></td>
+          <td><span class="tool-pill">show_final_video</span></td>
+          <td>file_path=/projects/52414510932/workspace/assets/fitted_sheet_fold_collage_R01.mp4</td>
+          <td>a_RuYtZ1m</td>
+          <td>Delivered a final video containing native generated speech plus formal narrator VO without final audio QA</td>
+        </tr>
+        </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section id="skills">
+        <h2>Skills / Reference 读取逻辑</h2>
+        <div class="callout">Assembly 根 Skill 与 voice-production reference 已明确要求 sound-on+post-VO 做 STT、每条 speech line 只有一个 audible owner。失败以 read-but-violated、skipped handoff 和可绕过 lint 为主。</div>
+        <h3>实际 read_file</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>File</th><th>Lines</th><th>Complete</th><th>Notes</th></tr></thead>
+            <tbody>
+        <tr>
+          <td>2</td>
+          <td><code>/.skills/0/script-skill/SKILL.md</code></td>
+          <td>1-126</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>3</td>
+          <td><code>/.skills/0/brainstorm-skill/SKILL.md</code></td>
+          <td>1-227</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>4</td>
+          <td><code>/.skills/0/brainstorm-skill/references/creative-ideation-principles.md</code></td>
+          <td>1-112</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>5</td>
+          <td><code>/.skills/0/brainstorm-skill/references/creative-rhythm-design.md</code></td>
+          <td>1-76</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>6</td>
+          <td><code>/.skills/0/brainstorm-skill/references/creative-brief-contract.md</code></td>
+          <td>1-108</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>7</td>
+          <td><code>/.skills/0/brainstorm-skill/references/image-generation-guide.md</code></td>
+          <td>1-186</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>8</td>
+          <td><code>/.skills/0/script-skill/references/voice-strategy-execution.md</code></td>
+          <td>1-112</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>9</td>
+          <td><code>/.skills/0/script-skill/references/video-models-routing.md</code></td>
+          <td>1-197</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>10</td>
+          <td><code>/.skills/0/generation-skill/SKILL.md</code></td>
+          <td>1-98</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>11</td>
+          <td><code>/.skills/0/assembly-skill/SKILL.md</code></td>
+          <td>1-96</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>12</td>
+          <td><code>/.skills/0/motion-skill/SKILL.md</code></td>
+          <td>1-135</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>13</td>
+          <td><code>/.skills/0/generation-skill/references/generation-blueprint-design.md</code></td>
+          <td>1-91</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>14</td>
+          <td><code>/.skills/0/generation-skill/references/generation-execution-rules.md</code></td>
+          <td>1-101</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>15</td>
+          <td><code>/.skills/0/motion-skill/references/design-visual-styles.md</code></td>
+          <td>1-40</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>16</td>
+          <td><code>/.skills/0/motion-skill/references/design-beat-planning.md</code></td>
+          <td>1-117</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>17</td>
+          <td><code>/.skills/0/motion-skill/references/tech-html.md</code></td>
+          <td>1-281</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>18</td>
+          <td><code>/.skills/0/motion-skill/references/design-motion.md</code></td>
+          <td>1-82</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>19</td>
+          <td><code>/.skills/0/motion-skill/references/tech-html.md</code></td>
+          <td>1-281</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>20</td>
+          <td><code>/.skills/0/motion-skill/references/design-transitions.md</code></td>
+          <td>1-151</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>21</td>
+          <td><code>/.skills/0/motion-skill/references/design-house-style.md</code></td>
+          <td>1-336</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>26</td>
+          <td><code>/projects/52414510932/workspace/fitted-sheet-fold__script_handoff__locked__R01.md</code></td>
+          <td>1-200</td>
+          <td>No</td>
+          <td>truncated and not fully continued</td>
+        </tr>
+        
+
+        <tr>
+          <td>28</td>
+          <td><code>/.skills/0/generation-skill/references/voice-production-and-resolution.md</code></td>
+          <td>1-172</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        </tbody>
+          </table>
+        </div>
+        <h3 style="margin-top:18px">Trace 校准后的 skill/reference 审计</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Reference / Skill</th><th>Why Relevant</th><th>Status</th><th>Notes</th></tr></thead>
+            <tbody>
+        <tr class="">
+          <td><code>script-skill/SKILL.md</code></td>
+          <td>Measured VO-first and downstream ownership</td>
+          <td>read</td>
+          <td>Read but violated: the handoff was incomplete and no validated downstream handoff chain was enforced</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>assembly-skill/SKILL.md</code></td>
+          <td>STT for sound-on clips overlapping post VO and one final speech owner</td>
+          <td>read</td>
+          <td>Causal read-but-violated: Assembly was bypassed after its root rules were read</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>motion-skill/SKILL.md</code></td>
+          <td>Audio DOM ownership and final rendered-audio probe</td>
+          <td>read</td>
+          <td>Read but violated: no final audio probe or final-revision speech verification</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>generation-skill/references/voice-production-and-resolution.md</code></td>
+          <td>Inspect existing speech and prevent duplicate audible lines</td>
+          <td>read</td>
+          <td>Causal read-but-violated: native clip speech was never inspected before separate VO entered the mix</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>motion-skill/references/tech-html.md</code></td>
+          <td>HTML media and lint contract</td>
+          <td>read</td>
+          <td>Applied structurally, but the lint repair selected the wrong audio owner</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>motion-skill/references/design-house-style.md</code></td>
+          <td>Overlay and visual QC</td>
+          <td>read</td>
+          <td>Applied to still-frame visual checks; audio was outside those questions</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>motion-skill/references/design-visual-styles.md</code></td>
+          <td>Collage visual style</td>
+          <td>read</td>
+          <td>Applied</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>motion-skill/references/design-beat-planning.md</code></td>
+          <td>Five-beat composition</td>
+          <td>read</td>
+          <td>Applied partially</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>motion-skill/references/design-motion.md</code></td>
+          <td>Element motion</td>
+          <td>read</td>
+          <td>Applied partially</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>motion-skill/references/design-transitions.md</code></td>
+          <td>Five scene boundaries</td>
+          <td>read</td>
+          <td>Applied: hard cuts were preserved</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>script-skill/references/script-handoff-contract.md</code></td>
+          <td>Canonical measured-VO handoff and validation</td>
+          <td>missing</td>
+          <td>Explicit Script read gate; no complete validated handoff was produced</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>script-skill/references/video-generation-execution.md</code></td>
+          <td>Prompt audio ownership, SFX, and post-VO separation</td>
+          <td>missing</td>
+          <td>Explicit always-read Script reference</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>script-skill/references/audio-design-guide.md</code></td>
+          <td>BGM/SFX/VO relationship</td>
+          <td>missing</td>
+          <td>Triggered by requested BGM, SFX, and VO</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>script-skill/references/deterministic-visual-payload-guide.md</code></td>
+          <td>Title, step labels, captions, and CTA ownership</td>
+          <td>missing</td>
+          <td>Triggered by exact readable packaging</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>generation-skill/references/afc-multimodal-policy.md</code></td>
+          <td>Combined QA for sound-on generated video</td>
+          <td>missing</td>
+          <td>Causal: five clips received visual-only AFC</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>generation-skill/references/generation-preflight-gates.md</code></td>
+          <td>Production start and artifact gates</td>
+          <td>missing</td>
+          <td>Causal: video generation began after only a truncated handoff read</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>generation-skill/references/video-models-routing.md</code></td>
+          <td>Generation-local Seedance payload contract</td>
+          <td>missing</td>
+          <td>Only the Script-local routing copy was read</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>generation-skill/references/generation-voice-strategy-execution.md</code></td>
+          <td>Post-VO and generated-native speech ownership</td>
+          <td>missing</td>
+          <td>Causal triggered reference</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>generation-skill/references/video-generation-execution.md</code></td>
+          <td>Sound-on prompt, SFX, and audio lineage</td>
+          <td>missing</td>
+          <td>Causal triggered reference</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>generation-skill/references/generation-handoff-contract.md</code></td>
+          <td>Selected-revision audio lineage to Assembly</td>
+          <td>missing</td>
+          <td>Generation completed without a handoff</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>assembly-skill/references/design-audio-and-assembly.md</code></td>
+          <td>STT evidence and single audible owner ledger</td>
+          <td>missing</td>
+          <td>Causal: no native-audio ownership decision was recorded</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>assembly-skill/references/assembly-handoff-contract.md</code></td>
+          <td>Locked audio truth before Motion</td>
+          <td>missing</td>
+          <td>Assembly handoff was skipped</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>motion-skill/references/afc-multimodal-policy.md</code></td>
+          <td>Pass A/B and final-revision evidence</td>
+          <td>missing</td>
+          <td>Mandatory Motion reference</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>motion-skill/references/tech-data-attributes.md</code></td>
+          <td>Authorable audio data attributes</td>
+          <td>missing</td>
+          <td>Mandatory Motion reference</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>motion-skill/references/design-captions.md</code></td>
+          <td>VO/subtitle timing and ownership</td>
+          <td>missing</td>
+          <td>Triggered by five VO assets</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>motion-skill/references/design-typography.md</code></td>
+          <td>Title, labels, captions, and CTA sizing</td>
+          <td>missing</td>
+          <td>Triggered by readable text</td>
+        </tr>
+        
+
+        <tr class="has-problem">
+          <td><code>motion-skill/references/design-audio-and-assembly.md</code></td>
+          <td>Final HTML audio owner and mix verification</td>
+          <td>missing</td>
+          <td>Causal triggered reference</td>
+        </tr>
+        </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <aside class="side">
+      <section>
+        <h2>风险点</h2>
+        <ul class="issue-list">
+        <li>
+          <strong>#2 · read_file</strong>
+          <span>Read but violated: measured VO-first handoff and production ownership were not enforced</span>
+          <code>/.skills/0/script-skill/SKILL.md</code>
+        </li>
+        
+
+        <li>
+          <strong>#10 · read_file</strong>
+          <span>Generation root was read, but its blocking references and Generation Handoff were skipped</span>
+          <code>/.skills/0/generation-skill/SKILL.md</code>
+        </li>
+        
+
+        <li>
+          <strong>#11 · read_file</strong>
+          <span>Causal read-but-violated: Assembly required STT for sound-on clips overlapping post VO</span>
+          <code>/.skills/0/assembly-skill/SKILL.md</code>
+        </li>
+        
+
+        <li>
+          <strong>#12 · read_file</strong>
+          <span>Motion root was read, but mandatory audio reference and final audio probe were skipped</span>
+          <code>/.skills/0/motion-skill/SKILL.md</code>
+        </li>
+        
+
+        <li>
+          <strong>#26 · read_file</strong>
+          <span>Script Handoff read stopped at line 200 and was never continued to EOF</span>
+          <code>/projects/52414510932/workspace/fitted-sheet-fold__script_handoff__locked__R01.md</code>
+        </li>
+        
+
+        <li>
+          <strong>#28 · read_file</strong>
+          <span>Causal read-but-violated: the voice contract forbids separate VO duplicating embedded speech</span>
+          <code>/.skills/0/generation-skill/references/voice-production-and-resolution.md</code>
+        </li>
+        
+
+        <li>
+          <strong>#38 · video_generate</strong>
+          <span>sound:on created a native audio owner candidate; prompt intent did not prove the output speech-free</span>
+          <code>name=seg01_hook; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=4; sound=on; aspect=16:9</code>
+        </li>
+        
+
+        <li>
+          <strong>#39 · video_generate</strong>
+          <span>sound:on created a native audio owner candidate; prompt intent did not prove the output speech-free</span>
+          <code>name=seg03_step2; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=6; sound=on; aspect=16:9</code>
+        </li>
+        
+
+        <li>
+          <strong>#40 · video_generate</strong>
+          <span>sound:on created a native audio owner candidate; final clip contains generated speech</span>
+          <code>name=seg05_recap; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=4; sound=on; aspect=16:9</code>
+        </li>
+        
+
+        <li>
+          <strong>#41 · video_generate</strong>
+          <span>sound:on created a native audio owner candidate; STT later confirms &#x27;Shapes transform. Stories fold.&#x27;</span>
+          <code>name=seg04_step3; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=5; sound=on; aspect=16:9</code>
+        </li>
+        
+
+        <li>
+          <strong>#42 · video_generate</strong>
+          <span>sound:on created a native audio owner candidate; prompt intent did not prove the output speech-free</span>
+          <code>name=seg02_step1; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=5; sound=on; aspect=16:9</code>
+        </li>
+        
+
+        <li>
+          <strong>#44 · media_probe</strong>
+          <span>Probe confirmed an AAC stream, but the agent did not run STT or combined audio QA</span>
+          <code>file=/projects/52414510932/workspace/assets/seg04_step3_20260811T114128_ea16ec8d.mp4</code>
+        </li>
+        
+
+        <li>
+          <strong>#45 · media_probe</strong>
+          <span>Probe confirmed an AAC stream, but the agent did not run STT or combined audio QA</span>
+          <code>file=/projects/52414510932/workspace/assets/seg01_hook_20260811T114133_8fea129f.mp4</code>
+        </li>
+        
+
+        <li>
+          <strong>#46 · media_probe</strong>
+          <span>Probe confirmed an AAC stream; STT later confirms &#x27;And that&#x27;s how it&#x27;s done.&#x27;</span>
+          <code>file=/projects/52414510932/workspace/assets/seg05_recap_20260811T114300_a28b00b1.mp4</code>
+        </li>
+        
+
+        <li>
+          <strong>#47 · media_probe</strong>
+          <span>Probe confirmed an AAC stream, but the agent did not run STT or combined audio QA</span>
+          <code>file=/projects/52414510932/workspace/assets/seg03_step2_20260811T114317_7b2046b8.mp4</code>
+        </li>
+        
+
+        <li>
+          <strong>#48 · media_probe</strong>
+          <span>Probe confirmed an AAC stream, but the agent did not run STT or combined audio QA</span>
+          <code>file=/projects/52414510932/workspace/assets/seg02_step1_20260811T114127_0e8ff07e.mp4</code>
+        </li>
+        
+
+        <li>
+          <strong>#49 · analyze_file_content</strong>
+          <span>Visual-only AFC ignored the sound-on clip&#x27;s native audio</span>
+          <code>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</code>
+        </li>
+        
+
+        <li>
+          <strong>#50 · analyze_file_content</strong>
+          <span>Visual-only AFC ignored the sound-on clip&#x27;s native audio</span>
+          <code>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</code>
+        </li>
+        
+
+        <li>
+          <strong>#51 · analyze_file_content</strong>
+          <span>Visual-only AFC ignored the sound-on clip&#x27;s native audio</span>
+          <code>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</code>
+        </li>
+        
+
+        <li>
+          <strong>#52 · analyze_file_content</strong>
+          <span>Visual-only AFC ignored the sound-on clip&#x27;s native audio</span>
+          <code>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</code>
+        </li>
+        
+
+        <li>
+          <strong>#53 · analyze_file_content</strong>
+          <span>Visual-only AFC ignored the sound-on clip&#x27;s native audio</span>
+          <code>file=None; query=Describe the visual content: Is this a paper collage style animation? What objects are visible, are they movi...</code>
+        </li>
+        
+
+        <li>
+          <strong>#57 · write_file</strong>
+          <span>HTML initially kept all five generated videos muted, which preserved one audible narrator owner</span>
+          <code>/projects/52414510932/workspace/composition.html; content=14083 chars</code>
+        </li>
+        
+
+        <li>
+          <strong>#58 · lint_composition</strong>
+          <span>Lint exposed a declaration conflict; its suggested silent-video repair was not selected</span>
+          <code>{&#x27;fps&#x27;: 30, &#x27;html_file&#x27;: &#x27;/projects/52414510932/workspace/composition.html&#x27;}</code>
+        </li>
+        
+
+        <li>
+          <strong>#59 · edit_file</strong>
+          <span>Causal error: removed muted from all five videos, making their generated native speech audible</span>
+          <code>/projects/52414510932/workspace/composition.html; replace 1046-&gt;1016 chars</code>
+        </li>
+        
+
+        <li>
+          <strong>#62 · lint_composition</strong>
+          <span>Lint explicitly reported native-video audio overlapping separate VO; the warning was not resolved</span>
+          <code>{&#x27;fps&#x27;: 30, &#x27;html_file&#x27;: &#x27;/projects/52414510932/workspace/composition.html&#x27;}</code>
+        </li>
+        
+
+        <li>
+          <strong>#75 · submit_render</strong>
+          <span>Render submitted by acknowledging the known same-role audio overlap</span>
+          <code>html=/projects/52414510932/workspace/composition.html; output=fitted_sheet_fold_collage_R01; fps=30; format=None; quality=high</code>
+        </li>
+        
+
+        <li>
+          <strong>#77 · query_render</strong>
+          <span>Render completed, but no final MP4 audio probe, STT, or combined speech verification followed</span>
+          <code>job_id=8vwax54m</code>
+        </li>
+        
+
+        <li>
+          <strong>#79 · show_final_video</strong>
+          <span>Delivered a final video containing native generated speech plus formal narrator VO without final audio QA</span>
+          <code>file_path=/projects/52414510932/workspace/assets/fitted_sheet_fold_collage_R01.mp4</code>
+        </li>
+        </ul>
+      </section>
+      <section>
+        <h2>Tool Mix</h2>
+        <div class="mini-grid"><div class="mini-stat"><span>read_file</span><strong>22</strong></div>
+<div class="mini-stat"><span>analyze_file_content</span><strong>10</strong></div>
+<div class="mini-stat"><span>write_todos</span><strong>8</strong></div>
+<div class="mini-stat"><span>audio_produce</span><strong>5</strong></div>
+<div class="mini-stat"><span>media_probe</span><strong>5</strong></div>
+<div class="mini-stat"><span>render_frame</span><strong>5</strong></div>
+<div class="mini-stat"><span>video_generate</span><strong>5</strong></div>
+<div class="mini-stat"><span>edit_file</span><strong>3</strong></div>
+<div class="mini-stat"><span>add_attachments</span><strong>2</strong></div>
+<div class="mini-stat"><span>lint_composition</span><strong>2</strong></div>
+<div class="mini-stat"><span>ls</span><strong>2</strong></div>
+<div class="mini-stat"><span>query_render</span><strong>2</strong></div>
+<div class="mini-stat"><span>write_file</span><strong>2</strong></div>
+<div class="mini-stat"><span>image_generate</span><strong>1</strong></div>
+<div class="mini-stat"><span>list_fonts</span><strong>1</strong></div>
+<div class="mini-stat"><span>music_generate</span><strong>1</strong></div>
+<div class="mini-stat"><span>show_final_video</span><strong>1</strong></div>
+<div class="mini-stat"><span>submit_render</span><strong>1</strong></div>
+<div class="mini-stat"><span>voice_search</span><strong>1</strong></div></div>
+      </section>
+      <section>
+        <h2>结论</h2>
+        <p class="muted">正式旁白没有选错或重复选声：五条 TTS 的 voice_id 完全相同。双 VO 是 Seedance 生成片内嵌语音与独立 ElevenLabs 旁白同时进入最终混音。</p>
+        <p class="muted">最终 MP4 已本地复核为 23.146667 秒、1920x1080、H.264 + AAC；分离原生音轨 STT 明确识别出 Shapes transform. Stories fold. 与 And that's how it's done.。<strong>2</strong>。</p>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+const toolFilter = document.getElementById('toolFilter');
+const searchBox = document.getElementById('searchBox');
+const rows = Array.from(document.querySelectorAll('#chainTable tbody tr'));
+function applyFilters() {
+  const tool = toolFilter.value;
+  const q = searchBox.value.trim().toLowerCase();
+  rows.forEach(row => {
+    const toolOk = !tool || (tool === '__problem' ? row.dataset.problem === '1' : row.dataset.tool === tool);
+    const textOk = !q || row.innerText.toLowerCase().includes(q);
+    row.classList.toggle('hidden', !(toolOk && textOk));
+  });
+}
+toolFilter.addEventListener('change', applyFilters);
+searchBox.addEventListener('input', applyFilters);
+document.querySelectorAll('[data-filter]').forEach(link => {
+  link.addEventListener('click', () => {
+    toolFilter.value = link.dataset.filter;
+    applyFilters();
+  });
+});
+document.querySelectorAll('[data-call]').forEach(link => {
+  link.addEventListener('click', () => {
+    const details = document.getElementById('chainDetails');
+    if (details) details.open = true;
+    const target = document.getElementById(`call-${link.dataset.call}`);
+    if (!target) return;
+    toolFilter.value = '';
+    searchBox.value = '';
+    applyFilters();
+    document.querySelectorAll('.call-highlight').forEach(row => row.classList.remove('call-highlight'));
+    target.classList.add('call-highlight');
+    setTimeout(() => target.classList.remove('call-highlight'), 2600);
+  });
+});
+const roundTabs = Array.from(document.querySelectorAll('[data-round]'));
+const roundPanels = Array.from(document.querySelectorAll('[data-round-panel]'));
+roundTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    const selected = tab.dataset.round;
+    roundTabs.forEach(item => {
+      const active = item.dataset.round === selected;
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    roundPanels.forEach(panel => {
+      panel.hidden = panel.dataset.roundPanel !== selected;
+    });
+  });
+});
+</script>
+</body>
+</html>

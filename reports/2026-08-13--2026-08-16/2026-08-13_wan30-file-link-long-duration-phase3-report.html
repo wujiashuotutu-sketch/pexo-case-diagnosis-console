@@ -1,0 +1,1467 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Wan 3.0 文件与网页输入长时视频生成 Phase 3 实测报告，包含 10 条真实视频、媒体检查、成本、失败边界与生产建议。">
+  <title>Wan 3.0 文件与网页输入长时实测</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f2f1ec;
+      --surface: #fbfaf6;
+      --surface-strong: #ffffff;
+      --ink: #171a18;
+      --muted: #626963;
+      --line: #c9cec8;
+      --line-strong: #8f9891;
+      --pass: #176b58;
+      --pass-soft: #dcece5;
+      --warn: #9a611a;
+      --warn-soft: #f3e7d3;
+      --risk: #b33a30;
+      --risk-soft: #f2dedb;
+      --info: #285c8c;
+      --info-soft: #dce8f2;
+      --shadow: 0 18px 55px rgb(24 29 26 / 14%);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --page: min(1360px, calc(100vw - 40px));
+    }
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --paper: #151816;
+      --surface: #1c201d;
+      --surface-strong: #232824;
+      --ink: #eff2ed;
+      --muted: #aeb6af;
+      --line: #3b443d;
+      --line-strong: #68736b;
+      --pass: #79c7ad;
+      --pass-soft: #203b32;
+      --warn: #e2b066;
+      --warn-soft: #48351e;
+      --risk: #ee8d84;
+      --risk-soft: #492724;
+      --info: #8fc2ee;
+      --info-soft: #21394c;
+      --shadow: 0 18px 60px rgb(0 0 0 / 36%);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 78px;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      letter-spacing: 0;
+      transition: background-color 160ms ease, color 160ms ease;
+    }
+
+    button, input { font: inherit; letter-spacing: 0; }
+    button { color: inherit; }
+    a { color: inherit; }
+    img, video { display: block; max-width: 100%; }
+    code, .mono {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: .92em;
+    }
+
+    :focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--info) 70%, transparent);
+      outline-offset: 3px;
+    }
+
+    .skip-link {
+      position: fixed;
+      left: 16px;
+      top: -60px;
+      z-index: 1000;
+      padding: 10px 14px;
+      background: var(--ink);
+      color: var(--paper);
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+    }
+
+    .skip-link:focus { top: 12px; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--paper) 90%, transparent);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar-inner {
+      width: var(--page);
+      min-height: 62px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      min-width: max-content;
+      text-decoration: none;
+    }
+
+    .brand-lockup strong {
+      font-family: "Songti SC", STSong, "Noto Serif CJK SC", serif;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .brand-lockup span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-links::-webkit-scrollbar { display: none; }
+
+    .nav-links a {
+      padding: 8px 10px;
+      color: var(--muted);
+      font-size: 13px;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover { color: var(--ink); background: var(--surface); }
+
+    .toolbar { display: flex; align-items: center; gap: 6px; }
+
+    .icon-button {
+      width: 38px;
+      height: 38px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease;
+    }
+
+    .icon-button:hover { border-color: var(--line-strong); background: var(--surface-strong); }
+    .icon-button:active { transform: translateY(1px); }
+
+    main { overflow: clip; }
+
+    .hero {
+      width: var(--page);
+      min-height: calc(100vh - 62px);
+      margin: 0 auto;
+      padding: 72px 0 48px;
+      display: grid;
+      align-content: space-between;
+      gap: 64px;
+    }
+
+    .hero-copy { max-width: 1030px; }
+
+    .report-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      margin-bottom: 30px;
+      color: var(--muted);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 {
+      font-family: "Songti SC", STSong, "Noto Serif CJK SC", serif;
+      text-wrap: balance;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      max-width: 980px;
+      margin: 0;
+      font-size: clamp(48px, 7vw, 104px);
+      line-height: .98;
+      font-weight: 700;
+    }
+
+    .hero-lead {
+      max-width: 820px;
+      margin: 30px 0 0;
+      color: var(--muted);
+      font-size: clamp(18px, 2.1vw, 25px);
+      line-height: 1.55;
+      text-wrap: pretty;
+    }
+
+    .verdict-line {
+      margin-top: 28px;
+      padding: 17px 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-top: 1px solid var(--line-strong);
+      border-bottom: 1px solid var(--line-strong);
+      font-weight: 650;
+    }
+
+    .status-mark {
+      width: 12px;
+      height: 12px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--risk);
+      box-shadow: 0 0 0 5px var(--risk-soft);
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-top: 1px solid var(--line-strong);
+      border-bottom: 1px solid var(--line-strong);
+    }
+
+    .hero-metric {
+      min-height: 156px;
+      padding: 22px 22px 20px 0;
+      border-right: 1px solid var(--line);
+    }
+
+    .hero-metric:not(:first-child) { padding-left: 22px; }
+    .hero-metric:last-child { border-right: 0; }
+
+    .metric-value {
+      display: block;
+      font-family: "Songti SC", STSong, serif;
+      font-size: clamp(42px, 5vw, 72px);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric-label { display: block; margin-top: 12px; font-weight: 650; }
+    .metric-note { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; }
+
+    .section-band { border-top: 1px solid var(--line); }
+
+    .section-inner {
+      width: var(--page);
+      margin: 0 auto;
+      padding: 72px 0 82px;
+    }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: minmax(240px, .75fr) minmax(0, 1.25fr);
+      gap: 48px;
+      align-items: end;
+      margin-bottom: 42px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: clamp(34px, 4.5vw, 62px);
+      line-height: 1.05;
+    }
+
+    .section-heading p {
+      max-width: 720px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+      text-wrap: pretty;
+    }
+
+    .finding-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      border-top: 1px solid var(--line-strong);
+    }
+
+    .finding {
+      min-height: 250px;
+      padding: 26px 38px 30px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .finding:nth-child(odd) { border-right: 1px solid var(--line); }
+    .finding:nth-child(even) { padding-left: 38px; }
+
+    .finding-index {
+      display: block;
+      margin-bottom: 32px;
+      color: var(--muted);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .finding h3 { margin: 0 0 12px; font-size: 27px; line-height: 1.25; }
+    .finding p { margin: 0; color: var(--muted); text-wrap: pretty; }
+
+    .gate-band {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 40px;
+      margin-top: 46px;
+      padding: 30px 0;
+      border-top: 2px solid var(--risk);
+      border-bottom: 1px solid var(--risk);
+    }
+
+    .gate-band strong {
+      color: var(--risk);
+      font-size: 18px;
+    }
+
+    .gate-band p { margin: 0; font-size: 18px; font-weight: 600; }
+
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .filter-group { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .filter-button, .action-button {
+      min-height: 40px;
+      padding: 8px 13px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
+    }
+
+    .filter-button:hover, .action-button:hover { border-color: var(--line-strong); background: var(--surface-strong); }
+    .filter-button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .case-count { color: var(--muted); font-size: 13px; white-space: nowrap; }
+
+    .case-grid { display: grid; gap: 18px; }
+
+    .case-card {
+      display: grid;
+      grid-template-columns: minmax(300px, .92fr) minmax(0, 1.08fr);
+      min-height: 330px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+    }
+
+    .case-card:hover {
+      border-color: var(--line-strong);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgb(24 29 26 / 8%);
+    }
+
+    .case-media {
+      position: relative;
+      min-height: 310px;
+      background: #0d0f0e;
+      overflow: hidden;
+    }
+
+    .case-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: .92;
+      transition: transform 300ms ease, opacity 200ms ease;
+    }
+
+    .case-card:hover .case-media img { transform: scale(1.015); opacity: 1; }
+
+    .play-button {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      min-width: 112px;
+      min-height: 46px;
+      padding: 10px 16px;
+      border: 0;
+      border-radius: var(--radius-sm);
+      background: rgb(250 250 247 / 94%);
+      color: #151816;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgb(0 0 0 / 24%);
+    }
+
+    .play-button:hover { background: #ffffff; }
+
+    .media-duration {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      padding: 5px 8px;
+      border-radius: var(--radius-sm);
+      background: rgb(11 13 12 / 78%);
+      color: #ffffff;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .case-body { padding: 25px 28px 22px; }
+
+    .case-kicker {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 13px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 11px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .tag.pass { color: var(--pass); border-color: color-mix(in srgb, var(--pass) 45%, var(--line)); background: var(--pass-soft); }
+    .tag.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, var(--line)); background: var(--warn-soft); }
+    .tag.risk { color: var(--risk); border-color: color-mix(in srgb, var(--risk) 45%, var(--line)); background: var(--risk-soft); }
+
+    .case-body h3 { margin: 0; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.12; }
+    .case-id { margin: 8px 0 15px; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+    .case-summary { margin: 0; color: var(--muted); text-wrap: pretty; }
+
+    .case-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      margin: 21px 0 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .case-stat { padding: 12px 10px 12px 0; }
+    .case-stat + .case-stat { padding-left: 10px; border-left: 1px solid var(--line); }
+    .case-stat strong { display: block; font-size: 16px; font-variant-numeric: tabular-nums; }
+    .case-stat span { display: block; margin-top: 1px; color: var(--muted); font-size: 11px; }
+
+    .freeze-meter { margin-top: 17px; }
+    .freeze-meter-head { display: flex; justify-content: space-between; gap: 14px; margin-bottom: 7px; font-size: 12px; color: var(--muted); }
+    .freeze-track { height: 7px; overflow: hidden; border-radius: 999px; background: var(--line); }
+    .freeze-fill { display: block; height: 100%; background: var(--risk); border-radius: inherit; }
+    .freeze-fill.zero { background: var(--pass); }
+
+    details.case-details { margin-top: 16px; }
+    details.case-details summary { color: var(--info); font-size: 13px; font-weight: 650; cursor: pointer; }
+    details.case-details p { margin: 12px 0 0; font-size: 13px; }
+    .source-link { display: block; margin-top: 9px; color: var(--muted); overflow-wrap: anywhere; }
+
+    .prompt-block {
+      margin-top: 14px;
+      padding: 13px 14px;
+      border-left: 2px solid var(--line-strong);
+      background: color-mix(in srgb, var(--paper) 72%, var(--surface));
+    }
+
+    .prompt-block-label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .prompt-block p { margin: 0; color: var(--ink); }
+
+    .input-list { border-top: 1px solid var(--line-strong); }
+
+    .input-record { border-bottom: 1px solid var(--line); }
+
+    .input-record summary {
+      display: grid;
+      grid-template-columns: 42px minmax(210px, 1fr) auto auto;
+      align-items: center;
+      gap: 16px;
+      min-height: 66px;
+      padding: 12px 0;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .input-record summary::-webkit-details-marker { display: none; }
+    .input-record summary::after { content: "+"; color: var(--muted); font-size: 22px; font-weight: 300; }
+    .input-record[open] summary::after { content: "−"; }
+    .input-index { color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; font-size: 12px; }
+    .input-title { font-size: 17px; font-weight: 700; }
+    .input-duration { color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; font-size: 12px; white-space: nowrap; }
+
+    .input-record-body {
+      display: grid;
+      grid-template-columns: minmax(200px, .6fr) minmax(0, 1.4fr);
+      gap: 28px;
+      padding: 4px 58px 26px;
+    }
+
+    .input-field-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .input-url {
+      display: block;
+      overflow-wrap: anywhere;
+      color: var(--info);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .prompt-text {
+      margin: 0;
+      color: var(--ink);
+      font-size: 14px;
+      text-wrap: pretty;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px;
+    }
+
+    .comparison {
+      padding-top: 24px;
+      border-top: 2px solid var(--ink);
+    }
+
+    .comparison h3 { margin: 0 0 20px; font-size: 30px; }
+
+    .comparison-row {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 16px;
+      padding: 14px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .comparison-row:first-of-type { border-top: 0; }
+    .comparison-row dt { color: var(--muted); font-size: 13px; }
+    .comparison-row dd { margin: 0; }
+    .comparison-conclusion { margin-top: 22px; padding: 18px; background: var(--warn-soft); color: var(--ink); border-radius: var(--radius-sm); }
+
+    .freeze-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(280px, .55fr);
+      gap: 54px;
+      align-items: start;
+    }
+
+    .bar-chart { display: grid; gap: 14px; }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: minmax(150px, 230px) minmax(180px, 1fr) 76px;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .bar-label { font-size: 13px; }
+    .bar-track { height: 16px; background: var(--line); overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--risk); }
+    .bar-fill.good { background: var(--pass); }
+    .bar-value { font-family: "SFMono-Regular", Consolas, monospace; font-size: 13px; text-align: right; }
+
+    .method-note {
+      padding: 24px 0;
+      border-top: 1px solid var(--line-strong);
+      border-bottom: 1px solid var(--line-strong);
+    }
+
+    .method-note strong { display: block; margin-bottom: 9px; }
+    .method-note p { margin: 0; color: var(--muted); }
+
+    .boundary-list { border-top: 1px solid var(--line-strong); }
+
+    .boundary-item {
+      display: grid;
+      grid-template-columns: 72px minmax(220px, .65fr) minmax(0, 1.35fr);
+      gap: 24px;
+      padding: 22px 0;
+      border-bottom: 1px solid var(--line);
+      align-items: start;
+    }
+
+    .boundary-number { color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; }
+    .boundary-item h3 { margin: 0; font-family: inherit; font-size: 17px; }
+    .boundary-item p { margin: 0; color: var(--muted); }
+
+    .cost-ledger {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(290px, .8fr);
+      gap: 52px;
+      align-items: start;
+    }
+
+    .ledger { border-top: 1px solid var(--line-strong); }
+    .ledger-row { display: grid; grid-template-columns: 1fr auto; gap: 24px; padding: 17px 0; border-bottom: 1px solid var(--line); }
+    .ledger-row span { color: var(--muted); }
+    .ledger-row strong { font-variant-numeric: tabular-nums; }
+    .ledger-row.total { font-size: 20px; border-bottom-color: var(--line-strong); }
+    .ledger-row.total span { color: var(--ink); font-weight: 700; }
+    .ledger-row.over strong { color: var(--risk); }
+
+    .cost-graphic {
+      padding: 26px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+    }
+
+    .cost-graphic h3 { margin: 0 0 22px; font-size: 26px; }
+    .cost-stack { display: flex; height: 52px; overflow: hidden; border-radius: var(--radius-sm); }
+    .cost-main { width: 92.16%; display: grid; place-items: center; background: var(--info); color: #fff; font-weight: 700; }
+    .cost-extra { width: 7.84%; min-width: 38px; display: grid; place-items: center; background: var(--warn); color: #fff; font-weight: 700; }
+    .cost-legend { display: grid; gap: 8px; margin-top: 17px; color: var(--muted); font-size: 13px; }
+    .legend-row { display: flex; align-items: center; gap: 9px; }
+    .legend-swatch { width: 12px; height: 12px; background: var(--info); }
+    .legend-swatch.extra { background: var(--warn); }
+
+    .recommendations {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 26px;
+      margin-top: 54px;
+    }
+
+    .recommendation { padding-top: 22px; border-top: 2px solid var(--ink); }
+    .recommendation strong { display: block; margin-bottom: 10px; font-size: 18px; }
+    .recommendation p { margin: 0; color: var(--muted); }
+
+    .appendix-table-wrap { overflow-x: auto; border-top: 1px solid var(--line-strong); }
+    table { width: 100%; border-collapse: collapse; min-width: 940px; }
+    th, td { padding: 13px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: 12px; font-weight: 650; position: sticky; top: 62px; background: var(--paper); }
+    td { font-size: 13px; }
+    td.numeric { text-align: right; font-family: "SFMono-Regular", Consolas, monospace; }
+    .table-play { padding: 5px 9px; min-height: 32px; }
+
+    .report-footer {
+      border-top: 1px solid var(--line-strong);
+      padding: 34px 0 44px;
+    }
+
+    .footer-inner {
+      width: var(--page);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-path { overflow-wrap: anywhere; }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background: rgb(7 9 8 / 80%);
+      backdrop-filter: blur(10px);
+    }
+
+    .modal.open { display: grid; }
+
+    .modal-dialog {
+      width: min(1100px, 96vw);
+      max-height: 92vh;
+      overflow: auto;
+      background: var(--surface-strong);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+    }
+
+    .modal-head {
+      min-height: 58px;
+      padding: 10px 12px 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-head strong { overflow-wrap: anywhere; }
+    .modal-video { width: 100%; max-height: calc(92vh - 60px); background: #000; }
+
+    .empty-state {
+      display: none;
+      padding: 60px 20px;
+      color: var(--muted);
+      text-align: center;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    @media (max-width: 980px) {
+      .nav-links { display: none; }
+      .hero { min-height: auto; }
+      .hero-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero-metric:nth-child(2) { border-right: 0; }
+      .hero-metric:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .section-heading { grid-template-columns: 1fr; gap: 16px; }
+      .case-card { grid-template-columns: 1fr; }
+      .case-media { aspect-ratio: 16 / 9; min-height: 0; }
+      .freeze-layout, .cost-ledger { grid-template-columns: 1fr; }
+      .recommendations { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      :root { --page: min(100% - 28px, 1360px); }
+      .topbar-inner { gap: 12px; }
+      .brand-lockup span { display: none; }
+      .hero { padding-top: 48px; gap: 46px; }
+      h1 { font-size: clamp(45px, 15vw, 72px); }
+      .hero-metrics { grid-template-columns: 1fr; }
+      .hero-metric, .hero-metric:not(:first-child) { padding: 18px 0; border-right: 0; border-bottom: 1px solid var(--line); min-height: 0; }
+      .hero-metric:last-child { border-bottom: 0; }
+      .metric-value { font-size: 48px; }
+      .section-inner { padding: 54px 0 62px; }
+      .finding-grid { grid-template-columns: 1fr; }
+      .finding, .finding:nth-child(even) { min-height: 0; padding: 24px 0 26px; border-right: 0; }
+      .gate-band { grid-template-columns: 1fr; gap: 10px; }
+      .filter-bar { align-items: flex-start; flex-direction: column; }
+      .input-record summary { grid-template-columns: 32px minmax(0, 1fr) auto; gap: 10px; }
+      .input-record summary .tag { display: none; }
+      .input-duration { grid-column: 2; grid-row: 2; }
+      .input-record-body { grid-template-columns: 1fr; gap: 19px; padding: 4px 0 23px; }
+      .case-body { padding: 21px 20px 20px; }
+      .case-stats { grid-template-columns: repeat(2, 1fr); }
+      .case-stat:nth-child(3) { border-left: 0; border-top: 1px solid var(--line); }
+      .case-stat:nth-child(4) { border-top: 1px solid var(--line); }
+      .comparison-grid { grid-template-columns: 1fr; }
+      .bar-row { grid-template-columns: 1fr 62px; gap: 8px 12px; }
+      .bar-track { grid-row: 2; grid-column: 1 / -1; }
+      .boundary-item { grid-template-columns: 44px 1fr; gap: 8px 14px; }
+      .boundary-item p { grid-column: 2; }
+      .footer-inner { grid-template-columns: 1fr; }
+      .modal { padding: 10px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+
+    @media print {
+      :root { --paper: #fff; --surface: #fff; --surface-strong: #fff; --ink: #000; --muted: #444; --line: #bbb; }
+      .topbar, .filter-bar, .play-button, .modal, .icon-button, .table-play { display: none !important; }
+      .hero { min-height: auto; padding-top: 30px; }
+      .case-card { break-inside: avoid; box-shadow: none; grid-template-columns: 40% 60%; }
+      .case-media { min-height: 230px; }
+      .section-inner { padding: 42px 0; }
+      a { text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand-lockup" href="#top" aria-label="返回报告顶部">
+        <strong>Wan 3.0</strong>
+        <span>FILE / LINK PHASE 3</span>
+      </a>
+      <nav class="nav-links" aria-label="报告章节">
+        <a href="#findings">结论</a>
+        <a href="#test-set">测试集</a>
+        <a href="#evidence">样本</a>
+        <a href="#duration">时长</a>
+        <a href="#freeze">媒体</a>
+        <a href="#boundaries">边界</a>
+        <a href="#cost">成本</a>
+        <a href="#appendix">明细</a>
+      </nav>
+      <div class="toolbar">
+        <button class="icon-button" id="printButton" type="button" title="打印或导出 PDF" aria-label="打印或导出 PDF">⎙</button>
+        <button class="icon-button" id="themeButton" type="button" title="切换明暗主题" aria-label="切换明暗主题">◐</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-copy">
+        <div class="report-meta">
+          <span>2026-08-13</span>
+          <span>wan3.0-video</span>
+          <span>480P · adaptive · audio=false</span>
+          <span>Phase 3</span>
+        </div>
+        <h1>文件与网页输入<br>长时实测</h1>
+        <p class="hero-lead">10 条主任务全部产出真实 MP4，总输出 235 秒。接口能力已经在线成立，但长时视频仍存在事实幻觉、拟制界面和大段近静止，尚不足以进入默认生产路由。</p>
+        <div class="verdict-line">
+          <span class="status-mark" aria-hidden="true"></span>
+          <span>生产裁定：继续 Shadow。接口通过，严格内容保真未通过。</span>
+        </div>
+      </div>
+
+      <div class="hero-metrics" aria-label="关键指标">
+        <div class="hero-metric">
+          <span class="metric-value">10/10</span>
+          <span class="metric-label">主任务成功</span>
+          <span class="metric-note">全部下载并完成媒体检查</span>
+        </div>
+        <div class="hero-metric">
+          <span class="metric-value">235s</span>
+          <span class="metric-label">主视频总时长</span>
+          <span class="metric-note">15s、20s、30s 与 -1</span>
+        </div>
+        <div class="hero-metric">
+          <span class="metric-value">0</span>
+          <span class="metric-label">黑段与音轨</span>
+          <span class="metric-note">10 条均完整解码</span>
+        </div>
+        <div class="hero-metric">
+          <span class="metric-value">¥76.5</span>
+          <span class="metric-label">成功视频估算</span>
+          <span class="metric-note">含一条额外 20s 正例</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-band" id="findings">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>核心结论</h2>
+          <p>长时输出证明 Wan 3.0 能持续消费 PDF、PPTX、DOCX、XLSX、Markdown 与网页，但“生成得更久”不等于“理解得更准”。生产判断必须把接口成功、媒体健康与事实保真分开。</p>
+        </div>
+
+        <div class="finding-grid">
+          <article class="finding">
+            <span class="finding-index">01 / OUTPUT</span>
+            <h3>不再只有 2 秒</h3>
+            <p>本轮固定生成 15、20、30 秒视频；两个 <code>duration=-1</code> 输入分别选择 20 秒和 30 秒，说明智能时长会随输入变化。</p>
+          </article>
+          <article class="finding">
+            <span class="finding-index">02 / SEMANTICS</span>
+            <h3>结构化视觉文件更可靠</h3>
+            <p>PPTX、图片 DOCX、图表 XLSX 与扫描 PDF 的主题和主要视觉对象相关性最好，其中 30 秒产品 PPTX 内容覆盖最完整。</p>
+          </article>
+          <article class="finding">
+            <span class="finding-index">03 / FIDELITY</span>
+            <h3>长时没有消除幻觉</h3>
+            <p>Markdown 出现错误命令和拟制登录页；API 网页与 React 官网均被改造成源站不存在的产品界面，文字和品牌字样不稳定。</p>
+          </article>
+          <article class="finding">
+            <span class="finding-index">04 / MOTION</span>
+            <h3>唯一帧不等于持续运动</h3>
+            <p>所有帧 MD5 都唯一，但 XLSX 20 秒累计近静止 12.73 秒，Markdown 15 秒累计 10.10 秒。细微压缩变化会掩盖视觉冻结。</p>
+          </article>
+          <article class="finding">
+            <span class="finding-index">05 / RETRIEVAL</span>
+            <h3>第三方取件不稳定</h3>
+            <p>同一 jsDelivr PDF 可先失败后成功；网页解析也出现首次失败、重试成功。URL 尾段扩展名和特殊字符会直接改变结果。</p>
+          </article>
+          <article class="finding">
+            <span class="finding-index">06 / LIMITS</span>
+            <h3>50 页 PDF 上限已在线确认</h3>
+            <p>52 页 PDF 创建后快速失败，错误明确为 <code>PDF page count (52) exceeds limit of 50</code>。平台应在付费任务前完成页数和格式预检。</p>
+          </article>
+        </div>
+
+        <div class="gate-band">
+          <strong>Production Gate</strong>
+          <p>保留 file/link Shadow；先做自有稳定 URL 转存、有限重试、逐帧 OCR/数字核验与近静止检测，再讨论默认路由。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-band" id="test-set">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>测试集与输入</h2>
+          <p>这里保留本轮 10 条主任务的完整输入 URL、请求时长和原始提示词。打开每一行即可核对：模型拿到的是什么、我们要求它呈现什么，以及后面的真实视频是否兑现。</p>
+        </div>
+        <div class="input-list" id="testSetList"></div>
+        <noscript><p>启用 JavaScript 后可展开查看完整提示词；原始用例表位于 <code>wan30-long-input-2026-08-13/cases.tsv</code>。</p></noscript>
+      </div>
+    </section>
+
+    <section class="section-band" id="evidence">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>真实视频证据</h2>
+          <p>以下 10 个样本均为本轮实际生成并下载的 MP4。可以按输入类型或质量风险筛选，点击封面直接播放本地视频；“展开证据”包含原始输入、语义判断和媒体结果。</p>
+        </div>
+
+        <div class="filter-bar" aria-label="样本筛选">
+          <div class="filter-group" role="group" aria-label="筛选条件">
+            <button class="filter-button" type="button" data-filter="all" aria-pressed="true">全部</button>
+            <button class="filter-button" type="button" data-filter="file" aria-pressed="false">文件输入</button>
+            <button class="filter-button" type="button" data-filter="link" aria-pressed="false">网页输入</button>
+            <button class="filter-button" type="button" data-filter="strong" aria-pressed="false">相对可靠</button>
+            <button class="filter-button" type="button" data-filter="high" aria-pressed="false">高风险</button>
+          </div>
+          <span class="case-count" id="caseCount">显示 10 / 10</span>
+        </div>
+
+        <div class="case-grid" id="caseGrid"></div>
+        <div class="empty-state" id="emptyState">当前筛选条件没有样本。</div>
+        <noscript><p>此页面需要 JavaScript 来渲染样本筛选和视频播放器。原始报告位于同目录 Markdown 文件。</p></noscript>
+      </div>
+    </section>
+
+    <section class="section-band" id="duration">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>固定时长 vs 智能时长</h2>
+          <p><code>duration=-1</code> 能自动选择长度，但没有证据表明它会自动提升事实准确性、叙事完整度或运动质量。它应被视为长度选择器，而不是质量优化器。</p>
+        </div>
+
+        <div class="comparison-grid">
+          <article class="comparison">
+            <h3>研究论文 PDF</h3>
+            <dl>
+              <div class="comparison-row"><dt>固定</dt><dd><strong>30 秒</strong>，覆盖面更广，含标题和结论页；累计冻结 6.63 秒。</dd></div>
+              <div class="comparison-row"><dt>智能</dt><dd><strong>-1 → 20 秒</strong>，直接进入算法图，更紧凑；累计冻结 7.53 秒。</dd></div>
+              <div class="comparison-row"><dt>共同问题</dt><dd>标题、代码和结论文字不稳定；跨页取材成立，但不适合未经复核传播论文结论。</dd></div>
+            </dl>
+            <div class="comparison-conclusion">固定 30 秒节奏更完整，冻结比例也更低；多花约 ¥3，但仍没有达到事实严格保真。</div>
+          </article>
+
+          <article class="comparison">
+            <h3>Wan API 长网页</h3>
+            <dl>
+              <div class="comparison-row"><dt>固定</dt><dd><strong>30 秒</strong>，重点展示输入、首尾帧、分辨率与 2-30 秒。</dd></div>
+              <div class="comparison-row"><dt>智能</dt><dd><strong>-1 → 30 秒</strong>，覆盖输入类型、状态流和智能时长，范围更广。</dd></div>
+              <div class="comparison-row"><dt>共同问题</dt><dd>大量使用源网页不存在的控制台和产品界面，并出现不稳定品牌文字。</dd></div>
+            </dl>
+            <div class="comparison-conclusion">智能模式选择了最大 30 秒，但没有把网页复刻得更真实；只能承诺 Provider 自动选长度。</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-band" id="freeze">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>媒体健康与近静止</h2>
+          <p>10 条主结果均为 H.264、832×480、30fps，无音轨、无黑段、完整解码。真正需要警惕的是 near-static：画面可以每帧都不同，却在观感上长时间不动。</p>
+        </div>
+
+        <div class="freeze-layout">
+          <div class="bar-chart" aria-label="各样本累计冻结时长">
+            <div class="bar-row"><span class="bar-label">XLSX · 20s</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-value">12.73s</span></div>
+            <div class="bar-row"><span class="bar-label">Markdown · 15s</span><div class="bar-track"><div class="bar-fill" style="width:79.3%"></div></div><span class="bar-value">10.10s</span></div>
+            <div class="bar-row"><span class="bar-label">论文 · -1→20s</span><div class="bar-track"><div class="bar-fill" style="width:59.2%"></div></div><span class="bar-value">7.53s</span></div>
+            <div class="bar-row"><span class="bar-label">论文 · 固定30s</span><div class="bar-track"><div class="bar-fill" style="width:52.1%"></div></div><span class="bar-value">6.63s</span></div>
+            <div class="bar-row"><span class="bar-label">图片 DOCX · 20s</span><div class="bar-track"><div class="bar-fill" style="width:33.5%"></div></div><span class="bar-value">4.27s</span></div>
+            <div class="bar-row"><span class="bar-label">网页 · -1→30s</span><div class="bar-track"><div class="bar-fill" style="width:10.8%"></div></div><span class="bar-value">1.37s</span></div>
+            <div class="bar-row"><span class="bar-label">网页 · 固定30s</span><div class="bar-track"><div class="bar-fill" style="width:4.7%"></div></div><span class="bar-value">0.60s</span></div>
+            <div class="bar-row"><span class="bar-label">PPTX / 扫描 PDF / React</span><div class="bar-track"><div class="bar-fill good" style="width:1%"></div></div><span class="bar-value">0.00s</span></div>
+          </div>
+
+          <aside class="method-note">
+            <strong>检测口径</strong>
+            <p><code>freezedetect=n=-50dB:d=0.3</code> 捕捉近静止，而非编码重复帧。因此“600/600 唯一帧”和“累计近静止 12.73 秒”可以同时成立。生产验收不能只看帧哈希。</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-band" id="boundaries">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>URL 与文件边界</h2>
+          <p>正向任务成功不代表第三方资源可被稳定消费。格式判断、特殊字符、页数限制、重定向和 Provider 侧下载抖动都应在平台 Adapter 层被吸收。</p>
+        </div>
+
+        <div class="boundary-list">
+          <article class="boundary-item"><span class="boundary-number">01</span><h3>扩展名必须可识别</h3><p><code>https://arxiv.org/pdf/1706.03762</code> 被判定为扩展名 <code>03762</code>；即使响应 MIME 为 PDF 也失败。</p></article>
+          <article class="boundary-item"><span class="boundary-number">02</span><h3><code>@</code> 会被拒绝</h3><p><code>media.url</code> 含 <code>@</code> 会明确失败，常见的 <code>repo@version</code> CDN 形态不能直接传入。</p></article>
+          <article class="boundary-item"><span class="boundary-number">03</span><h3>PDF 最多 50 页</h3><p>52 页文档创建后快速失败，错误明确为 <code>PDF page count (52) exceeds limit of 50</code>。</p></article>
+          <article class="boundary-item"><span class="boundary-number">04</span><h3>下载存在非确定性</h3><p>同一 jsDelivr PDF 首次失败，随后固定 30 秒与智能时长任务均成功；网页解析同样出现重试成功。</p></article>
+          <article class="boundary-item"><span class="boundary-number">05</span><h3>Raw URL 不够稳定</h3><p>GitHub Raw PDF 多次报 <code>Failed to download</code>，添加 <code>?download=1</code> 也没有改善。</p></article>
+          <article class="boundary-item"><span class="boundary-number">06</span><h3>平台应先转存</h3><p>先下载并验证魔数、页数和大小，再转存到扩展名明确、不含特殊字符的自有 HTTPS URL；失败重试必须幂等。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-band" id="cost">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>成本与等待</h2>
+          <p>按 480P ¥0.3/秒估算。输出时长不是前台等待时长的代理：30 秒网页任务端到端可达 25 分 53 秒，包含约 10 分钟排队。</p>
+        </div>
+
+        <div class="cost-ledger">
+          <div class="ledger">
+            <div class="ledger-row"><span>10 条主任务 · 235 秒</span><strong>¥70.5</strong></div>
+            <div class="ledger-row"><span>替换 PDF 源时额外成功 · 20 秒</span><strong>¥6.0</strong></div>
+            <div class="ledger-row total"><span>成功视频总估算</span><strong>¥76.5</strong></div>
+            <div class="ledger-row over"><span>相对确认时最坏预算</span><strong>+¥3.0</strong></div>
+            <div class="ledger-row"><span>13 个无输出失败任务</span><strong>usage 为空</strong></div>
+          </div>
+
+          <aside class="cost-graphic">
+            <h3>成功费用构成</h3>
+            <div class="cost-stack" aria-label="主测试 70.5 元，额外正例 6 元">
+              <div class="cost-main">70.5</div>
+              <div class="cost-extra">6</div>
+            </div>
+            <div class="cost-legend">
+              <div class="legend-row"><span class="legend-swatch"></span><span>主测试：92.2%</span></div>
+              <div class="legend-row"><span class="legend-swatch extra"></span><span>额外成功任务：7.8%</span></div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="recommendations">
+          <article class="recommendation"><strong>前置资产治理</strong><p>验证真实格式、页数和文件大小，统一转存自有稳定 URL，屏蔽第三方链接形态差异。</p></article>
+          <article class="recommendation"><strong>内容级验收</strong><p>技术文档、命令、数字、品牌文字必须做逐帧 OCR 与源内容比对，主题相关不能替代事实准确。</p></article>
+          <article class="recommendation"><strong>媒体级验收</strong><p>保留完整解码、黑帧、音轨检查，并新增 near-static 占比门槛；不要用唯一帧计数替代运动判断。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-band" id="appendix">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>主测试明细</h2>
+          <p>端到端耗时按 Provider <code>submit_time → end_time</code> 计算。所有主视频均为 832×480、30fps、H.264，无音轨、无 blackdetect 事件且完整解码。</p>
+        </div>
+        <div class="appendix-table-wrap">
+          <table>
+            <thead>
+              <tr><th>Case</th><th>输入</th><th>请求 / 实际</th><th>端到端</th><th>冻结</th><th>质量判断</th><th>视频</th></tr>
+            </thead>
+            <tbody id="caseTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="report-footer">
+    <div class="footer-inner">
+      <div>
+        <strong>Wan 3.0 文件与网页长时输入 Phase 3</strong><br>
+        基于真实 API 任务、下载视频、ffprobe、blackdetect、freezedetect 与逐帧 MD5。
+      </div>
+      <div class="footer-path mono">analysis/wan30-long-input-2026-08-13/</div>
+    </div>
+  </footer>
+
+  <div class="modal" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle">
+    <div class="modal-dialog">
+      <div class="modal-head">
+        <strong id="videoModalTitle">视频预览</strong>
+        <button class="icon-button" id="closeModalButton" type="button" title="关闭视频" aria-label="关闭视频">×</button>
+      </div>
+      <video class="modal-video" id="modalVideo" controls playsinline preload="metadata"></video>
+    </div>
+  </div>
+
+  <script>
+    const caseData = [
+      {
+        id: "file_complex_pdf_fixed",
+        title: "研究论文 PDF",
+        type: "file",
+        format: "PDF · 14页",
+        quality: "review",
+        verdict: "需复核",
+        requested: "30s",
+        actual: 30,
+        latency: "26m11s",
+        freeze: 6.633,
+        freezes: 11,
+        longest: 1.433,
+        summary: "跨页覆盖 trace/JIT 流程、代码、树结构与性能图；标题和结尾文字存在明显乱码。",
+        detail: "固定 30 秒版叙事覆盖更广，但长时没有修复论文文字和结论表达的不稳定。适合作为主题意象，不适合未经复核传播论文结论或性能数字。",
+        source: "https://cdn.jsdelivr.net/gh/mozilla/pdf.js/web/compressed.tracemonkey-pldi-09.pdf",
+        prompt: "只根据这份 14 页英文研究论文 PDF 的真实内容，制作一段有清晰开头、主体和结尾的视觉摘要。覆盖 TraceMonkey、JavaScript trace trees、解释器与本地代码、性能图表和论文结论；尽量跨页取材。不得添加源文没有的数字、命令、品牌或结论。不要二维码，不要旁白。",
+        poster: "wan30-long-input-2026-08-13/file_complex_pdf_fixed-contact-sheet.jpg",
+        video: "wan30-long-input-2026-08-13/file_complex_pdf_fixed.mp4"
+      },
+      {
+        id: "file_scanned_pdf",
+        title: "图像型扫描 PDF",
+        type: "file",
+        format: "PDF · 6页",
+        quality: "strong",
+        verdict: "相对可靠",
+        requested: "20s",
+        actual: 20,
+        latency: "13m00s",
+        freeze: 0,
+        freezes: 0,
+        longest: 0,
+        summary: "识别老式书页、插图与折线图，媒体层无黑段或冻结；跨页类型覆盖仍不完整。",
+        detail: "能从图像页识别书页、插图和折线图，但未呈现源中的全部特殊页面形态，不能据此宣称 6 页都被充分理解。",
+        source: "https://cdn.jsdelivr.net/gh/ocrmypdf/OCRmyPDF/tests/resources/multipage.pdf",
+        prompt: "只根据这份图像型扫描 PDF 的真实页面制作视觉摘要。识别并区分老式书页与插图、LinnSequencer 双栏设备说明、倾斜图表、方向旋转页等不同页面类型，体现这是跨页扫描件。不得虚构可执行信息、品牌能力或统计数字。不要二维码，不要旁白。",
+        poster: "wan30-long-input-2026-08-13/file_scanned_pdf-contact-sheet.jpg",
+        video: "wan30-long-input-2026-08-13/file_scanned_pdf.mp4"
+      },
+      {
+        id: "file_image_docx",
+        title: "图片型 DOCX",
+        type: "file",
+        format: "DOCX · 3张图片",
+        quality: "strong",
+        verdict: "相对可靠",
+        requested: "20s",
+        actual: 20,
+        latency: "10m08s",
+        freeze: 4.267,
+        freezes: 2,
+        longest: 3.1,
+        summary: "正确呈现 Python 标志、Python Powered 与 Monty Python 海报，未臆造正文。",
+        detail: "语义主题没有漂离，三张嵌入图片均被识别；主要媒体问题是尾部约 3.10 秒近静止。",
+        source: "https://raw.githubusercontent.com/python-openxml/python-docx/master/tests/test_files/having-images.docx",
+        prompt: "只根据 DOCX 中实际嵌入的图片制作视觉摘要，重点呈现 Python 标志、Monty Python 海报与 Python Powered 标志之间的视觉关系。不要编造文档正文、软件功能、安装命令或网址。不要二维码，不要旁白。",
+        poster: "wan30-long-input-2026-08-13/file_image_docx-contact-sheet.jpg",
+        video: "wan30-long-input-2026-08-13/file_image_docx.mp4"
+      },
+      {
+        id: "file_chart_xlsx",
+        title: "多图表 XLSX",
+        type: "file",
+        format: "XLSX · 4张图表",
+        quality: "strong",
+        verdict: "语义较好 / 动态弱",
+        requested: "20s",
+        actual: 20,
+        latency: "10m25s",
+        freeze: 12.733,
+        freezes: 22,
+        longest: 1.9,
+        summary: "年份、Revenue 与五个品类总体对应，但累计近静止 12.73 秒，占成片 63.7%。",
+        detail: "能将多张图表重绘为线图、饼图和柱图序列；具体数值标签较小且属于生成式重绘，不适合作为精确财务陈述。",
+        source: "https://raw.githubusercontent.com/apache/poi/trunk/test-data/spreadsheet/123233_charts.xlsx?download=1",
+        prompt: "只根据 XLSX 中真实的工作表和图表制作数据视觉摘要。重点呈现 2004 到 2007 年 Revenue 及 Camping Equipment、Golf Equipment、Mountaineering Equipment、Outdoor Protection、Personal Accessories 等类别；保持类别、年份和趋势忠实，不新增数字。不要二维码，不要旁白。",
+        poster: "wan30-long-input-2026-08-13/file_chart_xlsx-contact-sheet.jpg",
+        video: "wan30-long-input-2026-08-13/file_chart_xlsx.mp4"
+      },
+      {
+        id: "file_product_pptx",
+        title: "产品演示 PPTX",
+        type: "file",
+        format: "PPTX · 4页",
+        quality: "strong",
+        verdict: "本轮最佳",
+        requested: "30s",
+        actual: 30,
+        latency: "21m43s",
+        freeze: 0,
+        freezes: 0,
+        longest: 0,
+        summary: "完整覆盖 AURORA One 三种配色、多视角、内部组件与佩戴办公场景，无冻结。",
+        detail: "这是本轮最接近可用产品摘要的样本。30 秒显著扩展了对四页内容的覆盖，同时没有出现媒体冻结。",
+        source: "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260806/ebapmr/glass.pptx",
+        prompt: "只根据四页产品演示文稿制作完整视觉摘要。覆盖 AURORA One 智能眼镜、黑银金配色、多视角外观、内部摄像头传感器芯片电池结构，以及佩戴办公和信息浮层场景。不得新增价格、二维码、网址或未出现的产品能力。不要旁白。",
+        poster: "wan30-long-input-2026-08-13/file_product_pptx-contact-sheet.jpg",
+        video: "wan30-long-input-2026-08-13/file_product_pptx.mp4"
+      },
+      {
+        id: "file_chinese_md",
+        title: "中文安装 Markdown",
+        type: "file",
+        format: "Markdown · 技术文档",
+        quality: "high",
+        verdict: "高风险",
+        requested: "15s",
+        actual: 15,
+        latency: "8m24s",
+        freeze: 10.1,
+        freezes: 13,
+        longest: 1.967,
+        summary: "识别 npm、Node 与鉴权主题，但生成错误命令、乱码命令、拟制登录页和 Token 界面。",
+        detail: "源文真实信息被扩写成不稳定终端和登录界面。技术操作类视频必须逐帧 OCR 并逐字核对命令；本片累计近静止占 67.3%。",
+        source: "https://bailian.aliyun.com/cli/install.md",
+        prompt: "只根据中文 Markdown 技术文档制作准确的安装流程视觉摘要。涉及命令时必须逐字忠于来源，尤其区分 npm、npx 以及文档中对 pnpm 和 yarn 的说明；不得自创命令、Token 页面、域名或工具名称。不要二维码，不要旁白。",
+        poster: "wan30-long-input-2026-08-13/file_chinese_md-contact-sheet.jpg",
+        video: "wan30-long-input-2026-08-13/file_chinese_md.mp4"
+      },
+      {
+        id: "link_chinese_long_fixed",
+        title: "Wan API 长网页 · 固定",
+        type: "link",
+        format: "网页 · 30s固定",
+        quality: "high",
+        verdict: "高风险",
+        requested: "30s",
+        actual: 30,
+        latency: "25m53s",
+        freeze: 0.6,
+        freezes: 2,
+        longest: 0.3,
+        summary: "识别输入、首尾帧、分辨率和 2-30 秒，但主体视觉是源网页不存在的拟制 UI。",
+        detail: "主题关联通过，页面复刻和事实严格保真不通过。端到端 25 分 53 秒包含约 10 分钟排队。",
+        source: "https://help.aliyun.com/zh/model-studio/wan3-video-generation-api-reference",
+        prompt: "只根据万相 3.0 视频生成 API 参考网页制作结构化视觉摘要。覆盖 wan3.0-video、异步任务、文字与媒体输入类型、480P/720P/1080P、2 到 30 秒与智能时长等网页真实信息。不得生成二维码、虚假控制台、价格、命令或不存在的参数。不要旁白。",
+        poster: "wan30-long-input-2026-08-13/link_chinese_long_fixed-contact-sheet.jpg",
+        video: "wan30-long-input-2026-08-13/link_chinese_long_fixed.mp4"
+      },
+      {
+        id: "link_react_js",
+        title: "React 动态官网",
+        type: "link",
+        format: "网页 · 动态站点",
+        quality: "high",
+        verdict: "高风险",
+        requested: "20s",
+        actual: 20,
+        latency: "14m48s",
+        freeze: 0,
+        freezes: 0,
+        longest: 0,
+        summary: "React 标志与 Web/Native 主题正确，随后自创视频搜索站界面和大会活动画面。",
+        detail: "媒体层健康，但内容层明显漂离。不能将成片解释为对 React 官网内容的完整摘要。",
+        source: "https://react.dev/",
+        prompt: "只根据 React 官方动态网页的真实内容制作视觉摘要。重点呈现 React 品牌、组件式 UI、Web 与 Native 以及代码示例的核心概念；不得自创 API、命令、活动、网址或产品界面。不要二维码，不要旁白。",
+        poster: "wan30-long-input-2026-08-13/link_react_js-contact-sheet.jpg",
+        video: "wan30-long-input-2026-08-13/link_react_js.mp4"
+      },
+      {
+        id: "file_complex_pdf_auto-final2",
+        inputId: "file_complex_pdf_auto",
+        title: "研究论文 PDF · 智能",
+        type: "file",
+        format: "PDF · duration=-1",
+        quality: "review",
+        verdict: "需复核",
+        requested: "-1",
+        actual: 20,
+        latency: "13m05s",
+        freeze: 7.533,
+        freezes: 19,
+        longest: 0.9,
+        summary: "自动选择 20 秒，覆盖算法图、树结构和性能图；更紧凑，但事实准确性没有提升。",
+        detail: "智能版省下 10 秒和约 ¥3，却有更高的冻结占比。duration=-1 只决定长度，不应被包装为质量优化。",
+        source: "https://cdn.jsdelivr.net/gh/mozilla/pdf.js/web/compressed.tracemonkey-pldi-09.pdf",
+        prompt: "只根据这份 14 页英文研究论文 PDF 的真实内容，自主选择足以讲清论文的时长，制作有清晰开头、主体和结尾的视觉摘要。覆盖 TraceMonkey、JavaScript trace trees、解释器与本地代码、性能图表和论文结论；尽量跨页取材。不得添加源文没有的数字、命令、品牌或结论。不要二维码，不要旁白。",
+        poster: "wan30-long-input-2026-08-13/file_complex_pdf_auto-final2-contact-sheet.jpg",
+        video: "wan30-long-input-2026-08-13/file_complex_pdf_auto-final2.mp4"
+      },
+      {
+        id: "link_chinese_long_auto-retry",
+        inputId: "link_chinese_long_auto",
+        title: "Wan API 长网页 · 智能",
+        type: "link",
+        format: "网页 · duration=-1",
+        quality: "high",
+        verdict: "高风险",
+        requested: "-1",
+        actual: 30,
+        latency: "16m12s",
+        freeze: 1.367,
+        freezes: 3,
+        longest: 0.567,
+        summary: "自动选择满 30 秒，覆盖更多输入类型、状态流和智能时长，但仍大量拟制控制台。",
+        detail: "比固定版信息范围更广，却没有更高的页面保真度。第一次网页解析失败，重试后成功。",
+        source: "https://help.aliyun.com/zh/model-studio/wan3-video-generation-api-reference",
+        prompt: "只根据万相 3.0 视频生成 API 参考网页的真实内容，自主选择足以讲清主题的时长，制作结构化视觉摘要。覆盖 wan3.0-video、异步任务、文字与媒体输入类型、480P/720P/1080P、2 到 30 秒与智能时长等网页真实信息。不得生成二维码、虚假控制台、价格、命令或不存在的参数。不要旁白。",
+        poster: "wan30-long-input-2026-08-13/link_chinese_long_auto-retry-contact-sheet.jpg",
+        video: "wan30-long-input-2026-08-13/link_chinese_long_auto-retry.mp4"
+      }
+    ];
+
+    const qualityClass = { strong: "pass", review: "warn", high: "risk" };
+    const caseGrid = document.getElementById("caseGrid");
+    const caseCount = document.getElementById("caseCount");
+    const emptyState = document.getElementById("emptyState");
+    const tableBody = document.getElementById("caseTableBody");
+    const modal = document.getElementById("videoModal");
+    const modalVideo = document.getElementById("modalVideo");
+    const modalTitle = document.getElementById("videoModalTitle");
+    let lastFocusedElement = null;
+
+    function formatFreeze(item) {
+      return item.freeze === 0 ? "0.00s" : `${item.freeze.toFixed(2)}s`;
+    }
+
+    function renderCases(filter = "all") {
+      const visible = caseData.filter((item) => filter === "all" || item.type === filter || item.quality === filter);
+      caseGrid.innerHTML = visible.map((item) => {
+        const freezeRatio = Math.min(100, (item.freeze / item.actual) * 100);
+        const tagClass = qualityClass[item.quality];
+        const typeLabel = item.type === "file" ? "FILE" : "LINK";
+        return `
+          <article class="case-card" data-case="${item.id}">
+            <div class="case-media">
+              <img src="${item.poster}" alt="${item.title} 的逐秒 contact sheet" loading="lazy">
+              <button class="play-button" type="button" data-play="${item.id}" aria-label="播放 ${item.title}">▶ 播放视频</button>
+              <span class="media-duration">${item.actual}s</span>
+            </div>
+            <div class="case-body">
+              <div class="case-kicker">
+                <span class="tag">${typeLabel}</span>
+                <span class="tag">${item.format}</span>
+                <span class="tag ${tagClass}">${item.verdict}</span>
+              </div>
+              <h3>${item.title}</h3>
+              <div class="case-id mono">${item.inputId ? `${item.inputId} → ${item.id}` : item.id}</div>
+              <p class="case-summary">${item.summary}</p>
+              <div class="case-stats">
+                <div class="case-stat"><strong>${item.requested}</strong><span>请求时长</span></div>
+                <div class="case-stat"><strong>${item.actual}s</strong><span>实际时长</span></div>
+                <div class="case-stat"><strong>${item.latency}</strong><span>端到端</span></div>
+                <div class="case-stat"><strong>${item.freezes}</strong><span>冻结事件</span></div>
+              </div>
+              <div class="freeze-meter">
+                <div class="freeze-meter-head"><span>累计近静止</span><span>${formatFreeze(item)} · ${freezeRatio.toFixed(1)}%</span></div>
+                <div class="freeze-track"><span class="freeze-fill ${item.freeze === 0 ? "zero" : ""}" style="width:${item.freeze === 0 ? 1 : freezeRatio}%"></span></div>
+              </div>
+              <details class="case-details">
+                <summary>展开证据</summary>
+                <p>${item.detail}</p>
+                <p><strong>最长单次冻结：</strong>${item.longest.toFixed(3)}s</p>
+                <div class="prompt-block"><span class="prompt-block-label">Prompt</span><p>${item.prompt}</p></div>
+                <a class="source-link mono" href="${item.source}" target="_blank" rel="noreferrer">${item.source}</a>
+              </details>
+            </div>
+          </article>`;
+      }).join("");
+
+      caseCount.textContent = `显示 ${visible.length} / ${caseData.length}`;
+      emptyState.style.display = visible.length ? "none" : "block";
+    }
+
+    function renderTable() {
+      tableBody.innerHTML = caseData.map((item) => `
+        <tr>
+          <td class="mono">${item.id}</td>
+          <td>${item.format}</td>
+          <td class="numeric">${item.requested} / ${item.actual}s</td>
+          <td class="numeric">${item.latency}</td>
+          <td class="numeric">${formatFreeze(item)}</td>
+          <td><span class="tag ${qualityClass[item.quality]}">${item.verdict}</span></td>
+          <td><button class="action-button table-play" type="button" data-play="${item.id}" aria-label="播放 ${item.title}">▶</button></td>
+        </tr>`).join("");
+    }
+
+    function renderTestSet() {
+      const testSetList = document.getElementById("testSetList");
+      testSetList.innerHTML = caseData.map((item, index) => {
+        const typeLabel = item.type === "file" ? "FILE" : "LINK";
+        const inputId = item.inputId || item.id;
+        return `
+          <details class="input-record">
+            <summary>
+              <span class="input-index">${String(index + 1).padStart(2, "0")}</span>
+              <span class="input-title">${item.title}</span>
+              <span class="tag">${typeLabel} · ${item.format}</span>
+              <span class="input-duration">请求 ${item.requested} / 实际 ${item.actual}s</span>
+            </summary>
+            <div class="input-record-body">
+              <div>
+                <span class="input-field-label">Input / source URL</span>
+                <p class="case-id mono">${inputId}</p>
+                <a class="input-url" href="${item.source}" target="_blank" rel="noreferrer">${item.source}</a>
+              </div>
+              <div>
+                <span class="input-field-label">Prompt / 原始提示词</span>
+                <p class="prompt-text">${item.prompt}</p>
+              </div>
+            </div>
+          </details>`;
+      }).join("");
+    }
+
+    function openVideo(caseId, trigger) {
+      const item = caseData.find((entry) => entry.id === caseId);
+      if (!item) return;
+      lastFocusedElement = trigger;
+      modalTitle.textContent = `${item.title} · ${item.actual}s`;
+      modalVideo.poster = item.poster;
+      modalVideo.src = item.video;
+      modal.classList.add("open");
+      document.body.style.overflow = "hidden";
+      document.getElementById("closeModalButton").focus();
+    }
+
+    function closeVideo() {
+      modalVideo.pause();
+      modalVideo.removeAttribute("src");
+      modalVideo.load();
+      modal.classList.remove("open");
+      document.body.style.overflow = "";
+      if (lastFocusedElement) lastFocusedElement.focus();
+    }
+
+    document.addEventListener("click", (event) => {
+      const playTrigger = event.target.closest("[data-play]");
+      if (playTrigger) openVideo(playTrigger.dataset.play, playTrigger);
+    });
+
+    document.querySelectorAll(".filter-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".filter-button").forEach((item) => item.setAttribute("aria-pressed", "false"));
+        button.setAttribute("aria-pressed", "true");
+        renderCases(button.dataset.filter);
+      });
+    });
+
+    document.getElementById("closeModalButton").addEventListener("click", closeVideo);
+    modal.addEventListener("click", (event) => { if (event.target === modal) closeVideo(); });
+    document.addEventListener("keydown", (event) => { if (event.key === "Escape" && modal.classList.contains("open")) closeVideo(); });
+    document.getElementById("printButton").addEventListener("click", () => window.print());
+
+    const themeButton = document.getElementById("themeButton");
+    const savedTheme = localStorage.getItem("wan30-report-theme");
+    if (savedTheme === "dark") document.documentElement.dataset.theme = "dark";
+    themeButton.addEventListener("click", () => {
+      const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = nextTheme;
+      localStorage.setItem("wan30-report-theme", nextTheme);
+    });
+
+    renderCases();
+    renderTestSet();
+    renderTable();
+  </script>
+</body>
+</html>

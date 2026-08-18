@@ -1,0 +1,1703 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case 69576318368 Dashboard</title>
+<style>
+:root {
+  --bg: #f5f7fb;
+  --panel: #ffffff;
+  --panel-2: #f0f4f8;
+  --ink: #18202f;
+  --muted: #647084;
+  --line: #d9e0ea;
+  --blue: #2563eb;
+  --cyan: #0f766e;
+  --green: #16803c;
+  --amber: #a15c05;
+  --red: #b42318;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: linear-gradient(180deg, #eef3f8 0, var(--bg) 260px, var(--bg) 100%);
+}
+a { color: var(--blue); }
+.shell { max-width: 1440px; margin: 0 auto; padding: 28px 28px 64px; }
+.hero-panel { background: #111827; color: #f8fafc; border-radius: 10px; padding: 22px; margin-bottom: 18px; display: grid; grid-template-columns: 1.35fr .65fr; gap: 20px; align-items: stretch; }
+.hero-panel h1 { margin: 0 0 10px; font-size: 34px; letter-spacing: 0; }
+.hero-panel p { margin: 0; color: #cbd5e1; line-height: 1.6; }
+.verdict { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-radius: 8px; padding: 16px; }
+.verdict h2 { margin: 0 0 12px; color: #fff; font-size: 17px; }
+.verdict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.verdict-item { border-radius: 8px; padding: 10px; background: rgba(255,255,255,.08); }
+.verdict-item span { display: block; color: #cbd5e1; font-size: 12px; }
+.verdict-item strong { display: block; margin-top: 4px; font-size: 18px; }
+.verdict-item.bad strong { color: #fca5a5; }
+.verdict-item.warn strong { color: #fcd34d; }
+.verdict-item.good strong { color: #86efac; }
+.topbar { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; margin-bottom: 20px; }
+.title h1 { margin: 0 0 8px; font-size: 30px; letter-spacing: 0; }
+.title p { margin: 0; color: var(--muted); }
+.nav { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.nav a { text-decoration: none; color: var(--ink); border: 1px solid var(--line); background: var(--panel); padding: 8px 10px; border-radius: 8px; font-size: 13px; }
+.stats { display: grid; grid-template-columns: repeat(6, minmax(130px, 1fr)); gap: 12px; margin: 18px 0 22px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+.stat span { display: block; color: var(--muted); font-size: 12px; }
+.stat strong { display: block; margin-top: 6px; font-size: 28px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.layout > main { min-width: 0; }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px; margin-bottom: 18px; min-width: 0; }
+h2 { margin: 0 0 14px; font-size: 20px; }
+h3 { margin: 0 0 8px; font-size: 15px; }
+.muted { color: var(--muted); }
+.mono, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+.linear-rail { position: relative; display: grid; gap: 14px; padding-left: 18px; min-width: 0; }
+.linear-rail::before { content: ""; position: absolute; left: 33px; top: 18px; bottom: 18px; width: 3px; background: #d5dde8; border-radius: 999px; }
+.kpop-visual { padding: 0; background: transparent; box-shadow: none; }
+.kpop-route { display: grid; grid-template-columns: minmax(150px, 1.2fr) 28px minmax(130px, 1fr) 28px minmax(130px, 1fr) 28px minmax(130px, 1fr) 28px minmax(150px, 1.1fr); align-items: stretch; margin: 4px 0 18px; }
+.route-node { min-height: 82px; border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: center; background: #f8fafc; }
+.route-node span { color: var(--muted); font-size: 12px; margin-bottom: 5px; }
+.route-node strong { font-size: 15px; line-height: 1.35; }
+.route-node.source { border-top: 4px solid var(--blue); }
+.route-node.active { border-top: 4px solid var(--green); background: #f0fdf4; }
+.route-node.warn { border-top: 4px solid var(--amber); background: #fffbeb; }
+.route-node.blocked { border-top: 4px solid var(--red); background: #fff7ed; }
+.route-arrow { display: grid; place-items: center; color: #94a3b8; font-size: 22px; }
+.kpop-visual-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; margin-top: 18px; }
+.kpop-visual-grid.generation-grid { grid-template-columns: 1fr 1fr; }
+.kpop-block { border-top: 1px solid var(--line); padding-top: 14px; min-width: 0; }
+.visual-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.visual-head h3 { margin: 0; font-size: 16px; }
+.visual-head span { color: var(--muted); font-size: 12px; text-align: right; }
+.version-lanes { display: grid; gap: 9px; }
+.version-lane { display: grid; grid-template-columns: 92px 1fr; align-items: center; gap: 10px; }
+.version-tag { color: #334155; font-weight: 800; font-size: 12px; }
+.lane-flow { min-height: 38px; display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: #f8fafc; border-left: 4px solid var(--blue); border-radius: 0 6px 6px 0; overflow: hidden; }
+.lane-flow b { white-space: nowrap; font-size: 12px; }
+.lane-flow i { font-style: normal; color: #94a3b8; }
+.lane-flow em { margin-left: auto; color: #92400e; font-style: normal; font-weight: 800; font-size: 12px; white-space: nowrap; }
+.version-lane.critical .lane-flow { border-left-color: var(--red); background: #fff7ed; }
+.duration-axis { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; margin-bottom: 5px; }
+.duration-track { display: flex; height: 46px; overflow: hidden; border-radius: 7px; background: #fee2e2; }
+.duration-track > div { display: flex; align-items: center; justify-content: center; min-width: 0; }
+.duration-track span { font-size: 12px; font-weight: 800; white-space: nowrap; }
+.duration-used { background: #bfdbfe; color: #1e3a8a; }
+.duration-missing { background: #ef4444; color: #fff; }
+.duration-note { display: flex; justify-content: space-between; gap: 12px; margin-top: 6px; font-size: 11px; }
+.duration-note span { color: var(--muted); }
+.duration-note strong { color: #991b1b; }
+.clock-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.clock-compare div { padding: 9px 10px; background: #f8fafc; border-left: 4px solid var(--blue); }
+.clock-compare .bad { background: #fff7ed; border-left-color: var(--red); }
+.clock-compare span, .clock-compare strong { display: block; }
+.clock-compare span { color: var(--muted); font-size: 11px; margin-bottom: 3px; }
+.clock-compare strong { font-size: 12px; }
+.attempt-chart { display: grid; gap: 7px; }
+.attempt-row { display: grid; grid-template-columns: 82px 1fr 48px; gap: 8px; align-items: center; }
+.attempt-row > span, .attempt-row > b { font-size: 11px; }
+.attempt-row > b { text-align: right; }
+.attempt-track { height: 16px; display: flex; overflow: hidden; border-radius: 4px; background: #e2e8f0; }
+.attempt-track i { display: block; height: 100%; }
+.attempt-track .ok { background: #22c55e; }
+.attempt-track .fail { background: #ef4444; }
+.route-compare { display: grid; align-content: start; }
+.route-lane { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.route-lane span { width: 40px; color: var(--muted); font-size: 11px; }
+.route-lane b { padding: 5px 7px; border-radius: 4px; background: #dcfce7; font-size: 11px; }
+.route-lane.actual b { background: #fee2e2; }
+.route-lane i { color: #94a3b8; font-style: normal; }
+.skip-count { display: flex; align-items: baseline; gap: 9px; padding-top: 14px; }
+.skip-count strong { font-size: 28px; color: #991b1b; }
+.skip-count span { color: var(--muted); font-size: 12px; }
+.evidence-head { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+.kpop-evidence-strip { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+.kpop-frame { margin: 0; min-width: 0; position: relative; }
+.kpop-frame img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; border-radius: 6px; }
+.kpop-frame figcaption { display: flex; align-items: baseline; gap: 7px; margin-top: 6px; }
+.kpop-frame figcaption strong { font-size: 24px; color: #991b1b; }
+.kpop-frame:first-child figcaption strong { color: #166534; }
+.kpop-frame figcaption span { color: var(--muted); font-size: 11px; }
+.kpop-unverified { min-height: 120px; border: 2px dashed #f59e0b; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fffbeb; text-align: center; padding: 12px; }
+.kpop-unverified strong { font-size: 34px; color: #92400e; }
+.kpop-unverified span, .kpop-unverified b { font-size: 11px; }
+.kpop-unverified b { margin-top: 5px; color: #991b1b; }
+.round-execution-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+.round-execution-head h2 { margin-bottom: 5px; }
+.round-execution-head p { margin: 0; color: var(--muted); font-size: 13px; }
+.round-tabs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.round-tab { appearance: none; border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 7px; padding: 8px 11px; font: inherit; font-size: 12px; cursor: pointer; }
+.round-tab:hover { background: #eff6ff; }
+.round-tab.is-active { background: #18202f; color: #fff; border-color: #18202f; }
+.round-panel[hidden] { display: none; }
+.round-summary { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)) minmax(220px, 1.35fr); gap: 8px; margin-bottom: 16px; }
+.round-summary > div { border-top: 3px solid #94a3b8; background: #f8fafc; padding: 10px; min-width: 0; }
+.round-summary > div:nth-child(3) { border-top-color: var(--green); }
+.round-summary > div:nth-child(4) { border-top-color: var(--amber); }
+.round-summary .round-output { border-top-color: var(--blue); }
+.round-summary span, .round-summary strong, .round-summary code { display: block; }
+.round-summary span { color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+.round-summary strong { font-size: 12px; overflow-wrap: anywhere; }
+.round-summary code { color: #1d4ed8; margin-top: 4px; overflow-wrap: anywhere; }
+.round-trace-band { display: grid; grid-template-columns: minmax(180px, 1fr) auto minmax(220px, 1.2fr); gap: 12px; align-items: center; background: #eff6ff; border-left: 4px solid var(--blue); padding: 9px 11px; margin-top: 14px; }
+.round-trace-band.recovery { background: #f0fdf4; border-left-color: var(--green); }
+.round-trace-band span { font-weight: 800; font-size: 12px; }
+.round-trace-band b { font-size: 11px; color: var(--muted); }
+.round-trace-band em { font-size: 11px; font-style: normal; text-align: right; }
+.round-step-list { position: relative; display: grid; gap: 0; padding: 8px 0 2px; }
+.round-step-list::before { content: ""; position: absolute; left: 16px; top: 8px; bottom: 2px; width: 2px; background: #d9e0ea; }
+.round-step { position: relative; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; padding: 8px 0; min-width: 0; }
+.round-step-marker { position: relative; z-index: 1; width: 34px; height: 34px; border-radius: 999px; display: grid; place-items: center; background: #e2e8f0; color: #475569; border: 4px solid #fff; font-size: 12px; font-weight: 800; }
+.round-step.ok .round-step-marker { background: #dcfce7; color: #166534; }
+.round-step.warn .round-step-marker { background: #fef3c7; color: #92400e; }
+.round-step.fail .round-step-marker { background: #fee2e2; color: #991b1b; }
+.round-step-body { border-left: 4px solid #94a3b8; background: #f8fafc; padding: 11px 12px; min-width: 0; }
+.round-step.ok .round-step-body { border-left-color: var(--green); }
+.round-step.warn .round-step-body { border-left-color: var(--amber); background: #fffbeb; }
+.round-step.fail .round-step-body { border-left-color: var(--red); background: #fff7ed; }
+.round-step-phase { color: var(--muted); font-size: 11px; margin-bottom: 3px; }
+.round-step-body h4 { margin: 0 0 5px; font-size: 14px; }
+.round-step-body p { margin: 0 0 7px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.round-step-result { font-size: 12px; font-weight: 800; margin-bottom: 8px; }
+.round-step-body .related-calls { background: rgba(255,255,255,.72); }
+.round-lineage { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 0 0; margin-top: 10px; border-top: 1px solid var(--line); }
+.round-lineage span, .round-lineage strong { padding: 6px 8px; background: #eff6ff; border-radius: 4px; font-size: 11px; }
+.round-lineage strong { background: #dcfce7; color: #166534; }
+.round-lineage i { color: #94a3b8; font-style: normal; }
+.round-media-row { display: grid; grid-template-columns: minmax(180px, 280px) minmax(180px, 280px) minmax(220px, 1fr); gap: 12px; align-items: stretch; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.round-media-row .kpop-frame img { aspect-ratio: 16 / 9; }
+.round-media-row .kpop-unverified { min-height: 150px; }
+.round-media-note { border-left: 4px solid var(--blue); background: #eff6ff; padding: 12px; display: flex; flex-direction: column; justify-content: center; }
+.round-media-note.fail { border-left-color: var(--red); background: #fff7ed; }
+.round-media-note strong, .round-media-note span { display: block; }
+.round-media-note strong { margin-bottom: 5px; font-size: 13px; }
+.round-media-note span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.biz-node { position: relative; display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 14px; align-items: start; min-width: 0; }
+.biz-marker { position: relative; z-index: 1; width: 34px; height: 34px; margin-top: 18px; display: grid; place-items: center; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-weight: 900; border: 4px solid var(--panel); box-shadow: 0 0 0 1px #bfdbfe; }
+.biz-marker.good { background: #dcfce7; color: var(--green); box-shadow: 0 0 0 1px #86efac; }
+.biz-marker.warn { background: #fef3c7; color: var(--amber); box-shadow: 0 0 0 1px #fcd34d; }
+.biz-marker.bad { background: #fee2e2; color: var(--red); box-shadow: 0 0 0 1px #fca5a5; }
+.biz-card { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 16px; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(260px, .8fr); gap: 16px; align-items: start; min-width: 0; }
+.biz-card.bad-card { border-color: #fecaca; background: linear-gradient(90deg, #fff7ed 0, #fff 52%); }
+.biz-card.warn-card { border-color: #fde68a; background: linear-gradient(90deg, #fffbeb 0, #fff 52%); }
+.biz-kicker { color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+.biz-main h3 { font-size: 20px; margin: 0 0 8px; }
+.biz-main p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.biz-main, .biz-proof { min-width: 0; }
+.biz-main h3, .biz-main p, .call-mini p { overflow-wrap: anywhere; }
+.biz-proof { border-left: 1px solid var(--line); padding-left: 16px; }
+.biz-label { display: block; color: var(--muted); font-size: 12px; font-weight: 800; margin-bottom: 6px; }
+.biz-proof > strong { display: block; font-size: 15px; margin-bottom: 10px; }
+.biz-media { display: grid; grid-template-columns: repeat(2, minmax(120px, 170px)); gap: 10px; margin-top: 12px; }
+.biz-media.wide { grid-template-columns: minmax(170px, 260px) minmax(140px, 220px); }
+.timeline-table { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 8px; margin-top: 12px; }
+.timeline-table div { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 9px; }
+.timeline-table span { display: block; color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+.timeline-table strong { display: block; font-size: 13px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.call-chip { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; padding: 4px 7px; border-radius: 999px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; text-decoration: none; font-size: 12px; font-weight: 800; }
+.call-chip:hover { background: #dbeafe; }
+.related-calls { border: 1px solid var(--line); border-radius: 8px; background: #fff; overflow: hidden; min-width: 0; }
+.related-calls summary { cursor: pointer; list-style: none; padding: 8px 9px; font-size: 12px; font-weight: 800; color: #334155; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.related-calls summary::-webkit-details-marker { display: none; }
+.related-calls summary::before { content: "▸"; color: var(--blue); margin-right: 4px; }
+.related-calls[open] summary::before { content: "▾"; }
+.related-calls summary span { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; text-transform: none; letter-spacing: 0; }
+.related-call-list { display: grid; gap: 7px; padding: 8px; border-top: 1px solid var(--line); max-height: 380px; overflow: auto; }
+.call-mini { border: 1px solid var(--line); background: #f8fafc; border-radius: 7px; padding: 8px; }
+.call-mini.bad { border-color: #fecaca; background: #fff7ed; }
+.call-mini-top { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.call-mini-top strong { font-size: 12px; }
+.call-mini-top span { margin-left: auto; color: var(--muted); font-size: 11px; text-transform: none; letter-spacing: 0; }
+.call-mini p { margin: 5px 0 0; font-size: 12px; line-height: 1.35; }
+.call-mini-problem { margin-top: 6px; border-left: 3px solid var(--red); padding-left: 7px; color: var(--red); font-size: 12px; font-weight: 700; }
+.bad-card { border-color: #fecaca; background: #fff7ed; }
+.warn-card { border-color: #fde68a; background: #fffbeb; }
+.evidence-media { margin: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #e2e8f0; }
+.evidence-media img, .evidence-media video { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; display: block; }
+.evidence-media figcaption { padding: 6px; font-size: 11px; color: var(--muted); background: white; }
+.evidence-grid { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 12px; min-width: 0; }
+.evidence-card { border: 1px solid var(--line); border-radius: 8px; padding: 14px; min-width: 0; overflow-wrap: anywhere; }
+.evidence-title { font-weight: 800; margin-bottom: 8px; }
+.evidence-card p { margin: 0 0 10px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.evidence-card a { font-size: 12px; font-weight: 700; text-decoration: none; }
+.evidence-card code { white-space: normal; overflow-wrap: anywhere; }
+.grid-assets { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.asset-card, .prompt-card { border: 1px solid var(--line); background: #fbfcfe; border-radius: 8px; overflow: hidden; }
+.asset-preview { background: #dfe7f1; min-height: 180px; display: grid; place-items: center; }
+.asset-preview img, .asset-preview video { max-width: 100%; width: 100%; max-height: 260px; object-fit: contain; display: block; }
+.asset-body, .prompt-card { padding: 12px; }
+.prompt-card p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+.row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.badge, .tool-pill { display: inline-flex; align-items: center; border: 1px solid #bfdbfe; background: #eff6ff; color: #1d4ed8; border-radius: 999px; padding: 3px 8px; font-size: 12px; white-space: nowrap; }
+.muted-badge { border-color: var(--line); background: var(--panel-2); color: var(--muted); }
+.controls { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+select, input { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: white; color: var(--ink); }
+input { min-width: 280px; flex: 1; }
+.technical-details { border: 1px solid var(--line); border-radius: 8px; background: #fbfcfe; overflow: hidden; min-width: 0; max-width: 100%; }
+.technical-details > summary { cursor: pointer; padding: 12px 14px; font-weight: 800; color: #334155; }
+.technical-details[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+.technical-details .controls, .technical-details .table-wrap { margin-left: 12px; margin-right: 12px; }
+.technical-details .table-wrap { margin-bottom: 12px; width: calc(100% - 24px); max-width: calc(100% - 24px); }
+.table-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--line); border-radius: 8px; min-width: 0; max-width: 100%; }
+table { width: 100%; border-collapse: collapse; min-width: 980px; }
+th, td { border-bottom: 1px solid var(--line); padding: 9px 10px; text-align: left; vertical-align: top; font-size: 13px; }
+th { position: sticky; top: 0; background: #f8fafc; color: #334155; z-index: 1; }
+tr.has-problem td { background: #fff7ed; }
+tr.call-highlight td { background: #dbeafe !important; box-shadow: inset 0 0 0 1px #93c5fd; }
+tr.hidden { display: none; }
+.side { display: grid; grid-template-columns: 1.2fr .8fr .8fr; gap: 18px; }
+.side section { position: static; }
+.issue-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; min-width: 0; }
+.issue-list li { border-left: 4px solid var(--red); background: #fff7ed; padding: 10px; border-radius: 6px; min-width: 0; overflow-wrap: anywhere; }
+.issue-list span, .issue-list code { display: block; margin-top: 4px; }
+.issue-list code { white-space: normal; overflow-wrap: anywhere; }
+.mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mini-stat { display: flex; justify-content: space-between; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 8px; background: #fbfcfe; font-size: 12px; }
+.step { border-left: 4px solid var(--green); background: #f7fee7; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+.step.bad { border-left-color: var(--red); background: #fff7ed; }
+.step p { margin: 6px 0 0; font-size: 13px; }
+.callout { border-left: 4px solid var(--amber); background: #fffbeb; padding: 12px; border-radius: 6px; color: #573a05; }
+@media (max-width: 1080px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .hero-panel { grid-template-columns: 1fr; }
+  .biz-card { grid-template-columns: 1fr; }
+  .biz-proof { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; padding-top: 14px; }
+  .timeline-table { grid-template-columns: 1fr; }
+  .evidence-grid { grid-template-columns: 1fr; }
+  .side { grid-template-columns: 1fr; }
+  .topbar { flex-direction: column; }
+  .nav { justify-content: flex-start; }
+  .kpop-route { grid-template-columns: 1fr; gap: 7px; }
+  .route-arrow { transform: rotate(90deg); min-height: 20px; }
+  .kpop-visual-grid, .kpop-visual-grid.generation-grid { grid-template-columns: 1fr; }
+  .kpop-evidence-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .round-execution-head { flex-direction: column; }
+  .round-tabs { justify-content: flex-start; }
+  .round-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .round-summary .round-output { grid-column: 1 / -1; }
+  .round-media-row { grid-template-columns: 1fr 1fr; }
+  .round-media-note { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  html, body { max-width: 100%; overflow-x: hidden; }
+  .shell { padding: 12px 8px 40px; }
+  .shell, .hero-panel, section, main, .layout { width: 100%; min-width: 0; }
+  .hero-panel, section { padding: 12px; }
+  .hero-panel h1, .title h1, .hero-panel p, .title p { max-width: 100%; overflow-wrap: anywhere; word-break: break-word; }
+  .hero-panel h1 { font-size: 24px; line-height: 1.3; }
+  .title h1 { font-size: 24px; line-height: 1.3; }
+  .verdict-grid { grid-template-columns: 1fr; }
+  .nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; gap: 6px; }
+  .nav a { min-width: 0; padding: 7px 4px; text-align: center; overflow-wrap: anywhere; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .biz-node { grid-template-columns: 32px minmax(0, 1fr); gap: 6px; }
+  .linear-rail { padding-left: 0; }
+  .biz-card { padding: 12px; }
+  .biz-media, .biz-media.wide { grid-template-columns: 1fr; }
+  .related-calls summary { flex-wrap: wrap; }
+  input { min-width: 0; width: 100%; }
+  .version-lane { grid-template-columns: 1fr; gap: 4px; }
+  .lane-flow { flex-wrap: wrap; }
+  .lane-flow em { margin-left: 0; width: 100%; }
+  .clock-compare { grid-template-columns: 1fr; }
+  .attempt-row { grid-template-columns: 72px 1fr 42px; }
+  .kpop-evidence-strip { grid-template-columns: 1fr; }
+  .round-tabs { display: grid; grid-template-columns: 1fr; width: 100%; }
+  .round-summary { grid-template-columns: 1fr; }
+  .round-summary .round-output { grid-column: auto; }
+  .round-trace-band { grid-template-columns: 1fr; gap: 3px; }
+  .round-trace-band em { text-align: left; }
+  .round-media-row { grid-template-columns: 1fr; }
+  .round-media-note { grid-column: auto; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <section class="hero-panel">
+    <div>
+      <h1>Case 69576318368：动态调用链摘要</h1>
+      <p>从 trace 自动提取用户输入、2 个生成调用、15 个 read_file 和 7 个本地媒体。业务流程不再使用固定案例模板文案。</p>
+    </div>
+    <div class="verdict">
+      <h2>一眼结论</h2>
+      <div class="verdict-grid">
+        
+        <div class="verdict-item good"><span>总调用</span><strong>42</strong></div>
+        <div class="verdict-item good"><span>生成调用</span><strong>2</strong></div>
+        <div class="verdict-item warn"><span>Reference 覆盖</span><strong>14/14</strong></div>
+        <div class="verdict-item warn"><span>人工确认风险</span><strong>4</strong></div>
+        
+      </div>
+    </div>
+  </section>
+
+  <div class="topbar">
+    <div class="title">
+      <h1>Case 69576318368 调用链看板</h1>
+      <p>素材、工具调用、skills/reference 读取覆盖、QA 信号和渲染风险汇总。</p>
+    </div>
+    <nav class="nav">
+      <a href="#assets">素材</a>
+      <a href="#rounds">轮次</a>
+      <a href="#story">流程</a>
+      <a href="#evidence">证据</a>
+      <a href="#prompts">生成参数</a>
+      <a href="#chain">调用链</a>
+      <a href="#skills">Skills</a>
+    </nav>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span>总调用</span><strong>42</strong></div>
+    <div class="stat"><span>资产记录</span><strong>2</strong></div>
+    <div class="stat"><span>本地素材</span><strong>7</strong></div>
+    <div class="stat"><span>人工确认风险</span><strong>4</strong></div>
+    <div class="stat"><span>读取文件</span><strong>15</strong></div>
+    <div class="stat"><span>规则覆盖</span><strong>14/14</strong></div>
+  </div>
+
+  <div class="layout">
+    <main>
+      
+      
+      <section id="story">
+        <h2>业务可视化调用链</h2>
+        <div class="linear-rail">
+      <article class="biz-node">
+        <div class="biz-marker good">1</div>
+        <div class="biz-card">
+          <div class="biz-main">
+            <div class="biz-kicker">用户需求</div>
+            <h3>Make a animated wolf sitting on a cliff howling at the moon aspect ratio 9:16 and rough...</h3>
+            <p>Make a animated wolf sitting on a cliff howling at the moon aspect ratio 9:16 and roughly 12 seconds with clouds rolling in that style is perfect {&#x27;action&#x27;: &#x27;billing_confirm&#x27;, &#x27;timestamp&#x27;: &#x27;1786586276541&#x27;, &#x27;project_id&#x27;: &#x27;69576318368&#x27;, &#x27;user_visible&#x27;: False, &#x27;native_inputs&#x27;: {&#x27;text&#x27;: &#x27;&#x27;}, &#x27;billing_confirmation_policy&#x27;: {&#x27;mode&#x27;: &#x27;threshold&#x27;}, &#x27;billing_confirmation_response&#x27;: {&#x27;decision&#x27;: &#x27;approve&#x27;, &#x27;confirmation_id&#x27;: ...</p>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">状态</span>
+            <strong>来自 trace 输入</strong>
+            
+          <details class="related-calls">
+            <summary>1 个关联调用 <span><a class="call-chip" href="#chain" data-call="1">#1</a></span></summary>
+            <div class="related-call-list">
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="1">#1</a>
+                  <strong>read_file</strong>
+                  <span></span>
+                </div>
+                <p>/.skills/0/capability-discovery-skill/SKILL.md offset= limit=None</p>
+                <p class="muted">1 --- 2 name: capability-discovery-skill 3 description: &#x27;You MUST read this skill&#x27;&#x27;s full instructions before acting - do not rely on this ...</p>
+                
+              </div>
+            </div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+
+      <article class="biz-node">
+        <div class="biz-marker warn">2</div>
+        <div class="biz-card warn-card">
+          <div class="biz-main">
+            <div class="biz-kicker">前置规则</div>
+            <h3>读取了 15 个 skill/reference 文件</h3>
+            <p>当前静态 reference 覆盖为 14/14，显式 lint 调用为 0。完整判断仍以报告里的 Skill & Reference Read Audit 为准。</p>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">读取调用</span>
+            <strong>15 次 read_file</strong>
+            
+          <details class="related-calls">
+            <summary>8 个关联调用 <span><a class="call-chip" href="#chain" data-call="1">#1</a><a class="call-chip" href="#chain" data-call="2">#2</a><a class="call-chip" href="#chain" data-call="3">#3</a><a class="call-chip" href="#chain" data-call="4">#4</a><a class="call-chip" href="#chain" data-call="5">#5</a><a class="call-chip" href="#chain" data-call="6">#6</a>…</span></summary>
+            <div class="related-call-list">
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="1">#1</a>
+                  <strong>read_file</strong>
+                  <span></span>
+                </div>
+                <p>/.skills/0/capability-discovery-skill/SKILL.md offset= limit=None</p>
+                <p class="muted">1 --- 2 name: capability-discovery-skill 3 description: &#x27;You MUST read this skill&#x27;&#x27;s full instructions before acting - do not rely on this ...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="2">#2</a>
+                  <strong>read_file</strong>
+                  <span></span>
+                </div>
+                <p>/.skills/0/brainstorm-skill/SKILL.md offset= limit=None</p>
+                <p class="muted">1 --- 2 name: brainstorm-skill 3 description: Creative direction development plus the mandatory URL-video approval owner. For URL-backed vi...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="3">#3</a>
+                  <strong>read_file</strong>
+                  <span></span>
+                </div>
+                <p>/.skills/0/brainstorm-skill/references/image-generation-guide.md offset= limit=None</p>
+                <p class="muted">1 --- 2 id: image-generation-guide 3 description: &quot;Executable image generation contract for image_generate routing, reference preservation,...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="4">#4</a>
+                  <strong>read_file</strong>
+                  <span></span>
+                </div>
+                <p>/.skills/0/brainstorm-skill/references/creative-ideation-principles.md offset= limit=None</p>
+                <p class="muted">1 # Content 2 3 ## Contents 4 5 - **1. The &quot;Tight Brief&quot; Principle** - constraint is freedom; vague briefs need anchoring before exploratio...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="5">#5</a>
+                  <strong>read_file</strong>
+                  <span></span>
+                </div>
+                <p>/.skills/0/brainstorm-skill/references/creative-brief-contract.md offset= limit=None</p>
+                <p class="muted">1 # Creative Brief v1 Contract 2 3 Read completely before writing or handing off a Creative Brief. 4 5 # Runtime Shape 6 7 Write one immuta...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="6">#6</a>
+                  <strong>read_file</strong>
+                  <span></span>
+                </div>
+                <p>/.skills/0/brainstorm-skill/references/creative-rhythm-design.md offset= limit=None</p>
+                <p class="muted">1 # Creative Density and Rhythm Planning 2 3 Use this reference to turn a locked concept into a macro beat curve. Brainstorm owns the audie...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="16">#16</a>
+                  <strong>read_file</strong>
+                  <span></span>
+                </div>
+                <p>/.skills/0/script-skill/SKILL.md offset= limit=None</p>
+                <p class="muted">1 --- 2 name: script-skill 3 description: Plan every new video at sequence level from a locked creative direction or production-ready brief...</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="17">#17</a>
+                  <strong>read_file</strong>
+                  <span></span>
+                </div>
+                <p>/.skills/0/script-skill/references/video-models-routing.md offset= limit=None</p>
+                <p class="muted">1 --- 2 id: video-models-routing 3 description: &quot;Executable video model routing contract for HappyHorse, Seedance Fast, Seedance, and Kling...</p>
+                
+              </div>
+            </div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+
+      <article class="biz-node">
+        <div class="biz-marker good">3</div>
+        <div class="biz-card ">
+          <div class="biz-main">
+            <div class="biz-kicker">生成与素材</div>
+            <h3>image_generate x1, video_generate x1</h3>
+            <p>本地提取到 7 个媒体文件，资产清单记录 2 个生成/交付资产；首个资产：<code>wolf_style_frame</code>。</p>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">生成调用</span>
+            <strong>2 次</strong>
+            
+          <details class="related-calls">
+            <summary>2 个关联调用 <span><a class="call-chip" href="#chain" data-call="13">#13</a><a class="call-chip" href="#chain" data-call="19">#19</a></span></summary>
+            <div class="related-call-list">
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="13">#13</a>
+                  <strong>image_generate</strong>
+                  <span></span>
+                </div>
+                <p>name=wolf_style_frame; seedream/seedream-4-5-251128; mode=None; size=</p>
+                <p class="muted">ok=True error=none file=/projects/69576318368/workspace/assets/wolf_style_frame_20260813T015641_70e38daa.png</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="19">#19</a>
+                  <strong>video_generate</strong>
+                  <span></span>
+                </div>
+                <p>name=wolf_howl_clip; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=12; sound=on; aspect=</p>
+                <p class="muted">ok=True error=none file=/projects/69576318368/workspace/assets/wolf_howl_clip_20260813T020218_e36c3589.mp4</p>
+                
+              </div>
+            </div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+
+      <article class="biz-node">
+        <div class="biz-marker good">4</div>
+        <div class="biz-card ">
+          <div class="biz-main">
+            <div class="biz-kicker">风险信号</div>
+            <h3>4 个需人工确认的关键风险</h3>
+            <p>自动规则未识别本案的 HyperFrames 序列结构问题；报告确认首版黑屏、时长翻倍、错误交付和投诉后错查源片。</p>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">问题调用</span>
+            <strong>4 个</strong>
+            
+          <details class="related-calls">
+            <summary>0 个关联调用 <span></span></summary>
+            <div class="related-call-list"></div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+
+      <article class="biz-node">
+        <div class="biz-marker good">5</div>
+        <div class="biz-card ">
+          <div class="biz-main">
+            <div class="biz-kicker">交付与证据</div>
+            <h3>最终/组装调用汇总</h3>
+            <p>看板现在只展示当前 case 的真实媒体与调用，不再复用固定 sticker 案例文案。</p>
+            <div class="biz-media wide"><figure class="evidence-media"><video src="case-data/cases/69576318368/media/first-final-black.mp4" controls muted loop playsinline></video><figcaption>first-final-black.mp4</figcaption></figure><figure class="evidence-media"><img src="case-data/cases/69576318368/media/first-final-sprite.jpg" alt="first-final-sprite.jpg" loading="lazy"><figcaption>first-final-sprite.jpg</figcaption></figure></div>
+          </div>
+          <div class="biz-proof">
+            <span class="biz-label">交付调用</span>
+            <strong>8 次</strong>
+            
+          <details class="related-calls">
+            <summary>8 个关联调用 <span><a class="call-chip" href="#chain" data-call="14">#14</a><a class="call-chip" href="#chain" data-call="28">#28</a><a class="call-chip" href="#chain" data-call="29">#29</a><a class="call-chip" href="#chain" data-call="32">#32</a><a class="call-chip" href="#chain" data-call="39">#39</a><a class="call-chip" href="#chain" data-call="40">#40</a>…</span></summary>
+            <div class="related-call-list">
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="14">#14</a>
+                  <strong>add_attachments</strong>
+                  <span></span>
+                </div>
+                <p>wolf_style_frame_20260813T015641_70e38daa.png</p>
+                <p class="muted">[{&quot;asset_id&quot;: &quot;a_JwCrrDX&quot;, &quot;mime_type&quot;: &quot;image/jpeg&quot;, &quot;name&quot;: &quot;wolf_style_frame_20260813T015641_70e38daa.png&quot;}]</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="28">#28</a>
+                  <strong>submit_render</strong>
+                  <span></span>
+                </div>
+                <p>html=/projects/69576318368/workspace/composition.html; output=None; fps=None; format=None; quality=None</p>
+                <p class="muted">success job=a41gh73t status=pending warnings=0</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="29">#29</a>
+                  <strong>query_render</strong>
+                  <span></span>
+                </div>
+                <p>job_id=a41gh73t</p>
+                <p class="muted">success=True status=done asset=None file=/projects/69576318368/workspace/assets/Wolf_Howl_-_Final.mp4</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="32">#32</a>
+                  <strong>show_final_video</strong>
+                  <span></span>
+                </div>
+                <p>file_path=/projects/69576318368/workspace/assets/Wolf_Howl_-_Final.mp4</p>
+                <p class="muted">a_4V6PBjM</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="39">#39</a>
+                  <strong>submit_render</strong>
+                  <span></span>
+                </div>
+                <p>html=/projects/69576318368/workspace/composition.html; output=None; fps=None; format=None; quality=None</p>
+                <p class="muted">success job=9obsx35x status=pending warnings=0</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="40">#40</a>
+                  <strong>query_render</strong>
+                  <span></span>
+                </div>
+                <p>job_id=9obsx35x</p>
+                <p class="muted">success=True status=running asset=None file=</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="41">#41</a>
+                  <strong>query_render</strong>
+                  <span></span>
+                </div>
+                <p>job_id=9obsx35x</p>
+                <p class="muted">success=True status=done asset=None file=/projects/69576318368/workspace/assets/Wolf_Howl_-_Final.mp4</p>
+                
+              </div>
+            
+              <div class="call-mini ">
+                <div class="call-mini-top">
+                  <a class="call-chip" href="#chain" data-call="42">#42</a>
+                  <strong>show_final_video</strong>
+                  <span></span>
+                </div>
+                <p>file_path=/projects/69576318368/workspace/assets/Wolf_Howl_-_Final.mp4</p>
+                <p class="muted">a_z1RDG1n</p>
+                
+              </div>
+            </div>
+          </details>
+        
+          </div>
+        </div>
+      </article>
+    </div>
+      </section>
+
+      <section id="evidence">
+        <h2>问题证据卡</h2>
+        <div class="evidence-grid">
+      <article class="evidence-card">
+        <div class="evidence-title">用户输入</div>
+        <p>Make a animated wolf sitting on a cliff howling at the moon aspect ratio 9:16 and roughly 12 seconds with clouds rolling in that style is perfect {&#x27;action&#x27;: &#x27;billing_confirm&#x27;, &#x27;timestamp&#x27;: &#x27;1786586276541&#x27;, &#x27;project_id&#x27;:...</p>
+        <a href="#overview">查看 trace 概览</a>
+      </article>
+      <article class="evidence-card">
+        <div class="evidence-title">生成调用</div>
+        <p>image_generate x1, video_generate x1；资产清单 2 条，本地媒体 7 个。</p>
+        <a href="#prompts">查看生成参数</a>
+      </article>
+      <article class="evidence-card warn-card">
+        <div class="evidence-title">规则读取</div>
+        <p>读取文件 15 个；静态 reference 覆盖 14/14。这块用于快速扫查，深度结论以 markdown 报告为准。</p>
+        <a href="#skills">看 skill 读取审计</a>
+      </article>
+      <article class="evidence-card ">
+        <div class="evidence-title">风险调用</div>
+          <p>自动规则未识别本案的 HyperFrames 序列结构问题；请以 Markdown 复核报告为准。</p>
+        <a href="#chain">查看调用链</a>
+      </article>
+    </div>
+      </section>
+
+      <section id="overview">
+        <h2>两轮会话概览</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Start UTC</th><th>Trace</th><th>User Input</th><th>Tools</th><th>Latency</th></tr></thead>
+            <tbody>
+        <tr>
+          <td></td>
+          <td><code>tool-chain.json</code><br><span class="muted">metabase</span></td>
+          <td></td>
+          <td>42</td>
+          <td>s</td>
+        </tr>
+        
+
+        <tr>
+          <td>2026-08-13T09:54:22.183441+08:00</td>
+          <td><code>messages.json</code><br><span class="muted">thread_09733867467_69576318368_01KZWD7QAWYGNXTC7M9ERGS9GD</span></td>
+          <td>Make a animated wolf sitting on a cliff howling at the moon
+aspect ratio 9:16 and roughly 12 seconds with clouds rolling in
+that style is perfect
+{&#x27;action&#x27;: &#x27;billing_confirm&#x27;, &#x27;timestamp&#x27;: &#x27;1786586276541&#x27;, &#x27;project_id&#x27;: &#x27;69576318368&#x27;, &#x27;user_visible&#x27;: False, &#x27;native_inputs&#x27;: {&#x27;text&#x27;: &#x27;&#x27;}, &#x27;billing_confirmation_policy&#x27;: {&#x27;mode&#x27;: &#x27;threshold&#x27;}, &#x27;billing_confirmation_response&#x27;: {&#x27;decision&#x27;: &#x27;approve&#x27;, &#x27;confirmation_id&#x27;: &#x27;billing_50488d905dd35c58b7173c59f4f62928&#x27;}}
+the wolf isnt there just the sound
+{&#x27;comments&#x27;: {&#x27;texts&#x27;: {&#x27;final_video_id&#x27;: &#x27;a_4V6PBjM&#x27;, &#x27;single_comments&#x27;: [{&#x27;text&#x27;: &#x27;no wolf in frame&#x27;, &#x27;frame&#x27;: {&#x27;timestamp&#x27;: 2.43, &#x27;marker_coordinate_ratio&#x27;: {&#x27;x&#x27;: 0, &#x27;y&#x27;: 0}}, &#x27;timestamp&#x27;: &#x27;1786586696347&#x27;}]}}, &#x27;timestamp&#x27;: &#x27;1786586696347&#x27;, &#x27;project_id&#x27;: &#x27;69576318368&#x27;, &#x27;native_inputs&#x27;: {&#x27;text&#x27;: &#x27;&#x27;}, &#x27;billing_confirmation_policy&#x27;: {&#x27;mode&#x27;: &#x27;threshold&#x27;}}</td>
+          <td>0</td>
+          <td>s</td>
+        </tr>
+        </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="assets">
+        <h2>素材预览</h2>
+        <div class="grid-assets">
+    <article class="asset-card">
+      <div class="asset-preview"><video src="case-data/cases/69576318368/media/first-final-black.mp4" controls muted loop playsinline></video></div>
+      <div class="asset-body">
+        <h3>first-final-black.mp4</h3>
+        <p>video/mp4 · 628.7 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/69576318368/media/first-final-sprite.jpg" alt="first-final-sprite.jpg" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>first-final-sprite.jpg</h3>
+        <p>image/jpeg · 7.4 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/69576318368/media/fixed-final-sprite.jpg" alt="fixed-final-sprite.jpg" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>fixed-final-sprite.jpg</h3>
+        <p>image/jpeg · 80.2 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><video src="case-data/cases/69576318368/media/fixed-final.mp4" controls muted loop playsinline></video></div>
+      <div class="asset-body">
+        <h3>fixed-final.mp4</h3>
+        <p>video/mp4 · 3995.4 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/69576318368/media/fixed-frame-check.jpg" alt="fixed-frame-check.jpg" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>fixed-frame-check.jpg</h3>
+        <p>image/jpeg · 279.9 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><video src="case-data/cases/69576318368/media/source-wolf-howl.mp4" controls muted loop playsinline></video></div>
+      <div class="asset-body">
+        <h3>source-wolf-howl.mp4</h3>
+        <p>video/mp4 · 1795.9 KB</p>
+      </div>
+    </article>
+    
+
+    <article class="asset-card">
+      <div class="asset-preview"><img src="case-data/cases/69576318368/media/style-frame.jpg" alt="style-frame.jpg" loading="lazy"></div>
+      <div class="asset-body">
+        <h3>style-frame.jpg</h3>
+        <p>image/jpeg · 846.9 KB</p>
+      </div>
+    </article>
+    </div>
+      </section>
+
+      <section id="prompts">
+        <h2>资产记录与 Prompt</h2>
+        <div class="grid-assets">
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">image</span>
+            <span class="badge muted-badge"></span>
+            <span class="badge muted-badge">seedream</span>
+          </div>
+          <h3>wolf_style_frame</h3>
+          <p class="mono">seedream-4-5-251128</p>
+          <p>Painterly 2D animated illustration, Studio Ghibli style graphic novel aesthetic. A lone wolf stands as a bold dark silhouette on the jagged edge of a rocky cliff, head raised in a full howl, neck stretched upward toward the sky. A massive luminous full moon dominates the upper frame, glowing pale silver-white with soft texture. Deep midnight blue and indigo sky fills the background. Dramatic dark ink-washed storm clouds roll across the frame, partially veiling the moon with swirling volumetric shapes. Soft silver rim light outlines the wolf from the moonlight. Rocky cliff edges rendered with expressive loose brushstroke texture. No text, no watermark. Cinematic vertical composition, pure atmosphere and mood.</p>
+        </article>
+        
+
+        <article class="prompt-card">
+          <div class="row">
+            <span class="badge">video</span>
+            <span class="badge muted-badge"></span>
+            <span class="badge muted-badge">seedance</span>
+          </div>
+          <h3>wolf_howl_clip</h3>
+          <p class="mono">doubao-seedance-2-0-260128</p>
+          <p>Painterly 2D animated scene in Studio Ghibli illustration style. A lone wolf stands as a bold dark silhouette on a jagged rocky cliff edge against a deep midnight blue and indigo night sky. A massive luminous full moon glows large in the upper frame with soft silver-white light. The scene opens with dramatic dark ink-washed storm clouds slowly rolling in from the edges, drifting with weight and volume across the sky, partially veiling the moon. Image 1 provides the visual style reference. After a few seconds the wolf slowly lifts its head upward, neck stretching into a full classic howl pose. As it begins to howl, the moon brightens momentarily as clouds part around it, casting silver rim light along the wolf&#x27;s silhouette. Clouds continue to surge and swirl past. The final moments hold on the howling wolf silhouette against the glowing moon with clouds drifting slowly across the frame. Wind sound, wolf howl echoing into the night, low ambient atmospheric audio. No speech, no dialogue, no background music, no soundtrack, no musical score.</p>
+        </article>
+        </div>
+      </section>
+
+      <section>
+        <h2>生成/渲染主链路</h2>
+        
+        <div class="step good">
+          <div><strong>image_generate</strong> <span></span></div>
+          <p>name=wolf_style_frame; seedream/seedream-4-5-251128; mode=None; size=</p>
+          <p class="muted">ok=True error=none file=/projects/69576318368/workspace/assets/wolf_style_frame_20260813T015641_70e38daa.png</p>
+        </div>
+        
+
+        <div class="step good">
+          <div><strong>video_generate</strong> <span></span></div>
+          <p>name=wolf_howl_clip; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=12; sound=on; aspect=</p>
+          <p class="muted">ok=True error=none file=/projects/69576318368/workspace/assets/wolf_howl_clip_20260813T020218_e36c3589.mp4</p>
+        </div>
+        
+      </section>
+
+      <section id="chain">
+        <h2>技术明细</h2>
+        <details id="chainDetails" class="technical-details">
+          <summary>展开完整调用表（42 行）</summary>
+          <div class="controls">
+            <select id="toolFilter">
+              <option value="">All tools (42)</option>
+              <option value="__problem">Only flagged (0)</option>
+              <option value="add_attachments">add_attachments (1)</option>
+<option value="analyze_file_content">analyze_file_content (3)</option>
+<option value="edit_file">edit_file (1)</option>
+<option value="image_generate">image_generate (1)</option>
+<option value="ls">ls (2)</option>
+<option value="media_probe">media_probe (2)</option>
+<option value="query_render">query_render (3)</option>
+<option value="read_file">read_file (15)</option>
+<option value="render_frame">render_frame (1)</option>
+<option value="show_final_video">show_final_video (2)</option>
+<option value="submit_render">submit_render (2)</option>
+<option value="video_generate">video_generate (1)</option>
+<option value="write_file">write_file (3)</option>
+<option value="write_todos">write_todos (5)</option>
+            </select>
+            <input id="searchBox" placeholder="搜索工具、参数、结果、问题">
+          </div>
+          <div class="table-wrap">
+            <table id="chainTable">
+              <thead><tr><th>#</th><th>UTC</th><th>Trace</th><th>Tool</th><th>Key params</th><th>Result</th><th>Problem</th></tr></thead>
+              <tbody>
+        <tr id="call-1" class="" data-index="1" data-tool="read_file" data-problem="0">
+          <td>1</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/capability-discovery-skill/SKILL.md offset= limit=None</td>
+          <td>1 --- 2 name: capability-discovery-skill 3 description: &#x27;You MUST read this skill&#x27;&#x27;s full instructions before acting - do not rely on this summary. Read it at the start of any cre...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-2" class="" data-index="2" data-tool="read_file" data-problem="0">
+          <td>2</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/brainstorm-skill/SKILL.md offset= limit=None</td>
+          <td>1 --- 2 name: brainstorm-skill 3 description: Creative direction development plus the mandatory URL-video approval owner. For URL-backed video work, always capture once, inspect a...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-3" class="" data-index="3" data-tool="read_file" data-problem="0">
+          <td>3</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/brainstorm-skill/references/image-generation-guide.md offset= limit=None</td>
+          <td>1 --- 2 id: image-generation-guide 3 description: &quot;Executable image generation contract for image_generate routing, reference preservation, schema fields, prompt hygiene, readable...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-4" class="" data-index="4" data-tool="read_file" data-problem="0">
+          <td>4</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/brainstorm-skill/references/creative-ideation-principles.md offset= limit=None</td>
+          <td>1 # Content 2 3 ## Contents 4 5 - **1. The &quot;Tight Brief&quot; Principle** - constraint is freedom; vague briefs need anchoring before exploration 6 - **2. The &quot;Would I Click This?&quot; Tes...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-5" class="" data-index="5" data-tool="read_file" data-problem="0">
+          <td>5</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/brainstorm-skill/references/creative-brief-contract.md offset= limit=None</td>
+          <td>1 # Creative Brief v1 Contract 2 3 Read completely before writing or handing off a Creative Brief. 4 5 # Runtime Shape 6 7 Write one immutable snapshot: 8 9 ```text 10 &lt;project_la...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-6" class="" data-index="6" data-tool="read_file" data-problem="0">
+          <td>6</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/brainstorm-skill/references/creative-rhythm-design.md offset= limit=None</td>
+          <td>1 # Creative Density and Rhythm Planning 2 3 Use this reference to turn a locked concept into a macro beat curve. Brainstorm owns the audience-level plan; script-skill owns sequen...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-7" class="" data-index="7" data-tool="write_todos" data-problem="0">
+          <td>7</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Lock the creative brief for the animated wolf howl=in_progress; Generate a style frame to preview the visual direction=pending; Generate the video segments=pending; Assemble and deliver the final video=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Lock the creative brief for the animated wolf howl&#x27;, &#x27;status&#x27;: &#x27;in_progress&#x27;}, {&#x27;content&#x27;: &#x27;Generate a style frame to preview the visual directi...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-8" class="" data-index="8" data-tool="ls" data-problem="0">
+          <td>8</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">ls</span></td>
+          <td>{&#x27;path&#x27;: &#x27;/projects/69576318368&#x27;}</td>
+          <td>[&#x27;/projects/69576318368/workspace&#x27;, &#x27;/projects/69576318368/conversation_history&#x27;, &#x27;/projects/69576318368/PROJECT.md&#x27;]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-9" class="" data-index="9" data-tool="write_file" data-problem="0">
+          <td>9</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">write_file</span></td>
+          <td>/projects/69576318368/wolf_howl__creative_brief__locked__R01.md; content=0 chars</td>
+          <td>Error: file_not_found: /projects/69576318368/wolf_howl__creative_brief__locked__R01.md</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-10" class="" data-index="10" data-tool="ls" data-problem="0">
+          <td>10</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">ls</span></td>
+          <td>{&#x27;path&#x27;: &#x27;/projects/69576318368/workspace&#x27;}</td>
+          <td>[&#x27;/projects/69576318368/workspace/assets/&#x27;]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-11" class="" data-index="11" data-tool="write_file" data-problem="0">
+          <td>11</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">write_file</span></td>
+          <td>/projects/69576318368/workspace/wolf_howl__creative_brief__locked__R01.md; content=0 chars</td>
+          <td>Updated file /projects/69576318368/workspace/wolf_howl__creative_brief__locked__R01.md</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-12" class="" data-index="12" data-tool="write_todos" data-problem="0">
+          <td>12</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Lock the creative brief for the animated wolf howl=completed; Generate a style frame to preview the visual direction=in_progress; Generate the video segments=pending; Assemble and deliver the final video=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Lock the creative brief for the animated wolf howl&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;Generate a style frame to preview the visual direction...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-13" class="" data-index="13" data-tool="image_generate" data-problem="0">
+          <td>13</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">image_generate</span></td>
+          <td>name=wolf_style_frame; seedream/seedream-4-5-251128; mode=None; size=</td>
+          <td>ok=True error=none file=/projects/69576318368/workspace/assets/wolf_style_frame_20260813T015641_70e38daa.png</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-14" class="" data-index="14" data-tool="add_attachments" data-problem="0">
+          <td>14</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">add_attachments</span></td>
+          <td>wolf_style_frame_20260813T015641_70e38daa.png</td>
+          <td>[{&quot;asset_id&quot;: &quot;a_JwCrrDX&quot;, &quot;mime_type&quot;: &quot;image/jpeg&quot;, &quot;name&quot;: &quot;wolf_style_frame_20260813T015641_70e38daa.png&quot;}]</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-15" class="" data-index="15" data-tool="write_todos" data-problem="0">
+          <td>15</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Lock the creative brief for the animated wolf howl=completed; Generate a style frame to preview the visual direction=completed; Generate the video segments=in_progress; Assemble and deliver the final video=pending</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Lock the creative brief for the animated wolf howl&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;Generate a style frame to preview the visual direction...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-16" class="" data-index="16" data-tool="read_file" data-problem="0">
+          <td>16</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/script-skill/SKILL.md offset= limit=None</td>
+          <td>1 --- 2 name: script-skill 3 description: Plan every new video at sequence level from a locked creative direction or production-ready brief. Own the script, shot breakdown, readab...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-17" class="" data-index="17" data-tool="read_file" data-problem="0">
+          <td>17</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/script-skill/references/video-models-routing.md offset= limit=None</td>
+          <td>1 --- 2 id: video-models-routing 3 description: &quot;Executable video model routing contract for HappyHorse, Seedance Fast, Seedance, and Kling. Uses Strategy Genes for hard routing r...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-18" class="" data-index="18" data-tool="read_file" data-problem="0">
+          <td>18</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/script-skill/references/video-generation-execution.md offset= limit=None</td>
+          <td>1 --- 2 id: video-generation-execution 3 description: &quot;Executable video generation execution contract for audio strategy, sequence planning, prompt payload discipline, voice-sourc...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-19" class="" data-index="19" data-tool="video_generate" data-problem="0">
+          <td>19</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">video_generate</span></td>
+          <td>name=wolf_howl_clip; seedance/doubao-seedance-2-0-260128; mode=reference2video; duration=12; sound=on; aspect=</td>
+          <td>ok=True error=none file=/projects/69576318368/workspace/assets/wolf_howl_clip_20260813T020218_e36c3589.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-20" class="" data-index="20" data-tool="write_todos" data-problem="0">
+          <td>20</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Lock the creative brief for the animated wolf howl=completed; Generate a style frame to preview the visual direction=completed; Generate the video segments=completed; Assemble and deliver the final video=in_progress</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Lock the creative brief for the animated wolf howl&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;Generate a style frame to preview the visual direction...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-21" class="" data-index="21" data-tool="read_file" data-problem="0">
+          <td>21</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/SKILL.md offset= limit=None</td>
+          <td>1 --- 2 name: motion-skill 3 description: Compose and render final HTML video from locked production materials. Own composition.html, final packaging, DOM-native text/data/UI, ele...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-22" class="" data-index="22" data-tool="read_file" data-problem="0">
+          <td>22</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/references/tech-html.md offset= limit=100</td>
+          <td>1 # tech-html — Motion HTML authoring guide 2 3 For `data-*` attribute shapes see `tech-data-attributes.md`. 4 5 **In-HTML resource references:** 6 - Media, image, subtitle, poste...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-23" class="" data-index="23" data-tool="read_file" data-problem="0">
+          <td>23</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/references/design-visual-styles.md offset= limit=80</td>
+          <td>1 # Visual style library 2 3 Named visual identities. Pick one when the user gives you a style brief; let the brand override anywhere it conflicts. 4 5 **Design receipt ids.** The...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-24" class="" data-index="24" data-tool="read_file" data-problem="0">
+          <td>24</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/references/afc-multimodal-policy.md offset= limit=60</td>
+          <td>1 # AFC Multimodal Policy 2 3 Read this file before analyzing user uploads, generated images/videos, or footage used to build a Visual Map. 4 5 ## Responsibility boundary 6 7 - Th...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-25" class="" data-index="25" data-tool="read_file" data-problem="0">
+          <td>25</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/.skills/0/motion-skill/references/tech-data-attributes.md offset= limit=60</td>
+          <td>1 Every `data-*` attribute Motion recognises is listed below. Write only attrs from these tables; unknown Motion-looking attrs may be rejected before render. 2 3 ### Composition r...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-26" class="" data-index="26" data-tool="media_probe" data-problem="0">
+          <td>26</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/69576318368/workspace/assets/wolf_howl_clip_20260813T020218_e36c3589.mp4</td>
+          <td>{&quot;success&quot;: true, &quot;ffprobe&quot;: {&quot;streams&quot;: [{&quot;index&quot;: 0, &quot;codec_name&quot;: &quot;h264&quot;, &quot;codec_long_name&quot;: &quot;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&quot;, &quot;profile&quot;: &quot;High&quot;, &quot;codec_type&quot;: &quot;vide...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-27" class="" data-index="27" data-tool="write_file" data-problem="0">
+          <td>27</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">write_file</span></td>
+          <td>/projects/69576318368/workspace/composition.html; content=0 chars</td>
+          <td>Updated file /projects/69576318368/workspace/composition.html</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-28" class="" data-index="28" data-tool="submit_render" data-problem="0">
+          <td>28</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">submit_render</span></td>
+          <td>html=/projects/69576318368/workspace/composition.html; output=None; fps=None; format=None; quality=None</td>
+          <td>success job=a41gh73t status=pending warnings=0</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-29" class="" data-index="29" data-tool="query_render" data-problem="0">
+          <td>29</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">query_render</span></td>
+          <td>job_id=a41gh73t</td>
+          <td>success=True status=done asset=None file=/projects/69576318368/workspace/assets/Wolf_Howl_-_Final.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-30" class="" data-index="30" data-tool="media_probe" data-problem="0">
+          <td>30</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">media_probe</span></td>
+          <td>file=/projects/69576318368/workspace/assets/Wolf_Howl_-_Final.mp4</td>
+          <td>duration=None codec=None NonexNone pix_fmt=None</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-31" class="" data-index="31" data-tool="write_todos" data-problem="0">
+          <td>31</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">write_todos</span></td>
+          <td>Lock the creative brief for the animated wolf howl=completed; Generate a style frame to preview the visual direction=completed; Generate the video segments=completed; Assemble and deliver the final video=completed</td>
+          <td>Updated todo list to [{&#x27;content&#x27;: &#x27;Lock the creative brief for the animated wolf howl&#x27;, &#x27;status&#x27;: &#x27;completed&#x27;}, {&#x27;content&#x27;: &#x27;Generate a style frame to preview the visual direction...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-32" class="" data-index="32" data-tool="show_final_video" data-problem="0">
+          <td>32</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">show_final_video</span></td>
+          <td>file_path=/projects/69576318368/workspace/assets/Wolf_Howl_-_Final.mp4</td>
+          <td>a_4V6PBjM</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-33" class="" data-index="33" data-tool="analyze_file_content" data-problem="0">
+          <td>33</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=</td>
+          <td>Yes, a wolf is visible in the video, first as a dark silhouette, then as a backlit silhouette outlined by bright moonlight when the moon brightens. ### Evidence 1. 0.0-5.6s: A dar...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-34" class="" data-index="34" data-tool="analyze_file_content" data-problem="0">
+          <td>34</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=</td>
+          <td>### Conclusion This frame is entirely solid black, completely empty of any visible content, and no wolf is present. ### Evidence 1. The full area of the frame is uniformly pure bl...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-35" class="" data-index="35" data-tool="read_file" data-problem="0">
+          <td>35</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">read_file</span></td>
+          <td>/projects/69576318368/workspace/composition.html offset= limit=None</td>
+          <td>1 &lt;!doctype html&gt; 2 &lt;html data-composition-id=&quot;wolf-howl&quot; data-width=&quot;1080&quot; data-height=&quot;1920&quot;&gt; 3 &lt;head&gt; 4 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js&quot;&gt;...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-36" class="" data-index="36" data-tool="edit_file" data-problem="0">
+          <td>36</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">edit_file</span></td>
+          <td>/projects/69576318368/workspace/composition.html; replace 0-&gt;0 chars</td>
+          <td>Successfully replaced 1 instance(s) of the string in &#x27;/projects/69576318368/workspace/composition.html&#x27;</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-37" class="" data-index="37" data-tool="render_frame" data-problem="0">
+          <td>37</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">render_frame</span></td>
+          <td>html=/projects/69576318368/workspace/composition.html; output=wolf_frame_check; time=2.43</td>
+          <td>success=True asset=None file=/projects/69576318368/workspace/assets/wolf_frame_check.png</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-38" class="" data-index="38" data-tool="analyze_file_content" data-problem="0">
+          <td>38</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">analyze_file_content</span></td>
+          <td>file=None; query=</td>
+          <td>The wolf is visible. All listed elements are present in the frame. Evidence: 1. A black wolf silhouette with glowing yellow eyes, facing left, stands on the rock in the lower-midd...</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-39" class="" data-index="39" data-tool="submit_render" data-problem="0">
+          <td>39</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">submit_render</span></td>
+          <td>html=/projects/69576318368/workspace/composition.html; output=None; fps=None; format=None; quality=None</td>
+          <td>success job=9obsx35x status=pending warnings=0</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-40" class="" data-index="40" data-tool="query_render" data-problem="0">
+          <td>40</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">query_render</span></td>
+          <td>job_id=9obsx35x</td>
+          <td>success=True status=running asset=None file=</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-41" class="" data-index="41" data-tool="query_render" data-problem="0">
+          <td>41</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">query_render</span></td>
+          <td>job_id=9obsx35x</td>
+          <td>success=True status=done asset=None file=/projects/69576318368/workspace/assets/Wolf_Howl_-_Final.mp4</td>
+          <td></td>
+        </tr>
+        
+
+        <tr id="call-42" class="" data-index="42" data-tool="show_final_video" data-problem="0">
+          <td>42</td>
+          <td></td>
+          <td><code>metabase</code></td>
+          <td><span class="tool-pill">show_final_video</span></td>
+          <td>file_path=/projects/69576318368/workspace/assets/Wolf_Howl_-_Final.mp4</td>
+          <td>a_z1RDG1n</td>
+          <td></td>
+        </tr>
+        </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section id="skills">
+        <h2>Skills / Reference 读取逻辑</h2>
+        <div class="callout">这是自动生成的通用 skill/reference 读取摘要。它只展示 trace 里实际 read_file 的覆盖情况和静态期望；case 级根因请以 markdown 分析报告为准。</div>
+        <h3>实际 read_file</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>File</th><th>Lines</th><th>Complete</th><th>Notes</th></tr></thead>
+            <tbody>
+        <tr>
+          <td>1</td>
+          <td><code>/.skills/0/capability-discovery-skill/SKILL.md</code></td>
+          <td>1-3</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>2</td>
+          <td><code>/.skills/0/brainstorm-skill/SKILL.md</code></td>
+          <td>1-3</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>3</td>
+          <td><code>/.skills/0/brainstorm-skill/references/image-generation-guide.md</code></td>
+          <td>1-13</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>4</td>
+          <td><code>/.skills/0/brainstorm-skill/references/creative-ideation-principles.md</code></td>
+          <td>1-9</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>5</td>
+          <td><code>/.skills/0/brainstorm-skill/references/creative-brief-contract.md</code></td>
+          <td>1-18</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>6</td>
+          <td><code>/.skills/0/brainstorm-skill/references/creative-rhythm-design.md</code></td>
+          <td>1-10</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>16</td>
+          <td><code>/.skills/0/script-skill/SKILL.md</code></td>
+          <td>1-3</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>17</td>
+          <td><code>/.skills/0/script-skill/references/video-models-routing.md</code></td>
+          <td>1-10</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>18</td>
+          <td><code>/.skills/0/script-skill/references/video-generation-execution.md</code></td>
+          <td>1-10</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>21</td>
+          <td><code>/.skills/0/motion-skill/SKILL.md</code></td>
+          <td>1-4</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>22</td>
+          <td><code>/.skills/0/motion-skill/references/tech-html.md</code></td>
+          <td>1-9</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>23</td>
+          <td><code>/.skills/0/motion-skill/references/design-visual-styles.md</code></td>
+          <td>1-5</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>24</td>
+          <td><code>/.skills/0/motion-skill/references/afc-multimodal-policy.md</code></td>
+          <td>1-8</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>25</td>
+          <td><code>/.skills/0/motion-skill/references/tech-data-attributes.md</code></td>
+          <td>1-8</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        
+
+        <tr>
+          <td>35</td>
+          <td><code>/projects/69576318368/workspace/composition.html</code></td>
+          <td>1-14</td>
+          <td>Yes</td>
+          <td>complete read</td>
+        </tr>
+        </tbody>
+          </table>
+        </div>
+        <h3 style="margin-top:18px">应读 reference 覆盖</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Expected Reference</th><th>Why Relevant</th><th>Status</th><th>Notes</th></tr></thead>
+            <tbody>
+        <tr class="">
+          <td><code>/.skills/0/brainstorm-skill/SKILL.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/brainstorm-skill/references/creative-brief-contract.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/brainstorm-skill/references/creative-ideation-principles.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/brainstorm-skill/references/creative-rhythm-design.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/brainstorm-skill/references/image-generation-guide.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/capability-discovery-skill/SKILL.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/motion-skill/SKILL.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/motion-skill/references/afc-multimodal-policy.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/motion-skill/references/design-visual-styles.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/motion-skill/references/tech-data-attributes.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/motion-skill/references/tech-html.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/script-skill/SKILL.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/script-skill/references/video-generation-execution.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        
+
+        <tr class="">
+          <td><code>/.skills/0/script-skill/references/video-models-routing.md</code></td>
+          <td>Actually opened in trace</td>
+          <td>read</td>
+          <td>No static expectation set; see actual read_file table</td>
+        </tr>
+        </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <aside class="side">
+      <section>
+        <h2>风险点</h2>
+        <ul class="issue-list"></ul>
+      </section>
+      <section>
+        <h2>Tool Mix</h2>
+        <div class="mini-grid"><div class="mini-stat"><span>read_file</span><strong>15</strong></div>
+<div class="mini-stat"><span>write_todos</span><strong>5</strong></div>
+<div class="mini-stat"><span>analyze_file_content</span><strong>3</strong></div>
+<div class="mini-stat"><span>query_render</span><strong>3</strong></div>
+<div class="mini-stat"><span>write_file</span><strong>3</strong></div>
+<div class="mini-stat"><span>ls</span><strong>2</strong></div>
+<div class="mini-stat"><span>media_probe</span><strong>2</strong></div>
+<div class="mini-stat"><span>show_final_video</span><strong>2</strong></div>
+<div class="mini-stat"><span>submit_render</span><strong>2</strong></div>
+<div class="mini-stat"><span>add_attachments</span><strong>1</strong></div>
+<div class="mini-stat"><span>edit_file</span><strong>1</strong></div>
+<div class="mini-stat"><span>image_generate</span><strong>1</strong></div>
+<div class="mini-stat"><span>render_frame</span><strong>1</strong></div>
+<div class="mini-stat"><span>video_generate</span><strong>1</strong></div></div>
+      </section>
+      <section>
+        <h2>结论</h2>
+        <p class="muted">本看板的业务链路已从当前 case 的 trace、assets 和本地媒体动态生成；它用于快速定位调用链证据，不再携带固定 sticker 案例结论。</p>
+        <p class="muted">显式 lint 调用次数：<strong>0</strong>。</p>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+const toolFilter = document.getElementById('toolFilter');
+const searchBox = document.getElementById('searchBox');
+const rows = Array.from(document.querySelectorAll('#chainTable tbody tr'));
+function applyFilters() {
+  const tool = toolFilter.value;
+  const q = searchBox.value.trim().toLowerCase();
+  rows.forEach(row => {
+    const toolOk = !tool || (tool === '__problem' ? row.dataset.problem === '1' : row.dataset.tool === tool);
+    const textOk = !q || row.innerText.toLowerCase().includes(q);
+    row.classList.toggle('hidden', !(toolOk && textOk));
+  });
+}
+toolFilter.addEventListener('change', applyFilters);
+searchBox.addEventListener('input', applyFilters);
+document.querySelectorAll('[data-filter]').forEach(link => {
+  link.addEventListener('click', () => {
+    toolFilter.value = link.dataset.filter;
+    applyFilters();
+  });
+});
+document.querySelectorAll('[data-call]').forEach(link => {
+  link.addEventListener('click', () => {
+    const details = document.getElementById('chainDetails');
+    if (details) details.open = true;
+    const target = document.getElementById(`call-${link.dataset.call}`);
+    if (!target) return;
+    toolFilter.value = '';
+    searchBox.value = '';
+    applyFilters();
+    document.querySelectorAll('.call-highlight').forEach(row => row.classList.remove('call-highlight'));
+    target.classList.add('call-highlight');
+    setTimeout(() => target.classList.remove('call-highlight'), 2600);
+  });
+});
+const roundTabs = Array.from(document.querySelectorAll('[data-round]'));
+const roundPanels = Array.from(document.querySelectorAll('[data-round-panel]'));
+roundTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    const selected = tab.dataset.round;
+    roundTabs.forEach(item => {
+      const active = item.dataset.round === selected;
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    roundPanels.forEach(panel => {
+      panel.hidden = panel.dataset.roundPanel !== selected;
+    });
+  });
+});
+</script>
+</body>
+</html>
